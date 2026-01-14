@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nature Care Impex - Sustainable Solutions</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190433/photo_2025-12-31_22-10-18_k0jfc7.jpg"
+                    alt="Natural Care Impex">
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link active">Home</a></li>
+                <li><a href="products.html" class="nav-link">Products</a></li>
+                <li><a href="track-order.html" class="nav-link">Track Order</a></li>
+                <li><a href="about.html" class="nav-link">Our Story</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Carousel -->
+    <section class="hero-carousel">
+        <div class="carousel-track">
+            <!-- Slide 1: Cocopeat (Updated Image) -->
+            <div class="carousel-slide active"
+                style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&q=80&w=1920');">
+                <div class="hero-content">
+                    <h1>Premium Cocopeat Solutions</h1>
+                    <p>High-quality substrate for stronger roots and better yield.</p>
+                    <div class="cta-group">
+                        <a href="products.html" class="btn btn-primary">Shop Cocopeat</a>
+                        <a href="track-order.html" class="btn btn-secondary">Track Order</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2: Bamboo (Updated Image) -->
+            <div class="carousel-slide"
+                style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://media.istockphoto.com/id/492995390/photo/tree-roots-in-a-forest.jpg?s=612x612&w=0&k=20&c=hjLGbEZX8xQTrMCJQN-QWlaLUp7B_AP_vvK0skZ4jI4=');">
+                <div class="hero-content">
+                    <h1>Sustainable Bamboo Products</h1>
+                    <p>Eco-friendly alternatives for a plastic-free lifestyle.</p>
+                    <div class="cta-group">
+                        <a href="products.html" class="btn btn-primary">Explore Bamboo</a>
+                        <a href="contact.html" class="btn btn-secondary">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: Organic/General -->
+            <div class="carousel-slide"
+                style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=1920&q=80');">
+                <div class="hero-content">
+                    <h1>100% Organic & Natural</h1>
+                    <p>Nurturing the planet with biodegradable solutions.</p>
+                    <div class="cta-group">
+                        <a href="about.html" class="btn btn-primary">Our Story</a>
+                        <a href="products.html" class="btn btn-secondary">View Products</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <button class="carousel-btn prev">&#10094;</button>
+        <button class="carousel-btn next">&#10095;</button>
+
+        <div class="carousel-dots">
+            <span class="dot active" data-slide="0"></span>
+            <span class="dot" data-slide="1"></span>
+            <span class="dot" data-slide="2"></span>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="section-padding featured-products reveal-up">
+        <div class="container">
+            <div class="text-center section-header">
+                <h2>Curated Collection</h2>
+                <p>Discover our premium range of sustainable essentials.</p>
+            </div>
+
+            <div id="featured-grid" class="product-grid">
+                <!-- Static products for GitHub Pages -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190898/photo_2025-12-31_22-18-07_c2hs4m.jpg" alt="Cocopeat 5kg Block">
+                    </div>
+                    <div class="product-info">
+                        <h3>Cocopeat 5kg Block</h3>
+                        <p class="product-category">Cocopeat</p>
+                        <p class="product-price">₹250</p>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://cdn.moglix.com/p/B5wXshH1wq7TS-xxlarge.jpg" alt="Coco Grow Bags">
+                    </div>
+                    <div class="product-info">
+                        <h3>Coco Grow Bags</h3>
+                        <p class="product-category">Eco-Care</p>
+                        <p class="product-price">₹90</p>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbYHHF-lKgdGS9ftR4AwALD27xwGSO9hsldw&s" alt="Bamboo Period Pads">
+                    </div>
+                    <div class="product-info">
+                        <h3>Bamboo Period Pads</h3>
+                        <p class="product-category">Bamboo</p>
+                        <p class="product-price">₹120</p>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center" style="margin-top: 30px;">
+                <a href="products.html" class="btn btn-primary">View Full Catalogue</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Notice -->
+    <!-- Sustainability Highlights -->
+    <section class="section-padding sustainability reveal-up">
+        <div class="container">
+            <div class="text-center section-header">
+                <h2>The Art of Sustainability</h2>
+                <p>Crafted with conscience, designed for the future.</p>
+            </div>
+
+            <div class="highlights-container">
+                <div class="highlight-item">
+                    <span class="highlight-icon">🌱</span>
+                    <h3 class="highlight-title">Purely Organic</h3>
+                    <p>Sourced from the heart of nature, untouched by synthetics.</p>
+                </div>
+                <div class="highlight-item">
+                    <span class="highlight-icon">♻️</span>
+                    <h3 class="highlight-title">Zero Waste</h3>
+                    <p>A closed-loop philosophy that honours the earth.</p>
+                </div>
+                <div class="highlight-item">
+                    <span class="highlight-icon">🌍</span>
+                    <h3 class="highlight-title">Global Standards</h3>
+                    <p>Excellence delivered to discerning clients worldwide.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="reveal-up">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Nature Care Impex</h3>
+                    <p>Leading exporter of coir and natural products.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-icon">F</a>
+                        <a href="#" class="social-icon">I</a>
+                        <a href="#" class="social-icon">L</a>
+                    </div>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li>📧 naturecareimpex@gmail.com</li>
+                        <li>📞 9345540373</li>
+                        <li>📍 Shop 11A bajar street, kottakuppam, vanur taluk, villupuram district, tamilnadu, 605104</li>
+                        <li>GSTIN: 33AAYFN7568G</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 Nature Care Impex. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/github-pages-fallback.js"></script>
+    <script>
+        // Demo alert for GitHub Pages
+        function showDemoAlert() {
+            alert('🚀 This is a demo version!\n\nFor full functionality including:\n• Real order processing\n• Database integration\n• Payment handling\n• Owner portal\n\nContact us for deployment of the complete system!');
+        }
+        
+        // Simple carousel functionality
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dots = document.querySelectorAll('.dot');
+        
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            currentSlide = (n + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+        }
+        
+        document.querySelector('.carousel-btn.next').addEventListener('click', () => {
+            showSlide(currentSlide + 1);
+        });
+        
+        document.querySelector('.carousel-btn.prev').addEventListener('click', () => {
+            showSlide(currentSlide - 1);
+        });
+        
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => showSlide(index));
+        });
+        
+        // Auto-advance carousel
+        setInterval(() => {
+            showSlide(currentSlide + 1);
+        }, 5000);
+    </script>
+</body>
+
+</html>

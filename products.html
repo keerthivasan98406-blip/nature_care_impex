@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Products - Nature Care Impex</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+
+    <!-- Back Button -->
+    <a href="javascript:history.back()" class="back-button">Back</a>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190433/photo_2025-12-31_22-10-18_k0jfc7.jpg"
+                    alt="Natural Care Impex">
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="products.html" class="nav-link active">Products</a></li>
+                <li><a href="about.html" class="nav-link">About Us</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="section-padding" style="padding-bottom: 20px; padding-top: 30px;">
+        <div class="container">
+            <div class="products-header-flex" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+                <div class="text-center" style="flex: 1;">
+                    <h1>Our Products</h1>
+                    <p>Explore our range of sustainable coir and bamboo products.</p>
+                </div>
+                <div style="flex-shrink: 0; margin-top: -10px;">
+                    <a href="track-order.html" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; font-size: 0.85rem;">
+                        📦 Track Order
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="section-padding" style="padding-top: 20px; min-height: 60vh;">
+        <div class="container">
+
+            <!-- Filters -->
+            <div class="filters-container">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="cocopeat">Cocopeat</button>
+                <button class="filter-btn" data-filter="bamboo">Bamboo</button>
+                <button class="filter-btn" data-filter="eco-care">Eco-Care</button>
+            </div>
+
+            <!-- Grid -->
+            <div id="products-grid" class="product-grid">
+                <!-- Static products for GitHub Pages -->
+                <div class="product-card" data-category="cocopeat">
+                    <div class="product-image">
+                        <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190898/photo_2025-12-31_22-18-07_c2hs4m.jpg" alt="Cocopeat 5kg Block">
+                    </div>
+                    <div class="product-info">
+                        <h3>Cocopeat 5kg Block</h3>
+                        <p class="product-category">Cocopeat</p>
+                        <p class="product-description">Premium washed cocopeat blocks ideal for potting mixes and hydroponics.</p>
+                        <p class="product-price">₹250</p>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
+                    </div>
+                </div>
+                
+                <div class="product-card" data-category="eco-care">
+                    <div class="product-image">
+                        <img src="https://cdn.moglix.com/p/B5wXshH1wq7TS-xxlarge.jpg" alt="Coco Grow Bags">
+                    </div>
+                    <div class="product-info">
+                        <h3>Coco Grow Bags</h3>
+                        <p class="product-category">Eco-Care</p>
+                        <p class="product-description">Ready-to-use grow bags for greenhouse cultivation.</p>
+                        <p class="product-price">₹90</p>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
+                    </div>
+                </div>
+                
+                <div class="product-card" data-category="cocopeat">
+                    <div class="product-image">
+                        <img src="https://images.unsplash.com/photo-1591857177580-dc82b9e4e119?auto=format&fit=crop&w=800&q=80" alt="Coco Bricks">
+                    </div>
+                    <div class="product-info">
+                        <h3>Coco Bricks (650g)</h3>
+                        <p class="product-category">Cocopeat</p>
+                        <p class="product-description">Compact 650g briquettes, perfect for home gardening.</p>
+                        <p class="product-price">₹180</p>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
+                    </div>
+                </div>
+                
+                <div class="product-card" data-category="bamboo">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbYHHF-lKgdGS9ftR4AwALD27xwGSO9hsldw&s" alt="Bamboo Period Pads">
+                    </div>
+                    <div class="product-info">
+                        <h3>Bamboo Period Pads</h3>
+                        <p class="product-category">Bamboo</p>
+                        <p class="product-description">Comfortable, absorbent, and eco-friendly bamboo period pads.</p>
+                        <p class="product-price">₹120</p>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
+                    </div>
+                </div>
+                
+                <div class="product-card" data-category="cocopeat">
+                    <div class="product-image">
+                        <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190712/photo_2025-12-31_22-14-34_zu8ayl.jpg" alt="12 Coco Bricks">
+                    </div>
+                    <div class="product-info">
+                        <h3>12 Coco Bricks 400g</h3>
+                        <p class="product-category">Cocopeat</p>
+                        <p class="product-description">High-quality 400g coco peat bricks, perfect for home gardening.</p>
+                        <p class="product-price">₹200</p>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Nature Care Impex</h3>
+                    <p>Leading exporter of coir and natural products.</p>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li>📧 naturecareimpex@gmail.com</li>
+                        <li>📞 9345540373</li>
+                        <li>📍 Shop 11A bajar street, kottakuppam, vanur taluk, villupuram district, tamilnadu, 605104</li>
+                        <li>GSTIN: 33AAYFN7568G</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 Nature Care Impex. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Demo alert for GitHub Pages
+        function showDemoAlert() {
+            alert('🚀 This is a demo version!\n\nFor full functionality including:\n• Real order processing\n• Database integration\n• Payment handling\n• Owner portal\n\nContact us for deployment of the complete system!');
+        }
+        
+        // Product filtering
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const productCards = document.querySelectorAll('.product-card');
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    const filter = this.getAttribute('data-filter');
+                    
+                    productCards.forEach(card => {
+                        if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
