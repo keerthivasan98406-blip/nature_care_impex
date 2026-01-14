@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order - Nature Care Impex</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .track-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .track-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .track-btn {
+            padding: 12px;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .track-btn:hover {
+            background: #27ae60;
+        }
+        .demo-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190433/photo_2025-12-31_22-10-18_k0jfc7.jpg"
+                    alt="Natural Care Impex">
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="products.html" class="nav-link">Products</a></li>
+                <li><a href="about.html" class="nav-link">About Us</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Track Order Section -->
+    <section class="track-container">
+        <h1>📦 Track Your Order</h1>
+        <p>Enter your Order ID or Email to track your order status</p>
+
+        <div class="demo-notice">
+            <h3>📱 GitHub Pages Demo Version</h3>
+            <p>This is a demo version. The full system includes real-time order tracking with database integration.</p>
+            <p><strong>For actual order tracking, contact us directly!</strong></p>
+        </div>
+
+        <div class="track-form">
+            <div class="form-group">
+                <label for="trackMethod">Search by:</label>
+                <select id="trackMethod">
+                    <option value="orderId">Order ID</option>
+                    <option value="email">Email Address</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="trackInput" id="trackLabel">Order ID</label>
+                <input type="text" id="trackInput" placeholder="e.g., ORD-1234567890" required>
+            </div>
+
+            <button class="track-btn" onclick="trackOrder()">Track Order</button>
+        </div>
+
+        <!-- Demo Results Section -->
+        <div id="trackResults" style="display: none;">
+            <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <h3>📦 Sample Order: ORD-DEMO123</h3>
+                <p><strong>Product:</strong> Cocopeat 5kg Block</p>
+                <p><strong>Customer:</strong> Demo Customer</p>
+                <p><strong>Amount:</strong> ₹250</p>
+                <p><strong>Status:</strong> <span style="color: #2ecc71; font-weight: bold;">Shipped</span></p>
+                
+                <div style="margin-top: 20px;">
+                    <h4>Order Timeline:</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 5px 0;">✅ Order Placed - Jan 8, 2025</li>
+                        <li style="padding: 5px 0;">✅ Payment Confirmed - Jan 8, 2025</li>
+                        <li style="padding: 5px 0;">✅ Processing - Jan 9, 2025</li>
+                        <li style="padding: 5px 0;">✅ Shipped - Jan 10, 2025</li>
+                        <li style="padding: 5px 0; color: #999;">⏳ Delivered - Expected Jan 12, 2025</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Nature Care Impex</h3>
+                    <p>Leading exporter of coir and natural products.</p>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li>📧 naturecareimpex@gmail.com</li>
+                        <li>📞 9345540373</li>
+                        <li>📍 Shop 11A bajar street, kottakuppam, vanur taluk, villupuram district, tamilnadu, 605104</li>
+                        <li>GSTIN: 33AAYFN7568G</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 Nature Care Impex. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Update label when search method changes
+        document.getElementById('trackMethod').addEventListener('change', function() {
+            const label = document.getElementById('trackLabel');
+            const input = document.getElementById('trackInput');
+            if (this.value === 'orderId') {
+                label.textContent = 'Order ID';
+                input.placeholder = 'e.g., ORD-1234567890';
+            } else {
+                label.textContent = 'Email Address';
+                input.placeholder = 'e.g., customer@example.com';
+            }
+        });
+
+        function trackOrder() {
+            const input = document.getElementById('trackInput').value.trim();
+            const resultsDiv = document.getElementById('trackResults');
+
+            if (!input) {
+                alert('Please enter a search value');
+                return;
+            }
+
+            // Show demo results
+            resultsDiv.style.display = 'block';
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Allow Enter key to track order
+        document.getElementById('trackInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') trackOrder();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,43 @@
+{
+  "name": "nature-care-impex",
+  "version": "1.0.0",
+  "description": "Nature Care Impex - Sustainable Solutions Website with Owner Portal",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "live-server --port=3000 --open=index.html --watch=.",
+    "serve": "live-server --port=8080 --open=index.html",
+    "owner": "live-server --port=3000 --open=owner.html",
+    "build": "echo \"Static website - no build needed. Files ready for deployment.\"",
+    "test": "echo \"Website functionality tests would go here\"",
+    "install-deps": "npm install",
+    "setup": "npm install && node server.js",
+    "mongodb": "echo \"MongoDB connection handled via .env file\""
+  },
+  "keywords": [
+    "nature",
+    "eco-friendly",
+    "cocopeat",
+    "bamboo",
+    "sustainable",
+    "ecommerce",
+    "owner-portal"
+  ],
+  "author": "Nature Care Impex",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.22.1",
+    "mongoose": "^8.0.0",
+    "multer": "^1.4.5-lts.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/nature-care-impex"
+  },
+  "homepage": "https://github.com/yourusername/nature-care-impex"
+}

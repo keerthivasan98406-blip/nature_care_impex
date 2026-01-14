@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Nature Care Impex</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css">
+
+    <style>
+        .about-split {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            margin-bottom: 40px;
+        }
+
+        .about-split:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .about-text {
+            flex: 1;
+        }
+
+        .about-image {
+            flex: 1;
+            height: 400px;
+            border-radius: var(--radius-sharp);
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @media (max-width: 768px) {
+
+            .about-split,
+            .about-split:nth-child(even) {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .about-image {
+                width: 100%;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Back Button -->
+    <a href="javascript:history.back()" class="back-button">Back</a>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190433/photo_2025-12-31_22-10-18_k0jfc7.jpg"
+                    alt="Natural Care Impex">
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="products.html" class="nav-link">Products</a></li>
+                <li><a href="about.html" class="nav-link active">About Us</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <section class="section-padding">
+        <div class="container">
+
+            <!-- Story Section -->
+            <div class="about-split">
+                <div class="about-text">
+                    <h2>Who We Are</h2>
+                    <p>Nature Care Impex is a premier exporter of eco-friendly coir and natural products based in
+                        India. Founded with a vision to promote sustainable living, we specialize in high-quality coco
+                        peat, grow bags, and bamboo products.</p>
+                    <br>
+                    <p>Our journey began with a simple belief: nature provides everything we need to grow and thrive. By
+                        harnessing the power of renewable resources like coconut husk, we are reducing global plastic
+                        dependency and promoting organic agriculture.</p>
+                </div>
+                <div class="about-image">
+                    <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80"
+                        alt="Coconut Farm">
+                </div>
+            </div>
+
+            <!-- Sustainability Section -->
+            <div class="about-split">
+                <div class="about-text">
+                    <h2>Our Sustainability Promise</h2>
+                    <p>We are committed to a zero-waste manufacturing process. Our coir products are 100% biodegradable
+                        and sourced from ethically managed farms.</p>
+                    <br>
+                    <p>Every product you buy supports eco-friendly farming practices and helps reduce your carbon
+                        footprint. We believe in transparency, quality, and a greener future for generations to come.
+                    </p>
+                </div>
+                <div class="about-image">
+                    <img src="https://images.unsplash.com/photo-1545239351-ef35f43d514b?auto=format&fit=crop&w=800&q=80"
+                        alt="Sprout in soil">
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Nature Care Impex</h3>
+                    <p>Leading exporter of coir and natural products.</p>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li>📧 naturecareimpex@gmail.com</li>
+                        <li>📞 9345540373</li>
+                        <li>📍 Shop 11A bajar street, kottakuppam, vanur taluk, villupuram district, tamilnadu, 605104</li>
+                        <li>GSTIN: 33AAYFN7568G</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 Nature Care Impex. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

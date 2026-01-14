@@ -115,7 +115,7 @@
                         <h3>Cocopeat 5kg Block</h3>
                         <p class="product-category">Cocopeat</p>
                         <p class="product-price">₹250</p>
-                        <a href="products.html" class="btn btn-primary">Buy Now</a>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
                     </div>
                 </div>
                 
@@ -127,7 +127,7 @@
                         <h3>Coco Grow Bags</h3>
                         <p class="product-category">Eco-Care</p>
                         <p class="product-price">₹90</p>
-                        <a href="products.html" class="btn btn-primary">Buy Now</a>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
                     </div>
                 </div>
                 
@@ -139,7 +139,7 @@
                         <h3>Bamboo Period Pads</h3>
                         <p class="product-category">Bamboo</p>
                         <p class="product-price">₹120</p>
-                        <a href="products.html" class="btn btn-primary">Buy Now</a>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
                     </div>
                 </div>
             </div>
@@ -147,6 +147,23 @@
             <div class="text-center" style="margin-top: 30px;">
                 <a href="products.html" class="btn btn-primary">View Full Catalogue</a>
             </div>
+        </div>
+    </section>
+
+    <!-- Demo Notice -->
+    <section class="section-padding" style="background: #fff3cd; border: 2px solid #ffeaa7;">
+        <div class="container text-center">
+            <h2>📱 GitHub Pages Demo Version</h2>
+            <p><strong>This is a static demo version.</strong> The full-stack version includes:</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                <div>✅ Real database integration</div>
+                <div>✅ Order processing system</div>
+                <div>✅ Payment handling</div>
+                <div>✅ Owner portal management</div>
+                <div>✅ Real-time order tracking</div>
+                <div>✅ Sales analytics</div>
+            </div>
+            <p><strong>Contact us for the full version deployment!</strong></p>
         </div>
     </section>
 
@@ -222,6 +239,11 @@
     <!-- Scripts -->
     <script src="js/github-pages-fallback.js"></script>
     <script>
+        // Demo alert for GitHub Pages
+        function showDemoAlert() {
+            alert('🚀 This is a demo version!\n\nFor full functionality including:\n• Real order processing\n• Database integration\n• Payment handling\n• Owner portal\n\nContact us for deployment of the complete system!');
+        }
+        
         // Simple carousel functionality
         let currentSlide = 0;
         const slides = document.querySelectorAll('.carousel-slide');

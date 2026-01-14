@@ -62,6 +62,13 @@
         </div>
     </section>
 
+    <!-- Demo Notice -->
+    <section style="background: #fff3cd; padding: 15px 0; border: 1px solid #ffeaa7;">
+        <div class="container text-center">
+            <p><strong>📱 GitHub Pages Demo:</strong> This shows static product data. The full version includes real database integration and order processing.</p>
+        </div>
+    </section>
+
     <!-- Products Section -->
     <section class="section-padding" style="padding-top: 20px; min-height: 60vh;">
         <div class="container">
@@ -86,7 +93,7 @@
                         <p class="product-category">Cocopeat</p>
                         <p class="product-description">Premium washed cocopeat blocks ideal for potting mixes and hydroponics.</p>
                         <p class="product-price">₹250</p>
-                        <a href="contact.html" class="btn btn-primary">Contact Us</a>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
                     </div>
                 </div>
                 
@@ -99,7 +106,7 @@
                         <p class="product-category">Eco-Care</p>
                         <p class="product-description">Ready-to-use grow bags for greenhouse cultivation.</p>
                         <p class="product-price">₹90</p>
-                        <a href="contact.html" class="btn btn-primary">Contact Us</a>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
                     </div>
                 </div>
                 
@@ -112,7 +119,7 @@
                         <p class="product-category">Cocopeat</p>
                         <p class="product-description">Compact 650g briquettes, perfect for home gardening.</p>
                         <p class="product-price">₹180</p>
-                        <a href="contact.html" class="btn btn-primary">Contact Us</a>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
                     </div>
                 </div>
                 
@@ -125,7 +132,7 @@
                         <p class="product-category">Bamboo</p>
                         <p class="product-description">Comfortable, absorbent, and eco-friendly bamboo period pads.</p>
                         <p class="product-price">₹120</p>
-                        <a href="contact.html" class="btn btn-primary">Contact Us</a>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
                     </div>
                 </div>
                 
@@ -138,7 +145,7 @@
                         <p class="product-category">Cocopeat</p>
                         <p class="product-description">High-quality 400g coco peat bricks, perfect for home gardening.</p>
                         <p class="product-price">₹200</p>
-                        <a href="contact.html" class="btn btn-primary">Contact Us</a>
+                        <button class="btn btn-primary" onclick="showDemoAlert()">Buy Now</button>
                     </div>
                 </div>
             </div>
@@ -183,6 +190,11 @@
 
     <!-- Scripts -->
     <script>
+        // Demo alert for GitHub Pages
+        function showDemoAlert() {
+            alert('🚀 This is a demo version!\n\nFor full functionality including:\n• Real order processing\n• Database integration\n• Payment handling\n• Owner portal\n\nContact us for deployment of the complete system!');
+        }
+        
         // Product filtering
         document.addEventListener('DOMContentLoaded', function() {
             const filterBtns = document.querySelectorAll('.filter-btn');
