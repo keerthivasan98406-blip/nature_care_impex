@@ -606,6 +606,7 @@ async function loadOrders() {
                         })" title="View Details">👁️ View</button>` : 
                         `<button class="btn-small" onclick="editOrder('${order.id}')" title="Edit Order">✏️ Edit</button>`
                     }
+                    <button class="btn-small btn-danger" onclick="deleteOrder('${order.id}', '${order.source}')" title="Delete Order" style="background: #dc3545; color: white;">🗑️ Delete</button>
                 </td>
             </tr>
         `).join('');
@@ -1718,6 +1719,63 @@ function viewOrder(orderId) {
 function editOrder(orderId) {
     showNotification(`Editing order ${orderId}`, 'info');
 }
+
+// Delete Order Function
+async function deleteOrder(orderId, source) {
+    console.log('Deleting order:', orderId, 'from source:', source);
+    
+    // Confirm deletion
+    if (!confirm(`Are you sure you want to delete order ${orderId}?\n\nThis action cannot be undone.`)) {
+        return;
+    }
+    
+    try {
+        if (source === 'admin') {
+            // Delete from admin orders
+            const orderIndex = orders.findIndex(o => o.id === orderId);
+            if (orderIndex !== -1) {
+                orders.splice(orderIndex, 1);
+                showNotification(`Order ${orderId} deleted successfully!`, 'success');
+            } else {
+                showNotification('Order not found in admin orders', 'error');
+                return;
+            }
+        } else {
+            // Delete from customer orders (localStorage)
+            const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+            const orderIndex = customerOrders.findIndex(o => o.orderId === orderId);
+            
+            if (orderIndex !== -1) {
+                customerOrders.splice(orderIndex, 1);
+                localStorage.setItem('customerOrders', JSON.stringify(customerOrders));
+                showNotification(`Order ${orderId} deleted successfully!`, 'success');
+                
+                // Try to delete from database as well
+                if (window.apiService) {
+                    try {
+                        await window.apiService.deleteOrder(orderId);
+                        console.log('✅ Order deleted from database');
+                    } catch (error) {
+                        console.log('⚠️ Could not delete from database:', error.message);
+                    }
+                }
+            } else {
+                showNotification('Order not found in customer orders', 'error');
+                return;
+            }
+        }
+        
+        // Reload orders to refresh the display
+        await loadOrders();
+        
+    } catch (error) {
+        console.error('Error deleting order:', error);
+        showNotification('Error deleting order: ' + error.message, 'error');
+    }
+}
+
+// Make deleteOrder globally available
+window.deleteOrder = deleteOrder;
 
 // Enhanced editProduct function with full modal implementation
 function editProduct(productId) {
