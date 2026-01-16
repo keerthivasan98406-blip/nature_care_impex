@@ -13,7 +13,8 @@ connectDB();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Set proper MIME types for static files
 app.use((req, res, next) => {
@@ -23,28 +24,46 @@ app.use((req, res, next) => {
     res.type('text/css');
   } else if (req.path.endsWith('.html')) {
     res.type('text/html');
+  } else if (req.path.endsWith('.json')) {
+    res.type('application/json');
   }
   next();
 });
 
-// Serve static files with proper MIME types
-app.use(express.static(path.join(__dirname, '..'), {
+// API Routes FIRST (before static files)
+app.use('/api/orders', require('./routes/orders'));
+app.use('/api/products', require('./routes/products'));
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'Server running successfully', 
+    timestamp: new Date(),
+    database: 'connected',
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Serve static files from specific folders with proper MIME types
+app.use('/css', express.static(path.join(__dirname, '..', 'css'), {
   setHeaders: (res, filePath) => {
-    if (filePath.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript');
-    } else if (filePath.endsWith('.css')) {
+    if (filePath.endsWith('.css')) {
       res.setHeader('Content-Type', 'text/css');
     }
   }
 }));
 
-// Serve static files from html, css, js, and assets folders
-app.use('/html', express.static(path.join(__dirname, '..', 'html')));
-app.use('/css', express.static(path.join(__dirname, '..', 'css')));
-app.use('/js', express.static(path.join(__dirname, '..', 'js')));
+app.use('/js', express.static(path.join(__dirname, '..', 'js'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    }
+  }
+}));
+
 app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
 
-// Routes for HTML files - serve from root directory
+// HTML Routes - Explicitly serve from root directory
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
@@ -54,10 +73,12 @@ app.get('/index.html', (req, res) => {
 });
 
 app.get('/owner', (req, res) => {
+  console.log('📋 Serving owner portal from root');
   res.sendFile(path.join(__dirname, '..', 'owner.html'));
 });
 
 app.get('/owner.html', (req, res) => {
+  console.log('📋 Serving owner.html from root');
   res.sendFile(path.join(__dirname, '..', 'owner.html'));
 });
 
@@ -117,24 +138,20 @@ app.get('/track-order.html', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'track-order.html'));
 });
 
-// API Routes (if you add APIs later)
-app.use('/api/orders', require('./routes/orders'));
-app.use('/api/products', require('./routes/products'));
-
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'Server running successfully', timestamp: new Date() });
-});
-
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Error:', err.message);
-  res.status(500).json({ error: 'Internal Server Error', message: err.message });
+  console.error('❌ Error:', err.message);
+  res.status(500).json({ 
+    success: false,
+    error: 'Internal Server Error', 
+    message: err.message 
+  });
 });
 
-// 404 - Page not found (serve index.html as fallback)
+// 404 - Page not found
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'html', 'index.html'));
+  console.log('⚠️ 404 Not Found:', req.path);
+  res.status(404).sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
 // Start server
