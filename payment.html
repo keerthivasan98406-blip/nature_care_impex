@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Nature Care Impex</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+
+    <!-- Back Button -->
+    <a href="javascript:history.back()" class="back-button">Back</a>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190433/photo_2025-12-31_22-10-18_k0jfc7.jpg"
+                    alt="Natural Care Impex">
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="products.html" class="nav-link">Products</a></li>
+                <li><a href="about.html" class="nav-link">About Us</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Payment Section -->
+    <section class="section-padding">
+        <div class="container">
+            <div class="payment-wrapper">
+                <h1 class="page-title">Payment</h1>
+                
+                <!-- Order Summary -->
+                <div class="payment-order-summary">
+                    <h2>Order Summary</h2>
+                    <div class="order-summary-content">
+                        <div class="summary-item">
+                            <span class="label">Order ID:</span>
+                            <span id="payment-order-id" class="value">Loading...</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Product:</span>
+                            <span id="payment-product-name" class="value">Loading...</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Quantity:</span>
+                            <span id="payment-quantity" class="value">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Unit Price:</span>
+                            <span id="payment-unit-price" class="value">₹0</span>
+                        </div>
+                        <div class="summary-item total-item">
+                            <span class="label">Total Amount:</span>
+                            <span id="payment-total-amount" class="value">₹0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Details -->
+                <div class="customer-details-summary">
+                    <h3>Delivery Details</h3>
+                    <div class="customer-info">
+                        <div class="info-row">
+                            <strong>Name:</strong> <span id="customer-name-display">Loading...</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>Phone:</strong> <span id="customer-phone-display">Loading...</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>Email:</strong> <span id="customer-email-display">Loading...</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>Address:</strong> <span id="customer-address-display">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Methods -->
+                <div class="payment-methods-section">
+                    <h3>Payment Options</h3>
+                    
+                    <div class="payment-method-card active">
+                        <div class="payment-method-header">
+                            <input type="radio" name="payment-method" value="upi" checked>
+                            <label>UPI Payment</label>
+                        </div>
+                        
+                        <div class="payment-method-content">
+                            <!-- QR Code Section -->
+                            <div class="qr-payment-section">
+                                <div class="qr-code-container">
+                                    <img id="payment-qr-code" src="" alt="QR Code" class="qr-code">
+                                    <p class="qr-instruction">Scan QR code with any UPI app</p>
+                                </div>
+                                
+                                <!-- UPI Apps -->
+                                <div class="upi-apps-section">
+                                    <p class="apps-instruction">Or pay directly using:</p>
+                                    <div class="app-buttons">
+                                        <button class="upi-app paytm" onclick="payWithApp('paytm')">
+                                            <span>Paytm</span>
+                                        </button>
+                                        <button class="upi-app gpay" onclick="payWithApp('gpay')">
+                                            <span>Google Pay</span>
+                                        </button>
+                                        <button class="upi-app phonepe" onclick="payWithApp('phonepe')">
+                                            <span>PhonePe</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- UPI ID -->
+                                <div class="upi-id-section">
+                                    <p><strong>UPI ID:</strong> naturecareimpex@paytm</p>
+                                    <button class="copy-upi-btn" onclick="copyUpiId()">Copy UPI ID</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Confirmation -->
+                <div class="payment-confirmation-section">
+                    <h3>Payment Confirmation</h3>
+                    <p class="confirmation-instruction">After making the payment, please upload a screenshot to confirm your order.</p>
+                    
+                    <div class="screenshot-upload-area">
+                        <div class="upload-zone" onclick="document.getElementById('screenshot-input').click()">
+                            <div class="upload-content">
+                                <div class="upload-icon">📷</div>
+                                <p class="upload-text">Click to upload payment screenshot</p>
+                                <small class="upload-note">Supported: JPG, PNG (Max 5MB)</small>
+                            </div>
+                            <input type="file" id="screenshot-input" accept="image/*" style="display: none;" onchange="handleScreenshotUpload(event)">
+                        </div>
+                        
+                        <div id="screenshot-preview" class="screenshot-preview" style="display: none;">
+                            <img id="preview-image" src="" alt="Payment Screenshot">
+                            <button class="remove-screenshot-btn" onclick="removeScreenshot()">&times;</button>
+                            <div class="screenshot-success" style="text-align: center; margin-top: 15px;">
+                                <p style="color: #28a745; font-weight: 600; margin: 10px 0;">✅ Screenshot uploaded successfully!</p>
+                                <button id="confirm-payment-btn-alt" class="btn btn-primary" onclick="confirmPayment()" style="
+                                    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                                    padding: 12px 24px;
+                                    border: none;
+                                    border-radius: 6px;
+                                    color: white;
+                                    font-weight: 600;
+                                    cursor: pointer;
+                                    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+                                ">
+                                    ✅ Confirm Order
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="payment-actions">
+                    <a href="order-details.html" class="btn btn-secondary">Back to Order</a>
+                    <div class="confirm-order-section">
+                        <button id="confirm-payment-btn" class="btn btn-primary" onclick="confirmPayment()">
+                            ✅ Confirm Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Nature Care Impex</h3>
+                    <p>Leading exporter of coir and natural products.</p>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li>📧 naturecareimpex@gmail.com</li>
+                        <li>📞 9345540373</li>
+                        <li>📍 Shop 11A bajar street, kottakuppam, vanur taluk, villupuram district, tamilnadu, 605104
+                        </li>
+                        <li>GSTIN: 33AAYFN7568G</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 Nature Care Impex. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/api-service.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Load payment details when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPaymentPage();
+        });
+    </script>
+</body>
+
+</html>
