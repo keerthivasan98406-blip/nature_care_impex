@@ -120,8 +120,8 @@
                                     <p class="apps-instruction">Or pay directly using:</p>
                                     <div class="app-buttons" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin: 20px 0;">
                                         <button class="upi-app paytm" onclick="payWithApp('paytm')" style="
-                                            background: white;
-                                            border: 2px solid #00BAF2;
+                                            background: linear-gradient(135deg, #00BAF2 0%, #00A0E3 100%);
+                                            border: none;
                                             border-radius: 12px;
                                             padding: 15px 25px;
                                             cursor: pointer;
@@ -129,14 +129,16 @@
                                             display: flex;
                                             align-items: center;
                                             gap: 10px;
-                                            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                                        " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 4px 12px rgba(0,186,242,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
-                                            <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_%28standalone%29.svg" alt="Paytm" style="width: 32px; height: 32px;">
-                                            <span style="color: #00BAF2; font-weight: 600; font-size: 16px;">Paytm</span>
+                                            box-shadow: 0 2px 8px rgba(0,186,242,0.3);
+                                        " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 4px 16px rgba(0,186,242,0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,186,242,0.3)'">
+                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+                                            </svg>
+                                            <span style="color: white; font-weight: 600; font-size: 16px;">Paytm</span>
                                         </button>
                                         <button class="upi-app gpay" onclick="payWithApp('gpay')" style="
-                                            background: white;
-                                            border: 2px solid #4285F4;
+                                            background: linear-gradient(135deg, #4285F4 0%, #3367D6 100%);
+                                            border: none;
                                             border-radius: 12px;
                                             padding: 15px 25px;
                                             cursor: pointer;
@@ -144,14 +146,16 @@
                                             display: flex;
                                             align-items: center;
                                             gap: 10px;
-                                            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                                        " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 4px 12px rgba(66,133,244,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
-                                            <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="Google Pay" style="width: 32px; height: 32px;">
-                                            <span style="color: #4285F4; font-weight: 600; font-size: 16px;">Google Pay</span>
+                                            box-shadow: 0 2px 8px rgba(66,133,244,0.3);
+                                        " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 4px 16px rgba(66,133,244,0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(66,133,244,0.3)'">
+                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                                            </svg>
+                                            <span style="color: white; font-weight: 600; font-size: 16px;">Google Pay</span>
                                         </button>
                                         <button class="upi-app phonepe" onclick="payWithApp('phonepe')" style="
-                                            background: white;
-                                            border: 2px solid #5F259F;
+                                            background: linear-gradient(135deg, #5F259F 0%, #7C3BAD 100%);
+                                            border: none;
                                             border-radius: 12px;
                                             padding: 15px 25px;
                                             cursor: pointer;
@@ -159,10 +163,12 @@
                                             display: flex;
                                             align-items: center;
                                             gap: 10px;
-                                            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                                        " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 4px 12px rgba(95,37,159,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
-                                            <img src="https://www.phonepe.com/webstatic/6.8.0/static/media/phonepe-logo.d6224e8d.svg" alt="PhonePe" style="width: 32px; height: 32px;" onerror="this.style.display='none'">
-                                            <span style="color: #5F259F; font-weight: 600; font-size: 16px;">PhonePe</span>
+                                            box-shadow: 0 2px 8px rgba(95,37,159,0.3);
+                                        " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 4px 16px rgba(95,37,159,0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(95,37,159,0.3)'">
+                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                            </svg>
+                                            <span style="color: white; font-weight: 600; font-size: 16px;">PhonePe</span>
                                         </button>
                                     </div>
                                 </div>
