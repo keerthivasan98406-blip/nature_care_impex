@@ -92,6 +92,12 @@
     <section class="track-container">
         <h1>📦 Track Your Order</h1>
         <p>Enter your Order ID or Email to track your order status</p>
+        
+        <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4caf50;">
+            <p style="margin: 0; color: #2e7d32; font-size: 0.95rem;">
+                <strong>🌐 Real-Time Tracking:</strong> All orders are stored in our secure database and can be tracked from any device, anywhere.
+            </p>
+        </div>
 
         <div class="track-form">
             <div class="form-group">
@@ -199,15 +205,36 @@
             }
 
             // Show loading
-            resultsDiv.innerHTML = '<div style="text-align: center; padding: 40px;"><p>🔍 Searching for your order...</p></div>';
+            resultsDiv.innerHTML = '<div style="text-align: center; padding: 40px;"><p>🔍 Searching for your order in database...</p></div>';
             resultsDiv.style.display = 'block';
 
             try {
-                // Search in localStorage first
-                const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
-                console.log('Searching in', customerOrders.length, 'orders');
-                
                 let foundOrder = null;
+                
+                // PRIORITY 1: Try database first (for real-time multi-device access)
+                if (window.apiService && window.apiService.serverConnected) {
+                    console.log('🔍 Searching in database...');
+                    try {
+                        // Pass orderId or email based on search method
+                        const orderId = method === 'orderId' ? input : '';
+                        const email = method === 'email' ? input : '';
+                        
+                        const result = await window.apiService.trackOrder(orderId, email);
+                        if (result.success && result.data) {
+                            console.log('✅ Order found in database');
+                            foundOrder = result.data;
+                            displayOrderDetails(foundOrder);
+                            return;
+                        }
+                    } catch (error) {
+                        console.log('⚠️ Database search failed:', error.message);
+                    }
+                }
+                
+                // FALLBACK: Search in localStorage only if database unavailable
+                console.log('📱 Searching in localStorage (fallback)...');
+                const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+                console.log('Found', customerOrders.length, 'orders in localStorage');
                 
                 if (method === 'orderId') {
                     foundOrder = customerOrders.find(o => o.orderId === input);
@@ -219,23 +246,11 @@
                 }
 
                 if (foundOrder) {
+                    console.log('✅ Order found in localStorage');
                     displayOrderDetails(foundOrder);
                 } else {
-                    // Try API if available
-                    if (window.apiService) {
-                        try {
-                            const result = await window.apiService.trackOrder(input, method === 'email' ? input : '');
-                            if (result.success && result.data) {
-                                displayOrderDetails(result.data);
-                            } else {
-                                showNotFound();
-                            }
-                        } catch (error) {
-                            showNotFound();
-                        }
-                    } else {
-                        showNotFound();
-                    }
+                    console.log('❌ Order not found');
+                    showNotFound();
                 }
             } catch (error) {
                 console.error('Error tracking order:', error);

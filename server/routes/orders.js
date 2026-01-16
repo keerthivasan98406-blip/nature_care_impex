@@ -95,17 +95,35 @@ router.post('/track', async (req, res) => {
     try {
         const { orderId, email } = req.body;
         
-        if (!orderId || !email) {
+        // Allow search by either orderId OR email
+        if (!orderId && !email) {
             return res.status(400).json({
                 success: false,
-                message: 'Order ID and email are required'
+                message: 'Either Order ID or email is required'
             });
         }
 
-        const order = await Order.findOne({
-            orderId: orderId,
-            'customerDetails.customerEmail': email
-        });
+        let query = {};
+        
+        // Search by orderId only
+        if (orderId && !email) {
+            query = { orderId: orderId };
+        }
+        // Search by email only
+        else if (email && !orderId) {
+            query = { 'customerDetails.customerEmail': email };
+        }
+        // Search by both (most secure)
+        else {
+            query = {
+                orderId: orderId,
+                'customerDetails.customerEmail': email
+            };
+        }
+
+        console.log('🔍 Tracking order with query:', query);
+
+        const order = await Order.findOne(query);
 
         if (!order) {
             return res.status(404).json({
@@ -113,6 +131,8 @@ router.post('/track', async (req, res) => {
                 message: 'Order not found with provided details'
             });
         }
+
+        console.log('✅ Order found:', order.orderId);
 
         res.json({
             success: true,
