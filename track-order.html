@@ -173,6 +173,7 @@
         </div>
     </footer>
 
+    <script src="js/api-service.js"></script>
     <script>
         // Update label when search method changes
         document.getElementById('trackMethod').addEventListener('change', function() {
@@ -187,8 +188,9 @@
             }
         });
 
-        function trackOrder() {
+        async function trackOrder() {
             const input = document.getElementById('trackInput').value.trim();
+            const method = document.getElementById('trackMethod').value;
             const resultsDiv = document.getElementById('trackResults');
 
             if (!input) {
@@ -196,9 +198,172 @@
                 return;
             }
 
-            // Show demo results
+            // Show loading
+            resultsDiv.innerHTML = '<div style="text-align: center; padding: 40px;"><p>🔍 Searching for your order...</p></div>';
             resultsDiv.style.display = 'block';
+
+            try {
+                // Search in localStorage first
+                const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+                console.log('Searching in', customerOrders.length, 'orders');
+                
+                let foundOrder = null;
+                
+                if (method === 'orderId') {
+                    foundOrder = customerOrders.find(o => o.orderId === input);
+                } else {
+                    const email = input.toLowerCase();
+                    foundOrder = customerOrders.find(o => 
+                        (o.customerDetails?.customerEmail || o.customerDetails?.email || '').toLowerCase() === email
+                    );
+                }
+
+                if (foundOrder) {
+                    displayOrderDetails(foundOrder);
+                } else {
+                    // Try API if available
+                    if (window.apiService) {
+                        try {
+                            const result = await window.apiService.trackOrder(input, method === 'email' ? input : '');
+                            if (result.success && result.data) {
+                                displayOrderDetails(result.data);
+                            } else {
+                                showNotFound();
+                            }
+                        } catch (error) {
+                            showNotFound();
+                        }
+                    } else {
+                        showNotFound();
+                    }
+                }
+            } catch (error) {
+                console.error('Error tracking order:', error);
+                resultsDiv.innerHTML = '<div style="background: #fee; padding: 20px; border-radius: 10px; text-align: center;"><p>❌ Error searching for order. Please try again.</p></div>';
+            }
+        }
+
+        function displayOrderDetails(order) {
+            const resultsDiv = document.getElementById('trackResults');
+            const customerName = order.customerDetails?.customerName || order.customerDetails?.name || 'Customer';
+            const customerEmail = order.customerDetails?.customerEmail || order.customerDetails?.email || 'N/A';
+            const customerPhone = order.customerDetails?.customerPhone || order.customerDetails?.phone || 'N/A';
+            const productName = order.product?.name || 'Product';
+            const quantity = order.customerDetails?.quantity || 1;
+            const total = order.totalAmount || order.customerDetails?.total || 0;
+            const status = order.status || 'pending';
+            const orderDate = order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A';
+            
+            const statusColors = {
+                'pending': '#f39c12',
+                'payment_submitted': '#3498db',
+                'screenshot': '#3498db',
+                'processing': '#9b59b6',
+                'shipped': '#2ecc71',
+                'delivered': '#27ae60',
+                'cancelled': '#e74c3c'
+            };
+            
+            const statusLabels = {
+                'pending': 'Pending',
+                'payment_submitted': 'Payment Submitted',
+                'screenshot': 'Payment Received',
+                'processing': 'Processing',
+                'shipped': 'Shipped',
+                'delivered': 'Delivered',
+                'cancelled': 'Cancelled'
+            };
+            
+            resultsDiv.innerHTML = `
+                <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="color: #2ecc71; margin-bottom: 20px;">✅ Order Found!</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div>
+                            <p><strong>Order ID:</strong> ${order.orderId}</p>
+                            <p><strong>Date:</strong> ${orderDate}</p>
+                            <p><strong>Product:</strong> ${productName}</p>
+                            <p><strong>Quantity:</strong> ${quantity}</p>
+                        </div>
+                        <div>
+                            <p><strong>Customer:</strong> ${customerName}</p>
+                            <p><strong>Email:</strong> ${customerEmail}</p>
+                            <p><strong>Phone:</strong> ${customerPhone}</p>
+                            <p><strong>Amount:</strong> ₹${total.toLocaleString()}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <p style="margin: 0;"><strong>Current Status:</strong> 
+                            <span style="color: ${statusColors[status]}; font-weight: bold; font-size: 18px;">
+                                ${statusLabels[status] || status}
+                            </span>
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4>Order Timeline:</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 8px 0; ${['pending', 'payment_submitted', 'screenshot', 'processing', 'shipped', 'delivered'].includes(status) ? 'color: #2ecc71;' : 'color: #999;'}">
+                                ${['pending', 'payment_submitted', 'screenshot', 'processing', 'shipped', 'delivered'].includes(status) ? '✅' : '⏳'} Order Placed
+                            </li>
+                            <li style="padding: 8px 0; ${['payment_submitted', 'screenshot', 'processing', 'shipped', 'delivered'].includes(status) ? 'color: #2ecc71;' : 'color: #999;'}">
+                                ${['payment_submitted', 'screenshot', 'processing', 'shipped', 'delivered'].includes(status) ? '✅' : '⏳'} Payment Confirmed
+                            </li>
+                            <li style="padding: 8px 0; ${['processing', 'shipped', 'delivered'].includes(status) ? 'color: #2ecc71;' : 'color: #999;'}">
+                                ${['processing', 'shipped', 'delivered'].includes(status) ? '✅' : '⏳'} Processing
+                            </li>
+                            <li style="padding: 8px 0; ${['shipped', 'delivered'].includes(status) ? 'color: #2ecc71;' : 'color: #999;'}">
+                                ${['shipped', 'delivered'].includes(status) ? '✅' : '⏳'} Shipped
+                            </li>
+                            <li style="padding: 8px 0; ${status === 'delivered' ? 'color: #2ecc71;' : 'color: #999;'}">
+                                ${status === 'delivered' ? '✅' : '⏳'} Delivered
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    ${order.customerDetails?.deliveryAddress ? `
+                        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                            <p style="margin: 0;"><strong>Delivery Address:</strong></p>
+                            <p style="margin: 5px 0 0 0;">${order.customerDetails.deliveryAddress || order.customerDetails.address}</p>
+                        </div>
+                    ` : ''}
+                    
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button onclick="window.print()" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">
+                            🖨️ Print Details
+                        </button>
+                        <a href="products.html" style="padding: 10px 20px; background: #2ecc71; color: white; border: none; border-radius: 5px; text-decoration: none; display: inline-block;">
+                            🛍️ Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            `;
+            
             resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showNotFound() {
+            const resultsDiv = document.getElementById('trackResults');
+            resultsDiv.innerHTML = `
+                <div style="background: #fff3cd; padding: 30px; border-radius: 10px; text-align: center;">
+                    <h3 style="color: #856404;">❌ Order Not Found</h3>
+                    <p>We couldn't find an order matching your search.</p>
+                    <p style="margin-top: 15px; font-size: 14px; color: #666;">
+                        Please check:
+                        <ul style="list-style: none; padding: 0; margin: 10px 0;">
+                            <li>✓ Order ID is correct (e.g., ORD-1234567890)</li>
+                            <li>✓ Email address matches the one used for ordering</li>
+                            <li>✓ Order was placed recently</li>
+                        </ul>
+                    </p>
+                    <div style="margin-top: 20px;">
+                        <a href="contact.html" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; text-decoration: none; display: inline-block;">
+                            📧 Contact Support
+                        </a>
+                    </div>
+                </div>
+            `;
         }
 
         // Allow Enter key to track order
