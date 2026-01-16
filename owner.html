@@ -259,8 +259,26 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="product-image">Product Image URL</label>
-                    <input type="url" id="product-image" placeholder="https://example.com/image.jpg" required>
+                    <label>Product Image</label>
+                    <div style="margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                        <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">
+                            💡 <strong>Choose one option:</strong>
+                        </p>
+                        <div style="margin-bottom: 15px;">
+                            <label for="product-image-url" style="display: block; margin-bottom: 5px; font-weight: 600;">Option 1: Image URL</label>
+                            <input type="url" id="product-image-url" placeholder="https://example.com/image.jpg" style="width: 100%;">
+                            <small style="color: #666;">Paste a direct link to an image</small>
+                        </div>
+                        <div style="text-align: center; margin: 10px 0; color: #999;">OR</div>
+                        <div>
+                            <label for="product-image-file" style="display: block; margin-bottom: 5px; font-weight: 600;">Option 2: Upload Image File</label>
+                            <input type="file" id="product-image-file" accept="image/*" style="width: 100%;">
+                            <small style="color: #666;">Select an image from your computer (max 5MB)</small>
+                        </div>
+                        <div id="product-image-preview" style="display: none; margin-top: 15px; text-align: center;">
+                            <img id="preview-img" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #ddd;">
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="modal-actions">
