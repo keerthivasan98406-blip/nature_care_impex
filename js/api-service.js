@@ -2,10 +2,50 @@
 
 class APIService {
     constructor() {
-        // Use relative URL so it works on localhost AND Render
-        this.baseURL = '/api';
+        // Detect environment and set appropriate base URL
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const isRender = window.location.hostname.includes('onrender.com');
+        
+        if (isLocalhost) {
+            this.baseURL = 'http://localhost:3000/api';
+        } else if (isRender) {
+            this.baseURL = `${window.location.origin}/api`;
+        } else {
+            // GitHub Pages or other static hosting - use localStorage only
+            this.baseURL = '/api';
+        }
+        
         this.fallbackToLocalStorage = true;
         this.serverConnected = false;
+        
+        console.log('🔧 API Service initialized');
+        console.log('🌐 Environment:', isLocalhost ? 'localhost' : isRender ? 'Render' : 'Static hosting');
+        console.log('🔗 Base URL:', this.baseURL);
+        
+        // Test server connection
+        this.testConnection();
+    }
+    
+    async testConnection() {
+        try {
+            const response = await fetch(`${this.baseURL.replace('/api', '')}/api/health`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            if (response.ok) {
+                this.serverConnected = true;
+                console.log('✅ Server connected successfully');
+            } else {
+                this.serverConnected = false;
+                console.log('⚠️ Server offline - Using localStorage fallback');
+                console.log('🔗 Attempted server URL:', this.baseURL.replace('/api', ''));
+            }
+        } catch (error) {
+            this.serverConnected = false;
+            console.log('⚠️ Server offline - Using localStorage fallback');
+            console.log('🔗 Attempted server URL:', this.baseURL.replace('/api', ''));
+        }
     }
 
     // Generic API call method
