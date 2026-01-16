@@ -451,20 +451,70 @@ function getTimeAgo(dateString) {
 // Order Management Functions
 // Enhanced loadOrders function with MongoDB integration
 async function loadOrders() {
-    console.log('loadOrders called');
+    console.log('🔄 loadOrders called');
     
     try {
         let allOrders = [];
         
-        // Try to load from MongoDB first
+        // ALWAYS load from localStorage first (immediate feedback)
+        const adminOrders = orders;
+        const customerOrdersRaw = localStorage.getItem('customerOrders');
+        console.log('📱 Raw customer orders from localStorage:', customerOrdersRaw);
+        
+        const customerOrders = JSON.parse(customerOrdersRaw || '[]');
+        console.log('📊 Parsed customer orders:', customerOrders.length);
+        
+        // Format localStorage orders
+        const localOrders = [
+            ...adminOrders.map(order => ({
+                ...order,
+                source: 'admin',
+                hasScreenshot: false,
+                productSize: order.productSize || 'Not specified'
+            })),
+            ...customerOrders.map(order => {
+                const customerName = order.customerDetails?.name || order.customerDetails?.customerName || 'Unknown Customer';
+                const customerEmail = order.customerDetails?.email || order.customerDetails?.customerEmail || 'No email';
+                const customerPhone = order.customerDetails?.phone || order.customerDetails?.customerPhone || 'No phone';
+                const customerAddress = order.customerDetails?.address || order.customerDetails?.deliveryAddress || 'No address';
+                const orderTotal = order.totalAmount || order.customerDetails?.total || 0;
+                const orderQuantity = order.customerDetails?.quantity || 1;
+                const productSize = order.productSize || order.customerDetails?.productSize || 'Not specified';
+                
+                return {
+                    id: order.orderId,
+                    date: order.createdAt ? order.createdAt.split('T')[0] : new Date().toISOString().split('T')[0],
+                    customer: customerName,
+                    email: customerEmail,
+                    product: order.product?.name || 'Unknown Product',
+                    productSize: productSize,
+                    quantity: orderQuantity,
+                    unitPrice: orderTotal / orderQuantity,
+                    amount: orderTotal,
+                    status: order.paymentScreenshot ? 'screenshot' : (order.status || 'pending'),
+                    notes: order.customerDetails?.notes || order.customerDetails?.orderNotes || '',
+                    source: 'customer',
+                    hasScreenshot: !!order.paymentScreenshot,
+                    screenshot: order.paymentScreenshot?.dataUrl || order.paymentScreenshot,
+                    phone: customerPhone,
+                    address: customerAddress,
+                    orderMonth: order.orderMonth || order.createdAt?.slice(0, 7) || new Date().toISOString().slice(0, 7)
+                };
+            })
+        ];
+        
+        allOrders = localOrders;
+        console.log('✅ Loaded', allOrders.length, 'orders from localStorage');
+        
+        // Try to load from MongoDB and merge
         if (window.apiService) {
             try {
                 const result = await window.apiService.getOrders();
-                if (result.success && result.data) {
+                if (result.success && result.data && result.data.length > 0) {
                     console.log('✅ Orders loaded from MongoDB:', result.data.length);
                     
                     // Convert MongoDB orders to display format
-                    allOrders = result.data.map(order => ({
+                    const dbOrders = result.data.map(order => ({
                         id: order.orderId,
                         date: order.createdAt ? order.createdAt.split('T')[0] : new Date().toISOString().split('T')[0],
                         customer: order.customerDetails?.customerName || 'Unknown Customer',
@@ -483,67 +533,20 @@ async function loadOrders() {
                         address: order.customerDetails?.deliveryAddress || 'No address',
                         orderMonth: order.orderMonth || order.createdAt?.slice(0, 7) || new Date().toISOString().slice(0, 7)
                     }));
-                } else {
-                    console.log('⚠️ MongoDB load failed, using localStorage fallback');
+                    
+                    // Merge orders (prefer database, but keep localStorage-only orders)
+                    const dbOrderIds = new Set(dbOrders.map(o => o.id));
+                    const localOnlyOrders = allOrders.filter(o => !dbOrderIds.has(o.id));
+                    allOrders = [...dbOrders, ...localOnlyOrders];
+                    
+                    console.log('✅ Merged orders - DB:', dbOrders.length, 'Local only:', localOnlyOrders.length, 'Total:', allOrders.length);
                 }
             } catch (error) {
-                console.log('⚠️ MongoDB unavailable, using localStorage fallback:', error.message);
+                console.log('⚠️ MongoDB unavailable, using localStorage only:', error.message);
             }
         }
         
-        // Fallback: Load from localStorage if MongoDB failed
-        if (allOrders.length === 0) {
-            // Load both admin orders and customer orders
-            const adminOrders = orders;
-            const customerOrdersRaw = localStorage.getItem('customerOrders');
-            console.log('Raw customer orders from localStorage:', customerOrdersRaw);
-            
-            const customerOrders = JSON.parse(customerOrdersRaw || '[]');
-            console.log('Parsed customer orders:', customerOrders);
-            console.log('Number of customer orders:', customerOrders.length);
-            
-            // Combine and format orders
-            allOrders = [
-                ...adminOrders.map(order => ({
-                    ...order,
-                    source: 'admin',
-                    hasScreenshot: false,
-                    productSize: order.productSize || 'Not specified'
-                })),
-                ...customerOrders.map(order => {
-                    const customerName = order.customerDetails?.name || order.customerDetails?.customerName || 'Unknown Customer';
-                    const customerEmail = order.customerDetails?.email || order.customerDetails?.customerEmail || 'No email';
-                    const customerPhone = order.customerDetails?.phone || order.customerDetails?.customerPhone || 'No phone';
-                    const customerAddress = order.customerDetails?.address || order.customerDetails?.deliveryAddress || 'No address';
-                    const orderTotal = order.totalAmount || order.customerDetails?.total || 0;
-                    const orderQuantity = order.customerDetails?.quantity || 1;
-                    const productSize = order.productSize || order.customerDetails?.productSize || 'Not specified';
-                    
-                    return {
-                        id: order.orderId,
-                        date: order.createdAt ? order.createdAt.split('T')[0] : new Date().toISOString().split('T')[0],
-                        customer: customerName,
-                        email: customerEmail,
-                        product: order.product?.name || 'Unknown Product',
-                        productSize: productSize,
-                        quantity: orderQuantity,
-                        unitPrice: orderTotal / orderQuantity,
-                        amount: orderTotal,
-                        status: order.paymentScreenshot ? 'screenshot' : (order.status || 'pending'),
-                        notes: order.customerDetails?.notes || order.customerDetails?.orderNotes || '',
-                        source: 'customer',
-                        hasScreenshot: !!order.paymentScreenshot,
-                        screenshot: order.paymentScreenshot?.dataUrl || order.paymentScreenshot,
-                        phone: customerPhone,
-                        address: customerAddress,
-                        orderMonth: order.orderMonth || order.createdAt?.slice(0, 7) || new Date().toISOString().slice(0, 7)
-                    };
-                })
-            ];
-        }
-        
-        console.log('All orders combined:', allOrders);
-        console.log('Total orders:', allOrders.length);
+        console.log('📊 Total orders to display:', allOrders.length);
         
         const tbody = document.getElementById('orders-tbody');
         if (!tbody) {
