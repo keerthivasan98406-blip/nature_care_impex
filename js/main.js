@@ -294,13 +294,13 @@ function generatePaymentQR(orderData) {
     qrCodeElement.style.height = 'auto';
 }
 
-// SIMPLE AND DIRECT PAYMENT APP OPENER - PROVEN METHOD
+// SIMPLE AND DIRECT PAYMENT APP OPENER - NO POPUPS
 window.openPaymentAppDirect = function(appName) {
     console.log('🚀 Direct app opening:', appName);
     
     const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
     if (!orderData) {
-        alert('❌ No order data found');
+        console.error('❌ No order data found');
         return;
     }
     
@@ -314,27 +314,8 @@ window.openPaymentAppDirect = function(appName) {
     let appDisplayName = '';
     
     if (appName === 'paytm') {
-        // Try multiple Paytm URL formats for better compatibility
         url = `paytm://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
         appDisplayName = 'Paytm';
-        
-        // Try primary Paytm URL
-        window.location.href = url;
-        
-        // If primary doesn't work, try alternative after delay
-        setTimeout(() => {
-            const altPaytmUrl = `paytmmp://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
-            console.log('🔄 Trying alternative Paytm URL:', altPaytmUrl);
-            window.location.href = altPaytmUrl;
-        }, 1000);
-        
-        // If still doesn't work, try generic UPI
-        setTimeout(() => {
-            const genericUrl = `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
-            console.log('🔄 Trying generic UPI URL for Paytm:', genericUrl);
-            window.location.href = genericUrl;
-        }, 2000);
-        
     } else if (appName === 'gpay') {
         url = `tez://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
         appDisplayName = 'Google Pay';
@@ -342,39 +323,22 @@ window.openPaymentAppDirect = function(appName) {
         url = `phonepe://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
         appDisplayName = 'PhonePe';
     } else {
-        alert('❌ Invalid app name');
+        console.error('❌ Invalid app name');
         return;
     }
     
     console.log(`🔗 ${appDisplayName} URL:`, url);
     console.log(`💰 Amount: ₹${amount}`);
     
-    // PROVEN MOBILE METHOD
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isMobile = /android|iphone|ipad|ipod/.test(userAgent);
-    
-    if (isMobile) {
-        // Mobile device - use direct approach
+    // DIRECT OPENING - NO POPUPS
+    try {
         window.location.href = url;
-        
-        // Give feedback after delay
-        setTimeout(() => {
-            const success = confirm(`💳 ${appDisplayName} Payment\n\nDid ${appDisplayName} open with ₹${amount} payment?\n\n✅ YES: Complete payment in the app\n❌ NO: Get manual instructions`);
-            
-            if (!success) {
-                alert(`📱 Manual Payment:\n\n🆔 UPI ID: ${upiId}\n💰 Amount: ₹${amount}\n📝 Note: ${note}\n\n1. Open ${appDisplayName} manually\n2. Tap 'Pay' or 'Send Money'\n3. Enter UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Complete payment`);
-            }
-        }, 2000);
-    } else {
-        // Desktop - show QR code message
-        alert(`📱 This feature works best on mobile devices.\n\nPlease:\n1. Open this page on your mobile phone\n2. Click the ${appDisplayName} button\n\nOr use the QR code below to pay with any UPI app.`);
-        
-        // Highlight QR code
-        const qrSection = document.querySelector('.qr-code-container');
-        if (qrSection) {
-            qrSection.scrollIntoView({ behavior: 'smooth' });
-            qrSection.style.border = '3px solid #2196f3';
-        }
+        console.log(`✅ ${appDisplayName} opening attempted`);
+    } catch (error) {
+        console.error(`❌ Error opening ${appDisplayName}:`, error);
+        // Fallback - try generic UPI
+        const genericUrl = `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
+        window.location.href = genericUrl;
     }
 };
 
@@ -383,7 +347,7 @@ function payWithApp(appName) {
     
     const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
     if (!orderData) {
-        alert('❌ Order data not found. Please try again.');
+        console.error('❌ Order data not found. Please try again.');
         return;
     }
     
@@ -392,7 +356,7 @@ function payWithApp(appName) {
     const orderId = orderData.orderId;
     const transactionNote = `Order-${orderId}`;
     
-    // SIMPLE AND DIRECT APPROACH - PROVEN TO WORK
+    // SIMPLE AND DIRECT APPROACH - NO POPUPS
     let appUrl = '';
     let appName_display = '';
     
@@ -410,7 +374,7 @@ function payWithApp(appName) {
             appName_display = 'PhonePe';
             break;
         default:
-            alert('❌ Invalid payment app');
+            console.error('❌ Invalid payment app');
             return;
     }
     
@@ -418,43 +382,15 @@ function payWithApp(appName) {
     console.log(`💰 Amount: ₹${amount}`);
     console.log(`🆔 UPI ID: ${upiId}`);
     
-    // DIRECT METHOD - MOST RELIABLE
+    // DIRECT METHOD - NO POPUPS
     try {
-        // Create a temporary link and click it
-        const tempLink = document.createElement('a');
-        tempLink.href = appUrl;
-        tempLink.target = '_self';
-        tempLink.style.display = 'none';
-        
-        // Add to DOM, click, and remove
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-        
+        window.location.href = appUrl;
         console.log(`✅ ${appName_display} opening attempted`);
-        
-        // Show immediate feedback
-        setTimeout(() => {
-            const opened = confirm(`💳 ${appName_display} Payment\n\n✅ If ${appName_display} opened with payment details: Complete the payment\n❌ If ${appName_display} didn't open: Click Cancel to get manual instructions\n\nDid ${appName_display} open with ₹${amount}?`);
-            
-            if (!opened) {
-                // Show manual payment instructions
-                alert(`📱 Manual Payment Instructions:\n\n🆔 UPI ID: ${upiId}\n💰 Amount: ₹${amount}\n📝 Note: ${transactionNote}\n\n📱 Steps:\n1. Open ${appName_display} app manually\n2. Tap 'Send Money' or 'Pay'\n3. Enter UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Add Note: ${transactionNote}\n6. Complete payment`);
-            }
-        }, 1500);
-        
     } catch (error) {
         console.error(`❌ Error opening ${appName_display}:`, error);
-        
-        // Fallback method
-        try {
-            window.location.href = appUrl;
-        } catch (fallbackError) {
-            console.error('❌ Fallback method also failed:', fallbackError);
-            
-            // Show manual instructions
-            alert(`❌ Could not open ${appName_display} automatically.\n\n📱 Manual Payment:\n\n🆔 UPI ID: ${upiId}\n💰 Amount: ₹${amount}\n📝 Note: ${transactionNote}\n\nPlease open ${appName_display} and enter these details manually.`);
-        }
+        // Fallback - try generic UPI
+        const genericUrl = `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
+        window.location.href = genericUrl;
     }
 }
 
@@ -464,7 +400,18 @@ function copyUpiId() {
     // Try to copy to clipboard
     if (navigator.clipboard) {
         navigator.clipboard.writeText(upiId).then(() => {
-            alert('✅ UPI ID copied to clipboard!\n\nPaste it in your UPI app to make payment.\n\nUPI ID: ' + upiId);
+            console.log('✅ UPI ID copied to clipboard:', upiId);
+            // Show visual feedback instead of popup
+            const copyBtn = document.querySelector('.copy-upi-btn');
+            if (copyBtn) {
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '✅ Copied!';
+                copyBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.style.background = 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)';
+                }, 2000);
+            }
         }).catch(() => {
             // Fallback for older browsers
             fallbackCopyUpiId(upiId);
@@ -482,7 +429,19 @@ function fallbackCopyUpiId(upiId) {
     tempInput.select();
     document.execCommand('copy');
     document.body.removeChild(tempInput);
-    alert('UPI ID copied to clipboard!');
+    console.log('✅ UPI ID copied to clipboard (fallback method):', upiId);
+    
+    // Show visual feedback instead of popup
+    const copyBtn = document.querySelector('.copy-upi-btn');
+    if (copyBtn) {
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '✅ Copied!';
+        copyBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+        setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+            copyBtn.style.background = 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)';
+        }, 2000);
+    }
 }
 
 function handleScreenshotUpload(event) {

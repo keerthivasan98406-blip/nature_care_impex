@@ -409,7 +409,7 @@ function payWithApp(appName) {
     
     const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
     if (!orderData) {
-        alert('Order data not found. Please try again.');
+        console.error('Order data not found. Please try again.');
         return;
     }
     
@@ -418,7 +418,7 @@ function payWithApp(appName) {
     const orderId = orderData.orderId;
     const transactionNote = `Order-${orderId}`;
     
-    // SIMPLE AND DIRECT APPROACH - SAME AS FORCE GPAY
+    // SIMPLE AND DIRECT APPROACH - NO POPUPS
     let appUrl = '';
     let appName_display = '';
     
@@ -436,7 +436,7 @@ function payWithApp(appName) {
             appName_display = 'PhonePe';
             break;
         default:
-            alert('❌ Invalid payment app');
+            console.error('❌ Invalid payment app');
             return;
     }
     
@@ -444,35 +444,25 @@ function payWithApp(appName) {
     console.log(`💰 Amount: ₹${amount}`);
     console.log(`🆔 UPI ID: ${upiId}`);
     
-    // DIRECT METHOD - SAME AS WORKING FORCE GPAY
+    // DIRECT METHOD - NO POPUPS
     try {
-        // Use the same method that works for Force GPay
         window.location.href = appUrl;
-        
         console.log(`✅ ${appName_display} opening attempted`);
-        
-        // Show feedback after delay
-        setTimeout(() => {
-            const opened = confirm(`💳 ${appName_display} Payment\n\n✅ If ${appName_display} opened with payment details: Complete the payment\n❌ If ${appName_display} didn't open: Click Cancel for manual instructions\n\nDid ${appName_display} open with ₹${amount}?`);
-            
-            if (!opened) {
-                alert(`📱 Manual Payment Instructions:\n\n🆔 UPI ID: ${upiId}\n💰 Amount: ₹${amount}\n📝 Note: ${transactionNote}\n\n📱 Steps:\n1. Open ${appName_display} app manually\n2. Tap 'Send Money' or 'Pay'\n3. Enter UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Add Note: ${transactionNote}\n6. Complete payment`);
-            }
-        }, 1500);
-        
     } catch (error) {
         console.error(`❌ Error opening ${appName_display}:`, error);
-        alert(`❌ Could not open ${appName_display}.\n\n📱 Manual Payment:\n\n🆔 UPI ID: ${upiId}\n💰 Amount: ₹${amount}\n📝 Note: ${transactionNote}\n\nPlease open ${appName_display} and enter these details manually.`);
+        // Fallback - try generic UPI
+        const genericUrl = `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
+        window.location.href = genericUrl;
     }
 }
 
-// SIMPLE AND DIRECT PAYMENT APP OPENER - SAME AS WORKING FORCE GPAY
+// SIMPLE AND DIRECT PAYMENT APP OPENER - NO POPUPS
 window.openPaymentAppDirect = function(appName) {
     console.log('🚀 Direct app opening:', appName);
     
     const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
     if (!orderData) {
-        alert('❌ No order data found');
+        console.error('❌ No order data found');
         return;
     }
     
@@ -481,7 +471,7 @@ window.openPaymentAppDirect = function(appName) {
     const orderId = orderData.orderId;
     const note = `Order-${orderId}`;
     
-    // SIMPLE URL CONSTRUCTION - SAME AS FORCE GPAY
+    // SIMPLE URL CONSTRUCTION
     let url = '';
     let appDisplayName = '';
     
@@ -495,39 +485,22 @@ window.openPaymentAppDirect = function(appName) {
         url = `phonepe://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
         appDisplayName = 'PhonePe';
     } else {
-        alert('❌ Invalid app name');
+        console.error('❌ Invalid app name');
         return;
     }
     
     console.log(`🔗 ${appDisplayName} URL:`, url);
     console.log(`💰 Amount: ₹${amount}`);
     
-    // SAME METHOD AS WORKING FORCE GPAY
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isMobile = /android|iphone|ipad|ipod/.test(userAgent);
-    
-    if (isMobile) {
-        // Mobile device - use direct approach (same as Force GPay)
+    // DIRECT OPENING - NO POPUPS
+    try {
         window.location.href = url;
-        
-        // Give feedback after delay
-        setTimeout(() => {
-            const success = confirm(`💳 ${appDisplayName} Payment\n\nDid ${appDisplayName} open with ₹${amount} payment?\n\n✅ YES: Complete payment in the app\n❌ NO: Get manual instructions`);
-            
-            if (!success) {
-                alert(`📱 Manual Payment:\n\n🆔 UPI ID: ${upiId}\n💰 Amount: ₹${amount}\n📝 Note: ${note}\n\n1. Open ${appDisplayName} manually\n2. Tap 'Pay' or 'Send Money'\n3. Enter UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Complete payment`);
-            }
-        }, 2000);
-    } else {
-        // Desktop - show QR code message
-        alert(`📱 This feature works best on mobile devices.\n\nPlease:\n1. Open this page on your mobile phone\n2. Click the ${appDisplayName} button\n\nOr use the QR code below to pay with any UPI app.`);
-        
-        // Highlight QR code
-        const qrSection = document.querySelector('.qr-code-container');
-        if (qrSection) {
-            qrSection.scrollIntoView({ behavior: 'smooth' });
-            qrSection.style.border = '3px solid #2196f3';
-        }
+        console.log(`✅ ${appDisplayName} opening attempted`);
+    } catch (error) {
+        console.error(`❌ Error opening ${appDisplayName}:`, error);
+        // Fallback - try generic UPI
+        const genericUrl = `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
+        window.location.href = genericUrl;
     }
 };
 
@@ -536,7 +509,18 @@ function copyUpiId() {
     
     if (navigator.clipboard) {
         navigator.clipboard.writeText(upiId).then(() => {
-            alert('✅ UPI ID copied to clipboard!\n\nUPI ID: ' + upiId);
+            console.log('✅ UPI ID copied to clipboard:', upiId);
+            // Show visual feedback instead of popup
+            const copyBtn = document.querySelector('.copy-upi-btn');
+            if (copyBtn) {
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '✅ Copied!';
+                copyBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.style.background = 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)';
+                }, 2000);
+            }
         }).catch(() => {
             fallbackCopyUpiId(upiId);
         });
@@ -552,7 +536,19 @@ function fallbackCopyUpiId(upiId) {
     tempInput.select();
     document.execCommand('copy');
     document.body.removeChild(tempInput);
-    alert('UPI ID copied to clipboard!');
+    console.log('✅ UPI ID copied to clipboard (fallback method):', upiId);
+    
+    // Show visual feedback instead of popup
+    const copyBtn = document.querySelector('.copy-upi-btn');
+    if (copyBtn) {
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '✅ Copied!';
+        copyBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+        setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+            copyBtn.style.background = 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)';
+        }, 2000);
+    }
 }
 
 function handleScreenshotUpload(event) {
