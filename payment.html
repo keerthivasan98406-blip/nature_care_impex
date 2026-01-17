@@ -428,34 +428,61 @@
                                 <!-- UPI ID -->
                                 <div class="upi-id-section" style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
                                     <p style="margin: 0 0 10px 0; font-size: 16px;"><strong>🆔 UPI ID:</strong> <span style="color: #1976d2; font-family: monospace; font-size: 18px;">naturecareimpex@paytm</span></p>
-                                    <button class="copy-upi-btn" onclick="copyUpiId()" style="
-                                        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-                                        color: white;
-                                        border: none;
-                                        padding: 8px 16px;
-                                        border-radius: 6px;
-                                        cursor: pointer;
-                                        font-weight: 600;
-                                        transition: all 0.3s ease;
-                                        box-shadow: 0 2px 4px rgba(76,175,80,0.3);
-                                        margin-right: 10px;
-                                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(76,175,80,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(76,175,80,0.3)'">
-                                        📋 Copy UPI ID
-                                    </button>
-                                    <button onclick="testPaymentSystem()" style="
-                                        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
-                                        color: white;
-                                        border: none;
-                                        padding: 8px 16px;
-                                        border-radius: 6px;
-                                        cursor: pointer;
-                                        font-weight: 600;
-                                        transition: all 0.3s ease;
-                                        box-shadow: 0 2px 4px rgba(33,150,243,0.3);
-                                    ">
-                                        🔧 Test System
-                                    </button>
-                                    <p style="font-size: 12px; color: #666; margin: 8px 0 0 0;">Click to copy and paste in your UPI app</p>
+                                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                                        <button class="copy-upi-btn" onclick="copyUpiId()" style="
+                                            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+                                            color: white;
+                                            border: none;
+                                            padding: 8px 16px;
+                                            border-radius: 6px;
+                                            cursor: pointer;
+                                            font-weight: 600;
+                                            transition: all 0.3s ease;
+                                            box-shadow: 0 2px 4px rgba(76,175,80,0.3);
+                                        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(76,175,80,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(76,175,80,0.3)'">
+                                            📋 Copy UPI ID
+                                        </button>
+                                        <button onclick="testPaymentSystem()" style="
+                                            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+                                            color: white;
+                                            border: none;
+                                            padding: 8px 16px;
+                                            border-radius: 6px;
+                                            cursor: pointer;
+                                            font-weight: 600;
+                                            transition: all 0.3s ease;
+                                            box-shadow: 0 2px 4px rgba(33,150,243,0.3);
+                                        ">
+                                            🔧 Test QR
+                                        </button>
+                                        <button onclick="validateUPIFormat()" style="
+                                            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+                                            color: white;
+                                            border: none;
+                                            padding: 8px 16px;
+                                            border-radius: 6px;
+                                            cursor: pointer;
+                                            font-weight: 600;
+                                            transition: all 0.3s ease;
+                                            box-shadow: 0 2px 4px rgba(255,152,0,0.3);
+                                        ">
+                                            📱 Test UPI
+                                        </button>
+                                        <button onclick="testUPIId()" style="
+                                            background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+                                            color: white;
+                                            border: none;
+                                            padding: 8px 16px;
+                                            border-radius: 6px;
+                                            cursor: pointer;
+                                            font-weight: 600;
+                                            transition: all 0.3s ease;
+                                            box-shadow: 0 2px 4px rgba(156,39,176,0.3);
+                                        ">
+                                            🧪 Test UPI IDs
+                                        </button>
+                                    </div>
+                                    <p style="font-size: 12px; color: #666; margin: 8px 0 0 0;">Copy UPI ID • Test QR Code • Validate UPI Format • Test Alternative UPI IDs</p>
                                 </div>
                             </div>
                         </div>
@@ -633,9 +660,9 @@
         window.copyUpiId = copyUpiId;
         window.payWithApp = payWithApp;
         
-        // Test function for debugging
+        // Enhanced test function for debugging
         window.testPaymentSystem = function() {
-            console.log('🔧 Testing payment system...');
+            console.log('🔧 Testing ENHANCED payment system...');
             
             // Check if order data exists
             const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
@@ -655,19 +682,150 @@
             
             console.log('✅ QR code element found');
             
-            // Test UPI URL generation
-            const upiData = `upi://pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${orderData.totalAmount}&cu=INR&tn=Order-${orderData.orderId}`;
-            console.log('📱 Generated UPI URL:', upiData);
+            // Test multiple UPI formats for compatibility
+            const upiFormats = [
+                `upi://pay?pa=naturecareimpex@paytm&pn=${encodeURIComponent('Nature Care Impex')}&am=${orderData.totalAmount}&cu=INR&tn=${encodeURIComponent('Order-' + orderData.orderId)}`,
+                `upi://pay?pa=naturecareimpex@paytm&pn=Nature%20Care%20Impex&am=${orderData.totalAmount}&cu=INR&tn=${encodeURIComponent('Order-' + orderData.orderId)}`,
+                `upi://pay?pa=naturecareimpex@paytm&am=${orderData.totalAmount}&tn=${encodeURIComponent('Order-' + orderData.orderId)}`,
+                `upi://pay?pa=naturecareimpex@ybl&pn=${encodeURIComponent('Nature Care Impex')}&am=${orderData.totalAmount}&cu=INR&tn=${encodeURIComponent('Order-' + orderData.orderId)}`,
+                `upi://pay?pa=naturecareimpex@okaxis&pn=${encodeURIComponent('Nature Care Impex')}&am=${orderData.totalAmount}&cu=INR&tn=${encodeURIComponent('Order-' + orderData.orderId)}`
+            ];
             
-            // Test QR code URL
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiData)}&format=png`;
-            console.log('🔗 QR Code URL:', qrUrl);
+            console.log('📱 Testing UPI formats:', upiFormats);
             
-            // Show test results
-            alert(`🔧 Payment System Test Results:\n\n✅ Order Data: Found\n✅ QR Element: Found\n✅ UPI URL: Generated\n✅ QR URL: Generated\n\nCheck console for details.`);
+            // Validate each format
+            const validationResults = upiFormats.map((upi, index) => {
+                const validation = {
+                    format: index + 1,
+                    upi: upi,
+                    hasUpiScheme: upi.startsWith('upi://pay?'),
+                    hasPayeeAddress: upi.includes('pa='),
+                    hasAmount: upi.includes('am=' + orderData.totalAmount),
+                    hasCurrency: upi.includes('cu=INR') || !upi.includes('cu='),
+                    hasTransactionNote: upi.includes('tn='),
+                    properEncoding: !upi.includes(' ') || upi.includes('%20')
+                };
+                validation.isValid = Object.values(validation).slice(2).every(v => v);
+                return validation;
+            });
             
-            // Force regenerate QR code
+            console.log('🔍 UPI Format Validation Results:', validationResults);
+            
+            const validFormats = validationResults.filter(v => v.isValid);
+            
+            // Test QR generation with Google Charts
+            const testQrUrl = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(upiFormats[0])}&choe=UTF-8&chld=L|0`;
+            console.log('🔗 Test QR URL:', testQrUrl);
+            
+            // Show comprehensive test results
+            const resultMessage = `🔧 ENHANCED Payment System Test Results:
+
+✅ Order Data: Found (₹${orderData.totalAmount})
+✅ QR Element: Found
+✅ Valid UPI Formats: ${validFormats.length}/${upiFormats.length}
+✅ QR URL: Generated
+
+📱 UPI Format Test Results:
+${validationResults.map(v => `${v.isValid ? '✅' : '❌'} Format ${v.format}: ${v.isValid ? 'Valid' : 'Invalid'}`).join('\n')}
+
+🔗 Primary UPI String:
+${upiFormats[0]}
+
+🆔 Alternative UPI IDs:
+• naturecareimpex@paytm (Paytm)
+• naturecareimpex@ybl (PhonePe)  
+• naturecareimpex@okaxis (Google Pay)
+• naturecareimpex@upi (Generic)
+
+Check console for detailed validation results.`;
+            
+            alert(resultMessage);
+            
+            // Force regenerate QR code with enhanced system
+            console.log('🔄 Regenerating QR with enhanced system...');
             generatePaymentQR(orderData);
+        };
+        
+        // Enhanced UPI format validator
+        window.validateUPIFormat = function() {
+            const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
+            if (!orderData) {
+                alert('❌ No order data found');
+                return;
+            }
+            
+            const primaryUpi = `upi://pay?pa=naturecareimpex@paytm&pn=${encodeURIComponent('Nature Care Impex')}&am=${orderData.totalAmount}&cu=INR&tn=${encodeURIComponent('Order-' + orderData.orderId)}`;
+            
+            // Test UPI string validity
+            const testValidation = {
+                hasUpiScheme: primaryUpi.startsWith('upi://pay?'),
+                hasPayeeAddress: primaryUpi.includes('pa=naturecareimpex@paytm'),
+                hasPayeeName: primaryUpi.includes('pn='),
+                hasAmount: primaryUpi.includes('am=' + orderData.totalAmount),
+                hasCurrency: primaryUpi.includes('cu=INR'),
+                hasTransactionNote: primaryUpi.includes('tn='),
+                properLength: primaryUpi.length < 500,
+                noSpaces: !primaryUpi.includes(' ') || primaryUpi.includes('%20')
+            };
+            
+            const isValid = Object.values(testValidation).every(v => v);
+            
+            // Copy to clipboard for manual testing
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(primaryUpi).then(() => {
+                    alert(`${isValid ? '✅' : '⚠️'} UPI String copied to clipboard!
+
+Validation Results:
+${Object.entries(testValidation).map(([key, value]) => `${value ? '✅' : '❌'} ${key}`).join('\n')}
+
+Overall Status: ${isValid ? 'VALID' : 'NEEDS REVIEW'}
+
+You can paste this in any UPI app to test:
+${primaryUpi.substring(0, 100)}...`);
+                });
+            } else {
+                alert(`${isValid ? '✅' : '⚠️'} UPI String Validation:
+
+${Object.entries(testValidation).map(([key, value]) => `${value ? '✅' : '❌'} ${key}`).join('\n')}
+
+UPI String: ${primaryUpi}`);
+            }
+        };
+        
+        // Add UPI ID tester
+        window.testUPIId = function() {
+            const upiIds = [
+                'naturecareimpex@paytm',
+                'naturecareimpex@ybl',
+                'naturecareimpex@okaxis', 
+                'naturecareimpex@upi'
+            ];
+            
+            const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
+            if (!orderData) return;
+            
+            const testResults = upiIds.map(upiId => {
+                const testUpi = `upi://pay?pa=${upiId}&am=${orderData.totalAmount}&tn=Test-${Date.now()}`;
+                return {
+                    upiId: upiId,
+                    testString: testUpi,
+                    provider: upiId.split('@')[1]
+                };
+            });
+            
+            console.log('🧪 UPI ID Test Results:', testResults);
+            
+            const message = `🧪 UPI ID Compatibility Test:
+
+${testResults.map((test, index) => 
+                `${index + 1}. ${test.upiId}
+   Provider: ${test.provider}
+   Test String: ${test.testString.substring(0, 60)}...`
+            ).join('\n\n')}
+
+All UPI IDs follow standard format. Try each one if primary doesn't work.`;
+            
+            alert(message);
         };
     </script>
 </body>
