@@ -427,7 +427,7 @@
                                 
                                 <!-- UPI ID -->
                                 <div class="upi-id-section" style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
-                                    <p style="margin: 0 0 10px 0; font-size: 16px;"><strong>🆔 UPI ID:</strong> <span style="color: #1976d2; font-family: monospace; font-size: 18px;">naturecareimpex@paytm</span></p>
+                                    <p style="margin: 0 0 10px 0; font-size: 16px;"><strong>🆔 UPI ID:</strong> <span style="color: #1976d2; font-family: monospace; font-size: 18px;">naveethulhussain700-4@okaxis</span></p>
                                     <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                                         <button class="copy-upi-btn" onclick="copyUpiId()" style="
                                             background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
@@ -682,13 +682,12 @@
             
             console.log('✅ QR code element found');
             
-            // Test multiple UPI formats for compatibility
+            // Test simple UPI format for compatibility
             const upiFormats = [
-                `upi://pay?pa=naturecareimpex@paytm&pn=${encodeURIComponent('Nature Care Impex')}&am=${orderData.totalAmount}&cu=INR&tn=${encodeURIComponent('Order-' + orderData.orderId)}`,
-                `upi://pay?pa=naturecareimpex@paytm&pn=Nature%20Care%20Impex&am=${orderData.totalAmount}&cu=INR&tn=${encodeURIComponent('Order-' + orderData.orderId)}`,
-                `upi://pay?pa=naturecareimpex@paytm&am=${orderData.totalAmount}&tn=${encodeURIComponent('Order-' + orderData.orderId)}`,
-                `upi://pay?pa=naturecareimpex@ybl&pn=${encodeURIComponent('Nature Care Impex')}&am=${orderData.totalAmount}&cu=INR&tn=${encodeURIComponent('Order-' + orderData.orderId)}`,
-                `upi://pay?pa=naturecareimpex@okaxis&pn=${encodeURIComponent('Nature Care Impex')}&am=${orderData.totalAmount}&cu=INR&tn=${encodeURIComponent('Order-' + orderData.orderId)}`
+                `upi://pay?pa=naveethulhussain700-4@okaxis&am=${orderData.totalAmount}&tn=${encodeURIComponent('Order-' + orderData.orderId)}`,
+                `upi://pay?pa=naveethulhussain700-4@paytm&am=${orderData.totalAmount}&tn=${encodeURIComponent('Order-' + orderData.orderId)}`,
+                `upi://pay?pa=naveethulhussain700-4@ybl&am=${orderData.totalAmount}&tn=${encodeURIComponent('Order-' + orderData.orderId)}`,
+                `upi://pay?pa=naveethulhussain700-4@upi&am=${orderData.totalAmount}&tn=${encodeURIComponent('Order-' + orderData.orderId)}`
             ];
             
             console.log('📱 Testing UPI formats:', upiFormats);
@@ -754,12 +753,12 @@ Check console for detailed validation results.`;
                 return;
             }
             
-            const primaryUpi = `upi://pay?pa=naturecareimpex@paytm&pn=${encodeURIComponent('Nature Care Impex')}&am=${orderData.totalAmount}&cu=INR&tn=${encodeURIComponent('Order-' + orderData.orderId)}`;
+            const primaryUpi = `upi://pay?pa=naveethulhussain700-4@okaxis&am=${orderData.totalAmount}&tn=${encodeURIComponent('Order-' + orderData.orderId)}`;
             
             // Test UPI string validity
             const testValidation = {
                 hasUpiScheme: primaryUpi.startsWith('upi://pay?'),
-                hasPayeeAddress: primaryUpi.includes('pa=naturecareimpex@paytm'),
+                hasPayeeAddress: primaryUpi.includes('pa=naveethulhussain700-4@okaxis'),
                 hasPayeeName: primaryUpi.includes('pn='),
                 hasAmount: primaryUpi.includes('am=' + orderData.totalAmount),
                 hasCurrency: primaryUpi.includes('cu=INR'),
@@ -795,10 +794,10 @@ UPI String: ${primaryUpi}`);
         // Add UPI ID tester
         window.testUPIId = function() {
             const upiIds = [
-                'naturecareimpex@paytm',
-                'naturecareimpex@ybl',
-                'naturecareimpex@okaxis', 
-                'naturecareimpex@upi'
+                'naveethulhussain700-4@okaxis',
+                'naveethulhussain700-4@paytm',
+                'naveethulhussain700-4@ybl',
+                'naveethulhussain700-4@upi'
             ];
             
             const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));

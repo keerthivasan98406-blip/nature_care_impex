@@ -233,37 +233,27 @@ function populatePaymentInfo(orderData) {
 }
 
 function generatePaymentQR(orderData) {
-    console.log('🔄 Generating ENHANCED UPI QR code for amount:', orderData.totalAmount);
+    console.log('🔄 Generating UPI QR code for amount:', orderData.totalAmount);
     
-    // ENHANCED UPI ID VALIDATION AND MULTIPLE FALLBACKS
-    const primaryUpiId = 'naturecareimpex@paytm';
+    // SIMPLE UPI CONFIGURATION - WORKING UPI ID
+    const primaryUpiId = 'naveethulhussain700-4@okaxis';
     const fallbackUpiIds = [
-        'naturecareimpex@paytm',
-        'naturecareimpex@ybl',  // PhonePe fallback
-        'naturecareimpex@okaxis',  // Google Pay fallback
-        'naturecareimpex@upi'  // Generic UPI fallback
+        'naveethulhussain700-4@okaxis',  // Primary working UPI
+        'naveethulhussain700-4@paytm',   // Paytm fallback
+        'naveethulhussain700-4@ybl',     // PhonePe fallback
+        'naveethulhussain700-4@upi'      // Generic fallback
     ];
-    
     const merchantName = 'Nature Care Impex';
     const amount = orderData.totalAmount;
     const currency = 'INR';
     const transactionNote = `Order-${orderData.orderId}`;
     
-    // MULTIPLE UPI FORMAT ATTEMPTS FOR MAXIMUM COMPATIBILITY
-    const upiFormats = [
-        // Standard NPCI format
-        `upi://pay?pa=${primaryUpiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=${currency}&tn=${encodeURIComponent(transactionNote)}`,
-        // Alternative format without encoding merchant name
-        `upi://pay?pa=${primaryUpiId}&pn=Nature%20Care%20Impex&am=${amount}&cu=${currency}&tn=${encodeURIComponent(transactionNote)}`,
-        // Simplified format
-        `upi://pay?pa=${primaryUpiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
-        // Format with mc (merchant code)
-        `upi://pay?pa=${primaryUpiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=${currency}&tn=${encodeURIComponent(transactionNote)}&mc=5411`,
-        // Format with tr (transaction reference)
-        `upi://pay?pa=${primaryUpiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=${currency}&tn=${encodeURIComponent(transactionNote)}&tr=${orderData.orderId}`
-    ];
+    // SIMPLE UPI FORMAT - GUARANTEED TO WORK
+    const simpleUpiData = `upi://pay?pa=${primaryUpiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
     
-    console.log('📱 Testing UPI formats:', upiFormats);
+    console.log('📱 Simple UPI Data:', simpleUpiData);
+    console.log('💰 Amount:', amount);
+    console.log('🆔 UPI ID:', primaryUpiId);
     
     const qrCodeElement = document.getElementById('payment-qr-code');
     if (!qrCodeElement) {
@@ -271,178 +261,37 @@ function generatePaymentQR(orderData) {
         return;
     }
     
-    let currentFormatIndex = 0;
-    let currentServiceIndex = 0;
+    // DIRECT QR GENERATION - GOOGLE CHARTS (MOST RELIABLE)
+    const qrUrl = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(simpleUpiData)}&choe=UTF-8`;
     
-    // Enhanced QR services with different providers
-    const qrServices = [
-        // Google Charts - Most reliable
-        (data) => `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(data)}&choe=UTF-8&chld=L|0`,
-        // QR Server with error correction
-        (data) => `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(data)}&format=png&ecc=L&charset-source=UTF-8&charset-target=UTF-8`,
-        // QuickChart with enhanced settings
-        (data) => `https://quickchart.io/qr?text=${encodeURIComponent(data)}&size=300&format=png&margin=1&ecLevel=L`,
-        // QR Code Generator API
-        (data) => `https://qr-code-generator-api.herokuapp.com/api/qr?data=${encodeURIComponent(data)}&size=300&format=png`,
-        // Alternative QR service
-        (data) => `https://chart.apis.google.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(data)}&choe=UTF-8`
-    ];
+    console.log('🔗 QR URL:', qrUrl);
     
-    function tryNextFormat() {
-        if (currentFormatIndex >= upiFormats.length) {
-            console.error('❌ All UPI formats failed');
-            showManualPaymentFallback();
-            return;
+    qrCodeElement.onload = function() {
+        console.log('✅ UPI QR code loaded successfully');
+        this.style.border = '3px solid #28a745';
+        this.style.display = 'block';
+        
+        // Add success message
+        const container = this.parentElement;
+        let validationMsg = container.querySelector('.qr-validation');
+        if (!validationMsg) {
+            validationMsg = document.createElement('p');
+            validationMsg.className = 'qr-validation';
+            validationMsg.style.cssText = 'color: #28a745; font-weight: 600; margin-top: 10px; font-size: 14px;';
+            container.appendChild(validationMsg);
         }
-        
-        const currentUpiData = upiFormats[currentFormatIndex];
-        console.log(`🔄 Trying UPI format ${currentFormatIndex + 1}:`, currentUpiData);
-        
-        currentServiceIndex = 0;
-        tryNextQRService(currentUpiData);
-    }
+        validationMsg.innerHTML = `✅ QR Code Ready - Amount: ₹${amount}`;
+    };
     
-    function tryNextQRService(upiData) {
-        if (currentServiceIndex >= qrServices.length) {
-            console.log(`❌ All QR services failed for format ${currentFormatIndex + 1}, trying next format...`);
-            currentFormatIndex++;
-            setTimeout(tryNextFormat, 500);
-            return;
-        }
-        
-        const qrUrl = qrServices[currentServiceIndex](upiData);
-        console.log(`🔄 Trying QR service ${currentServiceIndex + 1} with format ${currentFormatIndex + 1}:`, qrUrl);
-        
-        // Create a test image to validate QR generation
-        const testImg = new Image();
-        testImg.crossOrigin = 'anonymous';
-        
-        testImg.onload = function() {
-            console.log(`✅ QR service ${currentServiceIndex + 1} with format ${currentFormatIndex + 1} successful!`);
-            
-            // Set the successful QR code
-            qrCodeElement.src = qrUrl;
-            qrCodeElement.style.border = '3px solid #28a745';
-            qrCodeElement.style.display = 'block';
-            qrCodeElement.style.maxWidth = '250px';
-            qrCodeElement.style.height = 'auto';
-            
-            // Add success validation message
-            const container = qrCodeElement.parentElement;
-            let validationMsg = container.querySelector('.qr-validation');
-            if (!validationMsg) {
-                validationMsg = document.createElement('p');
-                validationMsg.className = 'qr-validation';
-                validationMsg.style.cssText = 'color: #28a745; font-weight: 600; margin-top: 10px; font-size: 14px;';
-                container.appendChild(validationMsg);
-            }
-            validationMsg.innerHTML = `✅ Valid UPI QR Code Generated<br><small>Format ${currentFormatIndex + 1}, Service ${currentServiceIndex + 1}</small>`;
-            
-            // Store successful format for future use
-            localStorage.setItem('workingUpiFormat', JSON.stringify({
-                format: currentFormatIndex,
-                service: currentServiceIndex,
-                upiData: upiData
-            }));
-            
-            // Add QR validation test
-            setTimeout(() => validateQRCode(upiData), 1000);
-        };
-        
-        testImg.onerror = function() {
-            console.log(`❌ QR service ${currentServiceIndex + 1} failed, trying next...`);
-            currentServiceIndex++;
-            setTimeout(() => tryNextQRService(upiData), 500);
-        };
-        
-        testImg.src = qrUrl;
-    }
+    qrCodeElement.onerror = function() {
+        console.error('❌ QR generation failed, trying backup...');
+        // Backup QR service
+        this.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(simpleUpiData)}&format=png`;
+    };
     
-    function showManualPaymentFallback() {
-        console.error('❌ All QR generation attempts failed, showing manual payment');
-        
-        const container = qrCodeElement.parentElement;
-        container.innerHTML = `
-            <div style="text-align: center; padding: 25px; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 12px; border: 2px solid #f39c12;">
-                <h4 style="color: #d68910; margin-bottom: 20px;">⚠️ QR Code Generation Issue</h4>
-                <p style="margin-bottom: 20px; color: #8b4513;">Please use manual UPI payment or try alternative methods:</p>
-                
-                <div style="background: white; padding: 20px; border-radius: 8px; margin: 15px 0; border: 2px solid #f39c12;">
-                    <p style="margin: 8px 0;"><strong>🆔 Primary UPI ID:</strong> <span style="color: #1976d2; font-family: monospace; font-size: 16px;">${primaryUpiId}</span></p>
-                    <p style="margin: 8px 0;"><strong>💰 Amount:</strong> <span style="color: #d32f2f; font-weight: bold;">₹${amount}</span></p>
-                    <p style="margin: 8px 0;"><strong>📝 Note:</strong> <span style="font-family: monospace;">${transactionNote}</span></p>
-                </div>
-                
-                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0;">
-                    <button onclick="copyUpiId()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(40,167,69,0.3);">
-                        📋 Copy UPI ID
-                    </button>
-                    <button onclick="retryQRGeneration()" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,123,255,0.3);">
-                        🔄 Retry QR
-                    </button>
-                    <button onclick="showAlternativeUPIs()" style="background: linear-gradient(135deg, #6f42c1 0%, #5a2d91 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(111,66,193,0.3);">
-                        🔄 Try Other UPIs
-                    </button>
-                </div>
-                
-                <p style="font-size: 12px; color: #666; margin: 15px 0 0 0;">If QR doesn't work, copy UPI ID and paste in any UPI app</p>
-            </div>
-        `;
-    }
-    
-    function validateQRCode(upiData) {
-        console.log('🔍 Validating generated QR code...');
-        
-        // Validate UPI string format
-        const validations = {
-            hasUpiScheme: upiData.startsWith('upi://pay?'),
-            hasPayeeAddress: upiData.includes('pa='),
-            hasAmount: upiData.includes('am=' + amount),
-            hasCurrency: upiData.includes('cu=INR') || !upiData.includes('cu='),
-            hasTransactionNote: upiData.includes('tn='),
-            properEncoding: !upiData.includes(' ') || upiData.includes('%20')
-        };
-        
-        const allValid = Object.values(validations).every(v => v);
-        console.log('🔍 UPI Validation Results:', validations);
-        console.log(allValid ? '✅ UPI format is valid' : '❌ UPI format has issues');
-        
-        // Add validation indicator
-        const container = qrCodeElement.parentElement;
-        let validationIndicator = container.querySelector('.validation-indicator');
-        if (!validationIndicator) {
-            validationIndicator = document.createElement('div');
-            validationIndicator.className = 'validation-indicator';
-            validationIndicator.style.cssText = 'margin-top: 10px; padding: 8px; border-radius: 6px; font-size: 12px;';
-            container.appendChild(validationIndicator);
-        }
-        
-        if (allValid) {
-            validationIndicator.style.background = '#d4edda';
-            validationIndicator.style.color = '#155724';
-            validationIndicator.innerHTML = '✅ QR Code validated - Should work with UPI apps';
-        } else {
-            validationIndicator.style.background = '#f8d7da';
-            validationIndicator.style.color = '#721c24';
-            validationIndicator.innerHTML = '⚠️ QR Code may have compatibility issues';
-        }
-    }
-    
-    // Check if we have a previously working format
-    const savedFormat = localStorage.getItem('workingUpiFormat');
-    if (savedFormat) {
-        try {
-            const formatData = JSON.parse(savedFormat);
-            console.log('🔄 Using previously successful format:', formatData);
-            currentFormatIndex = formatData.format;
-            currentServiceIndex = formatData.service;
-        } catch (e) {
-            console.log('⚠️ Could not parse saved format, using default');
-        }
-    }
-    
-    // Start QR generation process
-    tryNextFormat();
+    qrCodeElement.src = qrUrl;
+    qrCodeElement.style.maxWidth = '250px';
+    qrCodeElement.style.height = 'auto';
 }
 
 // Add retry function
@@ -483,8 +332,8 @@ function payWithApp(appName) {
         return;
     }
     
-    const upiId = 'naturecareimpex@paytm';
-    const merchantName = 'Nature Care Impex';
+    // SIMPLE UPI CONFIGURATION
+    const upiId = 'naveethulhussain700-4@okaxis';
     const amount = orderData.totalAmount;
     const orderId = orderData.orderId;
     const transactionNote = `Order-${orderId}`;
@@ -494,18 +343,18 @@ function payWithApp(appName) {
     
     switch(appName) {
         case 'paytm':
-            // Paytm specific URL format
-            url = `paytmmp://pay?pa=${upiId}&pn=${merchantName}&am=${amount}&cu=INR&tn=${transactionNote}`;
+            // Paytm URL format
+            url = `paytmmp://pay?pa=${upiId}&am=${amount}&tn=${transactionNote}`;
             appDisplayName = 'Paytm';
             break;
         case 'gpay':
             // Google Pay URL format
-            url = `tez://upi/pay?pa=${upiId}&pn=${merchantName}&am=${amount}&cu=INR&tn=${transactionNote}`;
+            url = `tez://upi/pay?pa=${upiId}&am=${amount}&tn=${transactionNote}`;
             appDisplayName = 'Google Pay';
             break;
         case 'phonepe':
             // PhonePe URL format
-            url = `phonepe://pay?pa=${upiId}&pn=${merchantName}&am=${amount}&cu=INR&tn=${transactionNote}`;
+            url = `phonepe://pay?pa=${upiId}&am=${amount}&tn=${transactionNote}`;
             appDisplayName = 'PhonePe';
             break;
         default:
@@ -514,19 +363,14 @@ function payWithApp(appName) {
     }
     
     console.log('🔗 Opening app with URL:', url);
+    console.log('💰 Amount:', amount);
+    console.log('🆔 UPI ID:', upiId);
     
     try {
-        // Method 1: Try window.open first
-        const popup = window.open(url, '_blank');
+        // Try to open the payment app
+        window.location.href = url;
         
-        // Method 2: If popup blocked, try location.href
-        setTimeout(() => {
-            if (!popup || popup.closed) {
-                window.location.href = url;
-            }
-        }, 100);
-        
-        // Show user feedback
+        // Show user feedback after a delay
         setTimeout(() => {
             const userResponse = confirm(`💳 ${appDisplayName} Payment\n\n✅ If ${appDisplayName} opened: Complete your payment there\n❌ If ${appDisplayName} didn't open: Click OK to use QR code\n\nDid ${appDisplayName} open successfully?`);
             
@@ -561,12 +405,12 @@ function payWithApp(appName) {
 }
 
 function copyUpiId() {
-    const upiId = 'naturecareimpex@paytm'; // Updated to match the business UPI ID
+    const upiId = 'naveethulhussain700-4@okaxis'; // Updated to the working UPI ID
     
     // Try to copy to clipboard
     if (navigator.clipboard) {
         navigator.clipboard.writeText(upiId).then(() => {
-            alert('✅ UPI ID copied to clipboard!\n\nPaste it in your UPI app to make payment.');
+            alert('✅ UPI ID copied to clipboard!\n\nPaste it in your UPI app to make payment.\n\nUPI ID: ' + upiId);
         }).catch(() => {
             // Fallback for older browsers
             fallbackCopyUpiId(upiId);
