@@ -121,9 +121,10 @@
                         <div class="payment-method-content">
                             <!-- QR Code Section -->
                             <div class="qr-payment-section">
-                                <div class="qr-code-container">
-                                    <img id="payment-qr-code" src="" alt="QR Code" class="qr-code">
-                                    <p class="qr-instruction">Scan QR code with any UPI app</p>
+                                <div class="qr-code-container" style="text-align: center; margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 12px; border: 2px dashed #28a745;">
+                                    <img id="payment-qr-code" src="" alt="UPI QR Code" class="qr-code" style="max-width: 250px; height: auto; border: 3px solid #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                                    <p class="qr-instruction" style="margin: 15px 0 5px 0; font-weight: 600; color: #28a745;">📱 Scan QR code with any UPI app</p>
+                                    <p style="font-size: 14px; color: #666; margin: 0;">Google Pay, PhonePe, Paytm, BHIM, or any UPI app</p>
                                 </div>
                                 
                                 <!-- UPI Apps -->
@@ -185,9 +186,22 @@
                                 </div>
                                 
                                 <!-- UPI ID -->
-                                <div class="upi-id-section">
-                                    <p><strong>UPI ID:</strong> naveethulhussain700-4@okaxis</p>
-                                    <button class="copy-upi-btn" onclick="copyUpiId()">Copy UPI ID</button>
+                                <div class="upi-id-section" style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                                    <p style="margin: 0 0 10px 0; font-size: 16px;"><strong>🆔 UPI ID:</strong> <span style="color: #1976d2; font-family: monospace; font-size: 18px;">naturecareimpex@paytm</span></p>
+                                    <button class="copy-upi-btn" onclick="copyUpiId()" style="
+                                        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+                                        color: white;
+                                        border: none;
+                                        padding: 8px 16px;
+                                        border-radius: 6px;
+                                        cursor: pointer;
+                                        font-weight: 600;
+                                        transition: all 0.3s ease;
+                                        box-shadow: 0 2px 4px rgba(76,175,80,0.3);
+                                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(76,175,80,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(76,175,80,0.3)'">
+                                        📋 Copy UPI ID
+                                    </button>
+                                    <p style="font-size: 12px; color: #666; margin: 8px 0 0 0;">Click to copy and paste in your UPI app</p>
                                 </div>
                             </div>
                         </div>

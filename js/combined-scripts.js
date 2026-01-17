@@ -361,7 +361,7 @@ function populatePaymentInfo(orderData) {
 function generatePaymentQR(orderData) {
     console.log('Generating payment QR code...');
     
-    const upiData = `upi://pay?pa=naveethulhussain700-4@okaxis&pn=Nature Care Impex&am=${orderData.totalAmount}&cu=INR&tn=Order ${orderData.orderId}`;
+    const upiData = `upi://pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${orderData.totalAmount}&cu=INR&tn=Order ${orderData.orderId}`;
     
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiData)}`;
     
