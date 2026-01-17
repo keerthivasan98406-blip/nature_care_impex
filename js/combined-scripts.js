@@ -405,7 +405,7 @@ function generatePaymentQR(orderData) {
 }
 
 function payWithApp(appName) {
-    console.log('🚀 Pay with app:', appName);
+    console.log('🚀 Opening payment app:', appName);
     
     const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
     if (!orderData) {
@@ -413,97 +413,123 @@ function payWithApp(appName) {
         return;
     }
     
-    // ENHANCED UPI CONFIGURATION FOR DIRECT APP OPENING
     const upiId = 'naveethulhussain700-4@okaxis';
     const amount = orderData.totalAmount;
     const orderId = orderData.orderId;
     const transactionNote = `Order-${orderId}`;
-    const merchantName = 'Nature Care Impex';
     
-    let url = '';
-    let appDisplayName = '';
+    // SIMPLE AND DIRECT APPROACH - SAME AS FORCE GPAY
+    let appUrl = '';
+    let appName_display = '';
     
     switch(appName) {
         case 'paytm':
-            // Enhanced Paytm URL with all parameters
-            url = `paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
-            appDisplayName = 'Paytm';
+            appUrl = `paytmmp://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
+            appName_display = 'Paytm';
             break;
         case 'gpay':
-            // Enhanced Google Pay URL - multiple formats for compatibility
-            url = `tez://upi/pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
-            appDisplayName = 'Google Pay';
+            appUrl = `tez://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
+            appName_display = 'Google Pay';
             break;
         case 'phonepe':
-            // Enhanced PhonePe URL with all parameters
-            url = `phonepe://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
-            appDisplayName = 'PhonePe';
+            appUrl = `phonepe://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
+            appName_display = 'PhonePe';
             break;
         default:
-            alert('❌ Invalid payment app selected');
+            alert('❌ Invalid payment app');
             return;
     }
     
-    console.log('🔗 Opening app with URL:', url);
-    console.log('💰 Amount:', amount);
-    console.log('🆔 UPI ID:', upiId);
-    console.log('📱 App:', appDisplayName);
+    console.log(`🔗 ${appName_display} URL:`, appUrl);
+    console.log(`💰 Amount: ₹${amount}`);
+    console.log(`🆔 UPI ID: ${upiId}`);
     
-    // ENHANCED APP OPENING STRATEGY
-    function tryOpenApp() {
-        try {
-            // Method 1: Direct location change (most reliable on mobile)
-            window.location.href = url;
+    // DIRECT METHOD - SAME AS WORKING FORCE GPAY
+    try {
+        // Use the same method that works for Force GPay
+        window.location.href = appUrl;
+        
+        console.log(`✅ ${appName_display} opening attempted`);
+        
+        // Show feedback after delay
+        setTimeout(() => {
+            const opened = confirm(`💳 ${appName_display} Payment\n\n✅ If ${appName_display} opened with payment details: Complete the payment\n❌ If ${appName_display} didn't open: Click Cancel for manual instructions\n\nDid ${appName_display} open with ₹${amount}?`);
             
-            // Method 2: Create invisible link and click it
-            const link = document.createElement('a');
-            link.href = url;
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            console.log(`✅ Attempted to open ${appDisplayName}`);
-            
-        } catch (error) {
-            console.error(`❌ Error opening ${appDisplayName}:`, error);
-            
-            // Fallback: Show manual instructions
-            alert(`❌ Could not open ${appDisplayName} automatically.\n\n📱 Please:\n1. Open ${appDisplayName} manually\n2. Go to UPI/Send Money\n3. Enter UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Add Note: ${transactionNote}`);
-        }
+            if (!opened) {
+                alert(`📱 Manual Payment Instructions:\n\n🆔 UPI ID: ${upiId}\n💰 Amount: ₹${amount}\n📝 Note: ${transactionNote}\n\n📱 Steps:\n1. Open ${appName_display} app manually\n2. Tap 'Send Money' or 'Pay'\n3. Enter UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Add Note: ${transactionNote}\n6. Complete payment`);
+            }
+        }, 1500);
+        
+    } catch (error) {
+        console.error(`❌ Error opening ${appName_display}:`, error);
+        alert(`❌ Could not open ${appName_display}.\n\n📱 Manual Payment:\n\n🆔 UPI ID: ${upiId}\n💰 Amount: ₹${amount}\n📝 Note: ${transactionNote}\n\nPlease open ${appName_display} and enter these details manually.`);
+    }
+}
+
+// SIMPLE AND DIRECT PAYMENT APP OPENER - SAME AS WORKING FORCE GPAY
+window.openPaymentAppDirect = function(appName) {
+    console.log('🚀 Direct app opening:', appName);
+    
+    const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
+    if (!orderData) {
+        alert('❌ No order data found');
+        return;
     }
     
-    // Try to open the app
-    tryOpenApp();
+    const upiId = 'naveethulhussain700-4@okaxis';
+    const amount = orderData.totalAmount;
+    const orderId = orderData.orderId;
+    const note = `Order-${orderId}`;
     
-    // Enhanced user feedback
-    setTimeout(() => {
-        const userChoice = confirm(`💳 ${appDisplayName} Payment\n\n✅ If ${appDisplayName} opened: Complete your payment there\n❌ If ${appDisplayName} didn't open: Click OK for alternatives\n\nDid ${appDisplayName} open successfully?`);
+    // SIMPLE URL CONSTRUCTION - SAME AS FORCE GPAY
+    let url = '';
+    let appDisplayName = '';
+    
+    if (appName === 'paytm') {
+        url = `paytmmp://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
+        appDisplayName = 'Paytm';
+    } else if (appName === 'gpay') {
+        url = `tez://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
+        appDisplayName = 'Google Pay';
+    } else if (appName === 'phonepe') {
+        url = `phonepe://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
+        appDisplayName = 'PhonePe';
+    } else {
+        alert('❌ Invalid app name');
+        return;
+    }
+    
+    console.log(`🔗 ${appDisplayName} URL:`, url);
+    console.log(`💰 Amount: ₹${amount}`);
+    
+    // SAME METHOD AS WORKING FORCE GPAY
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isMobile = /android|iphone|ipad|ipod/.test(userAgent);
+    
+    if (isMobile) {
+        // Mobile device - use direct approach (same as Force GPay)
+        window.location.href = url;
         
-        if (!userChoice) {
-            // Try alternative URL formats
-            if (appName === 'gpay') {
-                // Try Google Pay alternative formats
-                const altUrls = [
-                    `gpay://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
-                    `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
-                ];
-                
-                altUrls.forEach((altUrl, index) => {
-                    setTimeout(() => {
-                        console.log(`🔄 Trying Google Pay alternative ${index + 1}:`, altUrl);
-                        window.location.href = altUrl;
-                    }, index * 1000);
-                });
-            } else {
-                // For other apps, try generic UPI format
-                const genericUrl = `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
-                console.log('🔄 Trying generic UPI format:', genericUrl);
-                window.location.href = genericUrl;
+        // Give feedback after delay
+        setTimeout(() => {
+            const success = confirm(`💳 ${appDisplayName} Payment\n\nDid ${appDisplayName} open with ₹${amount} payment?\n\n✅ YES: Complete payment in the app\n❌ NO: Get manual instructions`);
+            
+            if (!success) {
+                alert(`📱 Manual Payment:\n\n🆔 UPI ID: ${upiId}\n💰 Amount: ₹${amount}\n📝 Note: ${note}\n\n1. Open ${appDisplayName} manually\n2. Tap 'Pay' or 'Send Money'\n3. Enter UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Complete payment`);
             }
+        }, 2000);
+    } else {
+        // Desktop - show QR code message
+        alert(`📱 This feature works best on mobile devices.\n\nPlease:\n1. Open this page on your mobile phone\n2. Click the ${appDisplayName} button\n\nOr use the QR code below to pay with any UPI app.`);
+        
+        // Highlight QR code
+        const qrSection = document.querySelector('.qr-code-container');
+        if (qrSection) {
+            qrSection.scrollIntoView({ behavior: 'smooth' });
+            qrSection.style.border = '3px solid #2196f3';
         }
-    }, 2000);
-}
+    }
+};
 
 function copyUpiId() {
     const upiId = 'naveethulhussain700-4@okaxis';

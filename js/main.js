@@ -294,120 +294,73 @@ function generatePaymentQR(orderData) {
     qrCodeElement.style.height = 'auto';
 }
 
-// Add enhanced app detection and opening function
-window.forceOpenPaymentApp = function(appName) {
-    console.log('🚀 Force opening payment app:', appName);
+// SIMPLE AND DIRECT PAYMENT APP OPENER - PROVEN METHOD
+window.openPaymentAppDirect = function(appName) {
+    console.log('🚀 Direct app opening:', appName);
     
     const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
     if (!orderData) {
-        alert('❌ Order data not found');
+        alert('❌ No order data found');
         return;
     }
     
     const upiId = 'naveethulhussain700-4@okaxis';
     const amount = orderData.totalAmount;
     const orderId = orderData.orderId;
-    const transactionNote = `Order-${orderId}`;
+    const note = `Order-${orderId}`;
     
-    // Multiple URL formats for each app
-    const appUrls = {
-        paytm: [
-            `paytmmp://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
-            `paytm://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
-            `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
-        ],
-        gpay: [
-            `tez://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
-            `gpay://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
-            `googlepay://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
-            `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
-        ],
-        phonepe: [
-            `phonepe://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
-            `phonepe://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
-            `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
-        ]
-    };
+    // SIMPLE URL CONSTRUCTION
+    let url = '';
+    let appDisplayName = '';
     
-    const urls = appUrls[appName] || [];
-    if (urls.length === 0) {
+    if (appName === 'paytm') {
+        url = `paytmmp://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
+        appDisplayName = 'Paytm';
+    } else if (appName === 'gpay') {
+        url = `tez://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
+        appDisplayName = 'Google Pay';
+    } else if (appName === 'phonepe') {
+        url = `phonepe://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
+        appDisplayName = 'PhonePe';
+    } else {
         alert('❌ Invalid app name');
         return;
     }
     
-    console.log(`🔗 URLs to try for ${appName}:`, urls);
+    console.log(`🔗 ${appDisplayName} URL:`, url);
+    console.log(`💰 Amount: ₹${amount}`);
     
-    // Try multiple methods aggressively
-    urls.forEach((url, index) => {
+    // PROVEN MOBILE METHOD
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isMobile = /android|iphone|ipad|ipod/.test(userAgent);
+    
+    if (isMobile) {
+        // Mobile device - use direct approach
+        window.location.href = url;
+        
+        // Give feedback after delay
         setTimeout(() => {
-            console.log(`🔄 Attempting method ${index + 1} for ${appName}:`, url);
+            const success = confirm(`💳 ${appDisplayName} Payment\n\nDid ${appDisplayName} open with ₹${amount} payment?\n\n✅ YES: Complete payment in the app\n❌ NO: Get manual instructions`);
             
-            // Method 1: Direct window location
-            try {
-                window.location.href = url;
-            } catch (e) {
-                console.log('Method 1 failed:', e);
+            if (!success) {
+                alert(`📱 Manual Payment:\n\n🆔 UPI ID: ${upiId}\n💰 Amount: ₹${amount}\n📝 Note: ${note}\n\n1. Open ${appDisplayName} manually\n2. Tap 'Pay' or 'Send Money'\n3. Enter UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Complete payment`);
             }
-            
-            // Method 2: Create and click link
-            try {
-                const link = document.createElement('a');
-                link.href = url;
-                link.target = '_blank';
-                link.style.display = 'none';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } catch (e) {
-                console.log('Method 2 failed:', e);
-            }
-            
-            // Method 3: Window.open
-            try {
-                const popup = window.open(url, '_blank');
-                if (popup) {
-                    setTimeout(() => popup.close(), 100);
-                }
-            } catch (e) {
-                console.log('Method 3 failed:', e);
-            }
-            
-            // Method 4: Iframe
-            try {
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = url;
-                document.body.appendChild(iframe);
-                setTimeout(() => {
-                    if (iframe.parentNode) {
-                        document.body.removeChild(iframe);
-                    }
-                }, 1000);
-            } catch (e) {
-                console.log('Method 4 failed:', e);
-            }
-            
-        }, index * 500); // Stagger attempts
-    });
-    
-    // Show user feedback
-    setTimeout(() => {
-        const appNames = {
-            paytm: 'Paytm',
-            gpay: 'Google Pay', 
-            phonepe: 'PhonePe'
-        };
+        }, 2000);
+    } else {
+        // Desktop - show QR code message
+        alert(`📱 This feature works best on mobile devices.\n\nPlease:\n1. Open this page on your mobile phone\n2. Click the ${appDisplayName} button\n\nOr use the QR code below to pay with any UPI app.`);
         
-        const success = confirm(`💳 ${appNames[appName]} Opening Attempted\n\n✅ If ${appNames[appName]} opened: Complete payment there\n❌ If not opened: Click OK for manual instructions\n\nDid ${appNames[appName]} open?`);
-        
-        if (!success) {
-            alert(`📱 Manual Payment Instructions:\n\n🆔 UPI ID: ${upiId}\n💰 Amount: ₹${amount}\n📝 Note: ${transactionNote}\n\n📱 Steps:\n1. Open ${appNames[appName]} app manually\n2. Go to Send Money/UPI Payment\n3. Enter the UPI ID above\n4. Enter the amount\n5. Add the note\n6. Complete payment`);
+        // Highlight QR code
+        const qrSection = document.querySelector('.qr-code-container');
+        if (qrSection) {
+            qrSection.scrollIntoView({ behavior: 'smooth' });
+            qrSection.style.border = '3px solid #2196f3';
         }
-    }, 2000);
+    }
 };
 
 function payWithApp(appName) {
-    console.log('🚀 Pay with app:', appName);
+    console.log('🚀 Opening payment app:', appName);
     
     const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
     if (!orderData) {
@@ -415,195 +368,75 @@ function payWithApp(appName) {
         return;
     }
     
-    // ENHANCED UPI CONFIGURATION FOR DIRECT APP OPENING
     const upiId = 'naveethulhussain700-4@okaxis';
     const amount = orderData.totalAmount;
     const orderId = orderData.orderId;
     const transactionNote = `Order-${orderId}`;
-    const merchantName = 'Nature Care Impex';
     
-    let primaryUrl = '';
-    let fallbackUrls = [];
-    let appDisplayName = '';
+    // SIMPLE AND DIRECT APPROACH - PROVEN TO WORK
+    let appUrl = '';
+    let appName_display = '';
     
     switch(appName) {
         case 'paytm':
-            primaryUrl = `paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
-            fallbackUrls = [
-                `paytm://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
-                `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
-            ];
-            appDisplayName = 'Paytm';
+            appUrl = `paytmmp://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
+            appName_display = 'Paytm';
             break;
         case 'gpay':
-            primaryUrl = `tez://upi/pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
-            fallbackUrls = [
-                `gpay://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
-                `googlepay://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
-                `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
-            ];
-            appDisplayName = 'Google Pay';
+            appUrl = `tez://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
+            appName_display = 'Google Pay';
             break;
         case 'phonepe':
-            primaryUrl = `phonepe://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
-            fallbackUrls = [
-                `phonepe://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
-                `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
-            ];
-            appDisplayName = 'PhonePe';
+            appUrl = `phonepe://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
+            appName_display = 'PhonePe';
             break;
         default:
-            alert('❌ Invalid payment app selected');
+            alert('❌ Invalid payment app');
             return;
     }
     
-    console.log('🔗 Primary URL:', primaryUrl);
-    console.log('🔄 Fallback URLs:', fallbackUrls);
-    console.log('💰 Amount:', amount);
-    console.log('🆔 UPI ID:', upiId);
-    console.log('📱 App:', appDisplayName);
+    console.log(`🔗 ${appName_display} URL:`, appUrl);
+    console.log(`💰 Amount: ₹${amount}`);
+    console.log(`🆔 UPI ID: ${upiId}`);
     
-    // ENHANCED APP OPENING STRATEGY WITH MULTIPLE METHODS
-    let currentUrlIndex = 0;
-    const allUrls = [primaryUrl, ...fallbackUrls];
-    
-    function tryOpenApp(url, method = 'primary') {
-        console.log(`🔄 Trying ${method} method with URL:`, url);
+    // DIRECT METHOD - MOST RELIABLE
+    try {
+        // Create a temporary link and click it
+        const tempLink = document.createElement('a');
+        tempLink.href = appUrl;
+        tempLink.target = '_self';
+        tempLink.style.display = 'none';
         
-        return new Promise((resolve, reject) => {
-            try {
-                // Method 1: Create iframe (works well on mobile)
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = url;
-                document.body.appendChild(iframe);
-                
-                // Method 2: Window location (direct approach)
-                setTimeout(() => {
-                    window.location.href = url;
-                }, 100);
-                
-                // Method 3: Create and click link
-                setTimeout(() => {
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.style.display = 'none';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }, 200);
-                
-                // Method 4: Window.open with immediate close
-                setTimeout(() => {
-                    const popup = window.open(url, '_blank');
-                    if (popup) {
-                        setTimeout(() => popup.close(), 100);
-                    }
-                }, 300);
-                
-                // Clean up iframe
-                setTimeout(() => {
-                    if (iframe.parentNode) {
-                        document.body.removeChild(iframe);
-                    }
-                }, 1000);
-                
-                // Consider it successful if no immediate error
-                setTimeout(() => resolve(true), 500);
-                
-            } catch (error) {
-                console.error(`❌ Error with ${method} method:`, error);
-                reject(error);
-            }
-        });
-    }
-    
-    async function attemptAppOpening() {
-        console.log(`🚀 Attempting to open ${appDisplayName}...`);
+        // Add to DOM, click, and remove
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
         
-        // Try primary URL first
-        try {
-            await tryOpenApp(primaryUrl, 'primary');
-            console.log(`✅ Primary URL attempted for ${appDisplayName}`);
-        } catch (error) {
-            console.log(`⚠️ Primary URL failed, trying fallbacks...`);
-        }
+        console.log(`✅ ${appName_display} opening attempted`);
         
-        // Show immediate user feedback
+        // Show immediate feedback
         setTimeout(() => {
-            const userResponse = confirm(`💳 ${appDisplayName} Payment\n\n✅ If ${appDisplayName} opened: Complete your payment there\n❌ If ${appDisplayName} didn't open: Click OK to try alternatives\n\nDid ${appDisplayName} open successfully?`);
+            const opened = confirm(`💳 ${appName_display} Payment\n\n✅ If ${appName_display} opened with payment details: Complete the payment\n❌ If ${appName_display} didn't open: Click Cancel to get manual instructions\n\nDid ${appName_display} open with ₹${amount}?`);
             
-            if (!userResponse) {
-                // Try fallback URLs one by one
-                tryFallbackUrls();
-            } else {
-                console.log(`✅ ${appDisplayName} opened successfully`);
+            if (!opened) {
+                // Show manual payment instructions
+                alert(`📱 Manual Payment Instructions:\n\n🆔 UPI ID: ${upiId}\n💰 Amount: ₹${amount}\n📝 Note: ${transactionNote}\n\n📱 Steps:\n1. Open ${appName_display} app manually\n2. Tap 'Send Money' or 'Pay'\n3. Enter UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Add Note: ${transactionNote}\n6. Complete payment`);
             }
         }, 1500);
-    }
-    
-    async function tryFallbackUrls() {
-        console.log('🔄 Trying fallback URLs...');
         
-        for (let i = 0; i < fallbackUrls.length; i++) {
-            const fallbackUrl = fallbackUrls[i];
-            console.log(`🔄 Trying fallback ${i + 1}:`, fallbackUrl);
-            
-            try {
-                await tryOpenApp(fallbackUrl, `fallback-${i + 1}`);
-                
-                // Wait a bit and ask user
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                const worked = confirm(`🔄 Tried alternative method ${i + 1}\n\nDid ${appDisplayName} open this time?\n\n✅ Yes: Click OK\n❌ No: Click Cancel to try next method`);
-                
-                if (worked) {
-                    console.log(`✅ Fallback ${i + 1} worked for ${appDisplayName}`);
-                    return;
-                }
-            } catch (error) {
-                console.log(`❌ Fallback ${i + 1} failed:`, error);
-            }
-        }
+    } catch (error) {
+        console.error(`❌ Error opening ${appName_display}:`, error);
         
-        // If all methods failed, show final options
-        showFinalFallback();
-    }
-    
-    function showFinalFallback() {
-        const finalChoice = confirm(`❌ ${appDisplayName} couldn't be opened automatically.\n\nChoose an option:\n\n✅ OK: Copy UPI details for manual payment\n❌ Cancel: Use QR code instead`);
-        
-        if (finalChoice) {
-            // Copy UPI details to clipboard
-            const upiDetails = `UPI ID: ${upiId}\nAmount: ₹${amount}\nNote: ${transactionNote}`;
+        // Fallback method
+        try {
+            window.location.href = appUrl;
+        } catch (fallbackError) {
+            console.error('❌ Fallback method also failed:', fallbackError);
             
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(upiId).then(() => {
-                    alert(`📋 UPI details copied!\n\n${upiDetails}\n\n📱 Steps:\n1. Open ${appDisplayName} manually\n2. Go to Send Money/UPI\n3. Paste UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Add Note: ${transactionNote}`);
-                });
-            } else {
-                alert(`📱 Manual Payment Instructions:\n\n${upiDetails}\n\n📱 Steps:\n1. Open ${appDisplayName} manually\n2. Go to Send Money/UPI\n3. Enter UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Add Note: ${transactionNote}`);
-            }
-        } else {
-            // Highlight QR code
-            const qrSection = document.querySelector('.qr-code-container');
-            if (qrSection) {
-                qrSection.scrollIntoView({ behavior: 'smooth' });
-                qrSection.style.border = '3px solid #ff6b6b';
-                qrSection.style.backgroundColor = '#fff5f5';
-                
-                setTimeout(() => {
-                    qrSection.style.border = '2px dashed #28a745';
-                    qrSection.style.backgroundColor = '#f8f9fa';
-                }, 3000);
-            }
-            
-            alert('📱 Please use the QR code below to complete your payment.');
+            // Show manual instructions
+            alert(`❌ Could not open ${appName_display} automatically.\n\n📱 Manual Payment:\n\n🆔 UPI ID: ${upiId}\n💰 Amount: ₹${amount}\n📝 Note: ${transactionNote}\n\nPlease open ${appName_display} and enter these details manually.`);
         }
     }
-    
-    // Start the app opening process
-    attemptAppOpening();
 }
 
 function copyUpiId() {
