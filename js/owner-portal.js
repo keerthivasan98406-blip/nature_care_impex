@@ -63,8 +63,48 @@ let monthlyData = [
 ];
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Clear any cached default orders first
+    clearDefaultOrders();
+    
+    // Then initialize portal
     initializePortal();
 });
+
+// Clear any cached default orders from localStorage
+function clearDefaultOrders() {
+    try {
+        console.log('🔍 Checking for cached default orders...');
+        
+        // Clear from customerOrders in localStorage
+        const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+        const originalLength = customerOrders.length;
+        
+        const filteredOrders = customerOrders.filter(order => {
+            const orderId = order.orderId || order.id;
+            const isDefaultOrder = ['ORD-001', 'ORD-002', 'ORD-003'].includes(orderId);
+            
+            if (isDefaultOrder) {
+                console.log('🗑️ Removing cached default order:', orderId);
+            }
+            
+            return !isDefaultOrder;
+        });
+        
+        if (filteredOrders.length !== originalLength) {
+            localStorage.setItem('customerOrders', JSON.stringify(filteredOrders));
+            console.log('✅ Cleared', (originalLength - filteredOrders.length), 'default orders from localStorage');
+        } else {
+            console.log('✅ No default orders found in localStorage');
+        }
+        
+        // Also clear the admin orders array to be sure
+        orders.length = 0;
+        console.log('✅ Cleared admin orders array');
+        
+    } catch (error) {
+        console.error('Error clearing default orders:', error);
+    }
+}
 
 function initializePortal() {
     const loginForm = document.getElementById('login-form');
