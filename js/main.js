@@ -211,7 +211,7 @@ function generatePaymentQR(orderData) {
     console.log('Generating payment QR code...');
     
     // Create UPI payment URL
-    const upiData = `upi://pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${orderData.totalAmount}&cu=INR&tn=Order ${orderData.orderId}`;
+    const upiData = `upi://pay?pa=naveethulhussain700-4@okaxis&pn=Nature Care Impex&am=${orderData.totalAmount}&cu=INR&tn=Order ${orderData.orderId}`;
     
     // Generate QR code using QR server API
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiData)}`;
@@ -235,13 +235,13 @@ function payWithApp(appName) {
     let url = '';
     switch(appName) {
         case 'paytm':
-            url = `paytmmp://pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${amount}&cu=INR&tn=Order ${orderId}`;
+            url = `paytmmp://pay?pa=naveethulhussain700-4@okaxis&pn=Nature Care Impex&am=${amount}&cu=INR&tn=Order ${orderId}`;
             break;
         case 'gpay':
-            url = `tez://upi/pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${amount}&cu=INR&tn=Order ${orderId}`;
+            url = `tez://upi/pay?pa=naveethulhussain700-4@okaxis&pn=Nature Care Impex&am=${amount}&cu=INR&tn=Order ${orderId}`;
             break;
         case 'phonepe':
-            url = `phonepe://pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${amount}&cu=INR&tn=Order ${orderId}`;
+            url = `phonepe://pay?pa=naveethulhussain700-4@okaxis&pn=Nature Care Impex&am=${amount}&cu=INR&tn=Order ${orderId}`;
             break;
     }
     
@@ -255,7 +255,7 @@ function payWithApp(appName) {
 }
 
 function copyUpiId() {
-    const upiId = 'naturecareimpex@paytm';
+    const upiId = 'naveethulhussain700-4@okaxis';
     
     // Try to copy to clipboard
     if (navigator.clipboard) {
@@ -1339,7 +1339,7 @@ function showPaymentModal() {
     document.getElementById('payment-product').textContent = currentOrder.product.name;
     
     // Generate QR code (using a QR code service)
-    const qrData = `upi://pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${currentOrder.customerDetails.total}&cu=INR&tn=Order ${currentOrder.orderId}`;
+    const qrData = `upi://pay?pa=naveethulhussain700-4@okaxis&pn=Nature Care Impex&am=${currentOrder.customerDetails.total}&cu=INR&tn=Order ${currentOrder.orderId}`;
     document.getElementById('payment-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
     
     modal.style.display = 'block';
@@ -1407,7 +1407,7 @@ function createPaymentModal() {
                                     </div>
                                 </div>
                                 <div class="upi-id">
-                                    <p><strong>UPI ID:</strong> naturecareimpex@paytm</p>
+                                    <p><strong>UPI ID:</strong> naveethulhussain700-4@okaxis</p>
                                 </div>
                             </div>
                         </div>
@@ -1456,13 +1456,13 @@ function payWithApp(app) {
     let url = '';
     switch(app) {
         case 'paytm':
-            url = `paytmmp://pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${amount}&cu=INR&tn=Order ${orderId}`;
+            url = `paytmmp://pay?pa=naveethulhussain700-4@okaxis&pn=Nature Care Impex&am=${amount}&cu=INR&tn=Order ${orderId}`;
             break;
         case 'gpay':
-            url = `tez://upi/pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${amount}&cu=INR&tn=Order ${orderId}`;
+            url = `tez://upi/pay?pa=naveethulhussain700-4@okaxis&pn=Nature Care Impex&am=${amount}&cu=INR&tn=Order ${orderId}`;
             break;
         case 'phonepe':
-            url = `phonepe://pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${amount}&cu=INR&tn=Order ${orderId}`;
+            url = `phonepe://pay?pa=naveethulhussain700-4@okaxis&pn=Nature Care Impex&am=${amount}&cu=INR&tn=Order ${orderId}`;
             break;
     }
     

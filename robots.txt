@@ -1,21 +1,32 @@
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://nature-care-impex-1.onrender.com/sitemap.xml
-
-# Disallow admin areas
-Disallow: /owner.html
-Disallow: /server/
-Disallow: /.git/
-Disallow: /.vscode/
-
-# Allow important pages
+# Important pages
 Allow: /index.html
 Allow: /products.html
 Allow: /about.html
 Allow: /contact.html
 Allow: /track-order.html
+Allow: /product-detail.html
+Allow: /order-details.html
+Allow: /payment.html
+
+# Static resources
 Allow: /css/
 Allow: /js/
 Allow: /assets/
+Allow: /images/
+
+# Disallow admin and system areas
+Disallow: /owner.html
+Disallow: /server/
+Disallow: /.git/
+Disallow: /.vscode/
+Disallow: /node_modules/
+Disallow: /*.log$
+
+# Sitemap location
+Sitemap: https://nature-care-impex-1.onrender.com/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1
