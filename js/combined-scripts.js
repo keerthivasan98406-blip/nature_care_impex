@@ -405,7 +405,7 @@ function generatePaymentQR(orderData) {
 }
 
 function payWithApp(appName) {
-    console.log('Pay with app:', appName);
+    console.log('🚀 Pay with app:', appName);
     
     const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
     if (!orderData) {
@@ -413,33 +413,95 @@ function payWithApp(appName) {
         return;
     }
     
-    // SIMPLE UPI CONFIGURATION
+    // ENHANCED UPI CONFIGURATION FOR DIRECT APP OPENING
     const upiId = 'naveethulhussain700-4@okaxis';
     const amount = orderData.totalAmount;
     const orderId = orderData.orderId;
     const transactionNote = `Order-${orderId}`;
+    const merchantName = 'Nature Care Impex';
     
     let url = '';
+    let appDisplayName = '';
+    
     switch(appName) {
         case 'paytm':
-            url = `paytmmp://pay?pa=${upiId}&am=${amount}&tn=${transactionNote}`;
+            // Enhanced Paytm URL with all parameters
+            url = `paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+            appDisplayName = 'Paytm';
             break;
         case 'gpay':
-            url = `tez://upi/pay?pa=${upiId}&am=${amount}&tn=${transactionNote}`;
+            // Enhanced Google Pay URL - multiple formats for compatibility
+            url = `tez://upi/pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+            appDisplayName = 'Google Pay';
             break;
         case 'phonepe':
-            url = `phonepe://pay?pa=${upiId}&am=${amount}&tn=${transactionNote}`;
+            // Enhanced PhonePe URL with all parameters
+            url = `phonepe://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+            appDisplayName = 'PhonePe';
             break;
+        default:
+            alert('❌ Invalid payment app selected');
+            return;
     }
     
     console.log('🔗 Opening app with URL:', url);
     console.log('💰 Amount:', amount);
     console.log('🆔 UPI ID:', upiId);
+    console.log('📱 App:', appDisplayName);
     
-    window.location.href = url;
+    // ENHANCED APP OPENING STRATEGY
+    function tryOpenApp() {
+        try {
+            // Method 1: Direct location change (most reliable on mobile)
+            window.location.href = url;
+            
+            // Method 2: Create invisible link and click it
+            const link = document.createElement('a');
+            link.href = url;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            console.log(`✅ Attempted to open ${appDisplayName}`);
+            
+        } catch (error) {
+            console.error(`❌ Error opening ${appDisplayName}:`, error);
+            
+            // Fallback: Show manual instructions
+            alert(`❌ Could not open ${appDisplayName} automatically.\n\n📱 Please:\n1. Open ${appDisplayName} manually\n2. Go to UPI/Send Money\n3. Enter UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Add Note: ${transactionNote}`);
+        }
+    }
     
+    // Try to open the app
+    tryOpenApp();
+    
+    // Enhanced user feedback
     setTimeout(() => {
-        alert(`If ${appName} didn't open automatically, please use the QR code or UPI ID to make payment.`);
+        const userChoice = confirm(`💳 ${appDisplayName} Payment\n\n✅ If ${appDisplayName} opened: Complete your payment there\n❌ If ${appDisplayName} didn't open: Click OK for alternatives\n\nDid ${appDisplayName} open successfully?`);
+        
+        if (!userChoice) {
+            // Try alternative URL formats
+            if (appName === 'gpay') {
+                // Try Google Pay alternative formats
+                const altUrls = [
+                    `gpay://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
+                    `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
+                ];
+                
+                altUrls.forEach((altUrl, index) => {
+                    setTimeout(() => {
+                        console.log(`🔄 Trying Google Pay alternative ${index + 1}:`, altUrl);
+                        window.location.href = altUrl;
+                    }, index * 1000);
+                });
+            } else {
+                // For other apps, try generic UPI format
+                const genericUrl = `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
+                console.log('🔄 Trying generic UPI format:', genericUrl);
+                window.location.href = genericUrl;
+            }
+        }
     }, 2000);
 }
 

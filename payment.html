@@ -468,8 +468,8 @@
                                         ">
                                             📱 Test UPI
                                         </button>
-                                        <button onclick="testUPIId()" style="
-                                            background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+                                        <button onclick="testDirectPayment()" style="
+                                            background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
                                             color: white;
                                             border: none;
                                             padding: 8px 16px;
@@ -477,12 +477,12 @@
                                             cursor: pointer;
                                             font-weight: 600;
                                             transition: all 0.3s ease;
-                                            box-shadow: 0 2px 4px rgba(156,39,176,0.3);
+                                            box-shadow: 0 2px 4px rgba(233,30,99,0.3);
                                         ">
-                                            🧪 Test UPI IDs
+                                            🔗 Test Direct Apps
                                         </button>
                                     </div>
-                                    <p style="font-size: 12px; color: #666; margin: 8px 0 0 0;">Copy UPI ID • Test QR Code • Validate UPI Format • Test Alternative UPI IDs</p>
+                                    <p style="font-size: 12px; color: #666; margin: 8px 0 0 0;">Copy UPI ID • Test QR Code • Validate UPI Format • Test Direct Payment Apps</p>
                                 </div>
                             </div>
                         </div>
@@ -791,40 +791,56 @@ UPI String: ${primaryUpi}`);
             }
         };
         
-        // Add UPI ID tester
-        window.testUPIId = function() {
-            const upiIds = [
-                'naveethulhussain700-4@okaxis',
-                'naveethulhussain700-4@paytm',
-                'naveethulhussain700-4@ybl',
-                'naveethulhussain700-4@upi'
-            ];
-            
+        // Add direct payment test function
+        window.testDirectPayment = function() {
             const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
-            if (!orderData) return;
+            if (!orderData) {
+                alert('❌ No order data found');
+                return;
+            }
             
-            const testResults = upiIds.map(upiId => {
-                const testUpi = `upi://pay?pa=${upiId}&am=${orderData.totalAmount}&tn=Test-${Date.now()}`;
-                return {
-                    upiId: upiId,
-                    testString: testUpi,
-                    provider: upiId.split('@')[1]
-                };
-            });
+            const upiId = 'naveethulhussain700-4@okaxis';
+            const amount = orderData.totalAmount;
+            const orderId = orderData.orderId;
+            const transactionNote = `Order-${orderId}`;
+            const merchantName = 'Nature Care Impex';
             
-            console.log('🧪 UPI ID Test Results:', testResults);
+            // Test URLs for each payment app
+            const testUrls = {
+                paytm: `paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`,
+                gpay: `tez://upi/pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`,
+                phonepe: `phonepe://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`,
+                generic: `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
+            };
             
-            const message = `🧪 UPI ID Compatibility Test:
+            console.log('🔗 Direct Payment URLs:', testUrls);
+            
+            const testMessage = `🔗 Direct Payment App URLs Generated:
 
-${testResults.map((test, index) => 
-                `${index + 1}. ${test.upiId}
-   Provider: ${test.provider}
-   Test String: ${test.testString.substring(0, 60)}...`
-            ).join('\n\n')}
+💳 Paytm: ${testUrls.paytm.substring(0, 60)}...
+💳 Google Pay: ${testUrls.gpay.substring(0, 60)}...
+💳 PhonePe: ${testUrls.phonepe.substring(0, 60)}...
+💳 Generic UPI: ${testUrls.generic.substring(0, 60)}...
 
-All UPI IDs follow standard format. Try each one if primary doesn't work.`;
+📱 UPI ID: ${upiId}
+💰 Amount: ₹${amount}
+📝 Note: ${transactionNote}
+
+Check console for full URLs. Try clicking the payment buttons now!`;
             
-            alert(message);
+            alert(testMessage);
+            
+            // Also test if we can detect installed apps
+            const userAgent = navigator.userAgent.toLowerCase();
+            const deviceInfo = {
+                isMobile: /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent),
+                isAndroid: /android/i.test(userAgent),
+                isIOS: /iphone|ipad|ipod/i.test(userAgent),
+                browser: navigator.appName
+            };
+            
+            console.log('📱 Device Info:', deviceInfo);
+            console.log('🔍 User Agent:', userAgent);
         };
     </script>
 </body>

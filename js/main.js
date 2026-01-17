@@ -332,29 +332,35 @@ function payWithApp(appName) {
         return;
     }
     
-    // SIMPLE UPI CONFIGURATION
+    // ENHANCED UPI CONFIGURATION FOR DIRECT APP OPENING
     const upiId = 'naveethulhussain700-4@okaxis';
     const amount = orderData.totalAmount;
     const orderId = orderData.orderId;
     const transactionNote = `Order-${orderId}`;
+    const merchantName = 'Nature Care Impex';
     
     let url = '';
     let appDisplayName = '';
     
     switch(appName) {
         case 'paytm':
-            // Paytm URL format
-            url = `paytmmp://pay?pa=${upiId}&am=${amount}&tn=${transactionNote}`;
+            // Enhanced Paytm URL with all parameters
+            url = `paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
             appDisplayName = 'Paytm';
             break;
         case 'gpay':
-            // Google Pay URL format
-            url = `tez://upi/pay?pa=${upiId}&am=${amount}&tn=${transactionNote}`;
+            // Enhanced Google Pay URL - multiple formats for compatibility
+            const gpayUrls = [
+                `tez://upi/pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`,
+                `gpay://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
+                `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`
+            ];
+            url = gpayUrls[0]; // Try primary first
             appDisplayName = 'Google Pay';
             break;
         case 'phonepe':
-            // PhonePe URL format
-            url = `phonepe://pay?pa=${upiId}&am=${amount}&tn=${transactionNote}`;
+            // Enhanced PhonePe URL with all parameters
+            url = `phonepe://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
             appDisplayName = 'PhonePe';
             break;
         default:
@@ -365,17 +371,66 @@ function payWithApp(appName) {
     console.log('🔗 Opening app with URL:', url);
     console.log('💰 Amount:', amount);
     console.log('🆔 UPI ID:', upiId);
+    console.log('📱 App:', appDisplayName);
     
-    try {
-        // Try to open the payment app
-        window.location.href = url;
-        
-        // Show user feedback after a delay
-        setTimeout(() => {
-            const userResponse = confirm(`💳 ${appDisplayName} Payment\n\n✅ If ${appDisplayName} opened: Complete your payment there\n❌ If ${appDisplayName} didn't open: Click OK to use QR code\n\nDid ${appDisplayName} open successfully?`);
+    // ENHANCED APP OPENING STRATEGY
+    function tryOpenApp() {
+        try {
+            // Method 1: Direct location change (most reliable on mobile)
+            window.location.href = url;
             
-            if (!userResponse) {
-                // User said app didn't open, highlight QR code
+            // Method 2: Create invisible link and click it
+            const link = document.createElement('a');
+            link.href = url;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            console.log(`✅ Attempted to open ${appDisplayName}`);
+            
+        } catch (error) {
+            console.error(`❌ Error opening ${appDisplayName}:`, error);
+            
+            // Fallback: Show manual instructions
+            alert(`❌ Could not open ${appDisplayName} automatically.\n\n📱 Please:\n1. Open ${appDisplayName} manually\n2. Go to UPI/Send Money\n3. Enter UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Add Note: ${transactionNote}`);
+        }
+    }
+    
+    // Try to open the app
+    tryOpenApp();
+    
+    // Enhanced user feedback with multiple options
+    setTimeout(() => {
+        const userChoice = confirm(`💳 ${appDisplayName} Payment\n\n✅ If ${appDisplayName} opened: Complete your payment there\n❌ If ${appDisplayName} didn't open: Click OK for alternatives\n\nDid ${appDisplayName} open successfully?`);
+        
+        if (!userChoice) {
+            // Show alternative options
+            const alternatives = confirm(`🔄 ${appDisplayName} didn't open. Choose an option:\n\n✅ OK: Try alternative URL format\n❌ Cancel: Use QR code instead`);
+            
+            if (alternatives) {
+                // Try alternative URL formats
+                if (appName === 'gpay') {
+                    // Try Google Pay alternative formats
+                    const altUrls = [
+                        `gpay://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
+                        `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
+                    ];
+                    
+                    altUrls.forEach((altUrl, index) => {
+                        setTimeout(() => {
+                            console.log(`🔄 Trying Google Pay alternative ${index + 1}:`, altUrl);
+                            window.location.href = altUrl;
+                        }, index * 1000);
+                    });
+                } else {
+                    // For other apps, try generic UPI format
+                    const genericUrl = `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
+                    console.log('🔄 Trying generic UPI format:', genericUrl);
+                    window.location.href = genericUrl;
+                }
+            } else {
+                // Highlight QR code
                 const qrSection = document.querySelector('.qr-code-container');
                 if (qrSection) {
                     qrSection.scrollIntoView({ behavior: 'smooth' });
@@ -388,20 +443,12 @@ function payWithApp(appName) {
                     }, 3000);
                 }
                 
-                alert('📱 Please use the QR code below or copy the UPI ID to make payment manually.');
+                alert('📱 Please use the QR code below to complete your payment.');
             }
-        }, 2000);
-        
-    } catch (error) {
-        console.error('❌ Error opening payment app:', error);
-        alert(`❌ Could not open ${appDisplayName}.\n\n📱 Please use the QR code or copy UPI ID instead.`);
-        
-        // Highlight QR code section
-        const qrSection = document.querySelector('.qr-code-container');
-        if (qrSection) {
-            qrSection.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            console.log(`✅ ${appDisplayName} opened successfully`);
         }
-    }
+    }, 2000);
 }
 
 function copyUpiId() {
