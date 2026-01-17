@@ -371,7 +371,7 @@
                                 <div class="upi-apps-section">
                                     <p class="apps-instruction">Or pay directly using:</p>
                                     <div class="app-buttons" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin: 20px 0;">
-                                        <button class="upi-app paytm" onclick="payWithApp('paytm')" style="
+                                        <button class="upi-app paytm" onclick="payWithApp('paytm'); setTimeout(() => forceOpenPaymentApp('paytm'), 1000);" style="
                                             background: linear-gradient(135deg, #00BAF2 0%, #00A0E3 100%);
                                             border: none;
                                             border-radius: 12px;
@@ -388,7 +388,7 @@
                                             </svg>
                                             <span style="color: white; font-weight: 600; font-size: 16px;">Paytm</span>
                                         </button>
-                                        <button class="upi-app gpay" onclick="payWithApp('gpay')" style="
+                                        <button class="upi-app gpay" onclick="payWithApp('gpay'); setTimeout(() => forceOpenPaymentApp('gpay'), 1000);" style="
                                             background: linear-gradient(135deg, #4285F4 0%, #3367D6 100%);
                                             border: none;
                                             border-radius: 12px;
@@ -405,7 +405,7 @@
                                             </svg>
                                             <span style="color: white; font-weight: 600; font-size: 16px;">Google Pay</span>
                                         </button>
-                                        <button class="upi-app phonepe" onclick="payWithApp('phonepe')" style="
+                                        <button class="upi-app phonepe" onclick="payWithApp('phonepe'); setTimeout(() => forceOpenPaymentApp('phonepe'), 1000);" style="
                                             background: linear-gradient(135deg, #5F259F 0%, #7C3BAD 100%);
                                             border: none;
                                             border-radius: 12px;
@@ -469,7 +469,7 @@
                                             📱 Test UPI
                                         </button>
                                         <button onclick="testDirectPayment()" style="
-                                            background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
+                                            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
                                             color: white;
                                             border: none;
                                             padding: 8px 16px;
@@ -477,12 +477,25 @@
                                             cursor: pointer;
                                             font-weight: 600;
                                             transition: all 0.3s ease;
-                                            box-shadow: 0 2px 4px rgba(233,30,99,0.3);
+                                            box-shadow: 0 2px 4px rgba(33,150,243,0.3);
                                         ">
                                             🔗 Test Direct Apps
                                         </button>
+                                        <button onclick="forceOpenPaymentApp('gpay')" style="
+                                            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+                                            color: white;
+                                            border: none;
+                                            padding: 8px 16px;
+                                            border-radius: 6px;
+                                            cursor: pointer;
+                                            font-weight: 600;
+                                            transition: all 0.3s ease;
+                                            box-shadow: 0 2px 4px rgba(76,175,80,0.3);
+                                        ">
+                                            🚀 Force GPay
+                                        </button>
                                     </div>
-                                    <p style="font-size: 12px; color: #666; margin: 8px 0 0 0;">Copy UPI ID • Test QR Code • Validate UPI Format • Test Direct Payment Apps</p>
+                                    <p style="font-size: 12px; color: #666; margin: 8px 0 0 0;">Copy UPI ID • Test QR Code • Test Direct Apps • Force Open GPay</p>
                                 </div>
                             </div>
                         </div>

@@ -294,33 +294,116 @@ function generatePaymentQR(orderData) {
     qrCodeElement.style.height = 'auto';
 }
 
-// Add retry function
-window.retryQRGeneration = function() {
+// Add enhanced app detection and opening function
+window.forceOpenPaymentApp = function(appName) {
+    console.log('🚀 Force opening payment app:', appName);
+    
     const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
-    if (orderData) {
-        // Clear saved format to try all options again
-        localStorage.removeItem('workingUpiFormat');
-        generatePaymentQR(orderData);
+    if (!orderData) {
+        alert('❌ Order data not found');
+        return;
     }
-};
-
-// Add alternative UPI function
-window.showAlternativeUPIs = function() {
-    const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
-    if (!orderData) return;
     
-    const alternativeUPIs = [
-        'naturecareimpex@paytm',
-        'naturecareimpex@ybl',
-        'naturecareimpex@okaxis',
-        'naturecareimpex@upi'
-    ];
+    const upiId = 'naveethulhussain700-4@okaxis';
+    const amount = orderData.totalAmount;
+    const orderId = orderData.orderId;
+    const transactionNote = `Order-${orderId}`;
     
-    const upiList = alternativeUPIs.map((upi, index) => 
-        `${index + 1}. ${upi}`
-    ).join('\n');
+    // Multiple URL formats for each app
+    const appUrls = {
+        paytm: [
+            `paytmmp://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
+            `paytm://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
+            `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
+        ],
+        gpay: [
+            `tez://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
+            `gpay://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
+            `googlepay://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
+            `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
+        ],
+        phonepe: [
+            `phonepe://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
+            `phonepe://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
+            `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
+        ]
+    };
     
-    alert(`🔄 Alternative UPI IDs to try:\n\n${upiList}\n\nAmount: ₹${orderData.totalAmount}\nNote: Order-${orderData.orderId}\n\nTry these UPI IDs in your payment app if the primary one doesn't work.`);
+    const urls = appUrls[appName] || [];
+    if (urls.length === 0) {
+        alert('❌ Invalid app name');
+        return;
+    }
+    
+    console.log(`🔗 URLs to try for ${appName}:`, urls);
+    
+    // Try multiple methods aggressively
+    urls.forEach((url, index) => {
+        setTimeout(() => {
+            console.log(`🔄 Attempting method ${index + 1} for ${appName}:`, url);
+            
+            // Method 1: Direct window location
+            try {
+                window.location.href = url;
+            } catch (e) {
+                console.log('Method 1 failed:', e);
+            }
+            
+            // Method 2: Create and click link
+            try {
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (e) {
+                console.log('Method 2 failed:', e);
+            }
+            
+            // Method 3: Window.open
+            try {
+                const popup = window.open(url, '_blank');
+                if (popup) {
+                    setTimeout(() => popup.close(), 100);
+                }
+            } catch (e) {
+                console.log('Method 3 failed:', e);
+            }
+            
+            // Method 4: Iframe
+            try {
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = url;
+                document.body.appendChild(iframe);
+                setTimeout(() => {
+                    if (iframe.parentNode) {
+                        document.body.removeChild(iframe);
+                    }
+                }, 1000);
+            } catch (e) {
+                console.log('Method 4 failed:', e);
+            }
+            
+        }, index * 500); // Stagger attempts
+    });
+    
+    // Show user feedback
+    setTimeout(() => {
+        const appNames = {
+            paytm: 'Paytm',
+            gpay: 'Google Pay', 
+            phonepe: 'PhonePe'
+        };
+        
+        const success = confirm(`💳 ${appNames[appName]} Opening Attempted\n\n✅ If ${appNames[appName]} opened: Complete payment there\n❌ If not opened: Click OK for manual instructions\n\nDid ${appNames[appName]} open?`);
+        
+        if (!success) {
+            alert(`📱 Manual Payment Instructions:\n\n🆔 UPI ID: ${upiId}\n💰 Amount: ₹${amount}\n📝 Note: ${transactionNote}\n\n📱 Steps:\n1. Open ${appNames[appName]} app manually\n2. Go to Send Money/UPI Payment\n3. Enter the UPI ID above\n4. Enter the amount\n5. Add the note\n6. Complete payment`);
+        }
+    }, 2000);
 };
 
 function payWithApp(appName) {
@@ -339,28 +422,34 @@ function payWithApp(appName) {
     const transactionNote = `Order-${orderId}`;
     const merchantName = 'Nature Care Impex';
     
-    let url = '';
+    let primaryUrl = '';
+    let fallbackUrls = [];
     let appDisplayName = '';
     
     switch(appName) {
         case 'paytm':
-            // Enhanced Paytm URL with all parameters
-            url = `paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+            primaryUrl = `paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+            fallbackUrls = [
+                `paytm://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
+                `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
+            ];
             appDisplayName = 'Paytm';
             break;
         case 'gpay':
-            // Enhanced Google Pay URL - multiple formats for compatibility
-            const gpayUrls = [
-                `tez://upi/pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`,
+            primaryUrl = `tez://upi/pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+            fallbackUrls = [
                 `gpay://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
-                `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`
+                `googlepay://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
+                `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
             ];
-            url = gpayUrls[0]; // Try primary first
             appDisplayName = 'Google Pay';
             break;
         case 'phonepe':
-            // Enhanced PhonePe URL with all parameters
-            url = `phonepe://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+            primaryUrl = `phonepe://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+            fallbackUrls = [
+                `phonepe://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
+                `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
+            ];
             appDisplayName = 'PhonePe';
             break;
         default:
@@ -368,87 +457,153 @@ function payWithApp(appName) {
             return;
     }
     
-    console.log('🔗 Opening app with URL:', url);
+    console.log('🔗 Primary URL:', primaryUrl);
+    console.log('🔄 Fallback URLs:', fallbackUrls);
     console.log('💰 Amount:', amount);
     console.log('🆔 UPI ID:', upiId);
     console.log('📱 App:', appDisplayName);
     
-    // ENHANCED APP OPENING STRATEGY
-    function tryOpenApp() {
+    // ENHANCED APP OPENING STRATEGY WITH MULTIPLE METHODS
+    let currentUrlIndex = 0;
+    const allUrls = [primaryUrl, ...fallbackUrls];
+    
+    function tryOpenApp(url, method = 'primary') {
+        console.log(`🔄 Trying ${method} method with URL:`, url);
+        
+        return new Promise((resolve, reject) => {
+            try {
+                // Method 1: Create iframe (works well on mobile)
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = url;
+                document.body.appendChild(iframe);
+                
+                // Method 2: Window location (direct approach)
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 100);
+                
+                // Method 3: Create and click link
+                setTimeout(() => {
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }, 200);
+                
+                // Method 4: Window.open with immediate close
+                setTimeout(() => {
+                    const popup = window.open(url, '_blank');
+                    if (popup) {
+                        setTimeout(() => popup.close(), 100);
+                    }
+                }, 300);
+                
+                // Clean up iframe
+                setTimeout(() => {
+                    if (iframe.parentNode) {
+                        document.body.removeChild(iframe);
+                    }
+                }, 1000);
+                
+                // Consider it successful if no immediate error
+                setTimeout(() => resolve(true), 500);
+                
+            } catch (error) {
+                console.error(`❌ Error with ${method} method:`, error);
+                reject(error);
+            }
+        });
+    }
+    
+    async function attemptAppOpening() {
+        console.log(`🚀 Attempting to open ${appDisplayName}...`);
+        
+        // Try primary URL first
         try {
-            // Method 1: Direct location change (most reliable on mobile)
-            window.location.href = url;
-            
-            // Method 2: Create invisible link and click it
-            const link = document.createElement('a');
-            link.href = url;
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            console.log(`✅ Attempted to open ${appDisplayName}`);
-            
+            await tryOpenApp(primaryUrl, 'primary');
+            console.log(`✅ Primary URL attempted for ${appDisplayName}`);
         } catch (error) {
-            console.error(`❌ Error opening ${appDisplayName}:`, error);
+            console.log(`⚠️ Primary URL failed, trying fallbacks...`);
+        }
+        
+        // Show immediate user feedback
+        setTimeout(() => {
+            const userResponse = confirm(`💳 ${appDisplayName} Payment\n\n✅ If ${appDisplayName} opened: Complete your payment there\n❌ If ${appDisplayName} didn't open: Click OK to try alternatives\n\nDid ${appDisplayName} open successfully?`);
             
-            // Fallback: Show manual instructions
-            alert(`❌ Could not open ${appDisplayName} automatically.\n\n📱 Please:\n1. Open ${appDisplayName} manually\n2. Go to UPI/Send Money\n3. Enter UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Add Note: ${transactionNote}`);
+            if (!userResponse) {
+                // Try fallback URLs one by one
+                tryFallbackUrls();
+            } else {
+                console.log(`✅ ${appDisplayName} opened successfully`);
+            }
+        }, 1500);
+    }
+    
+    async function tryFallbackUrls() {
+        console.log('🔄 Trying fallback URLs...');
+        
+        for (let i = 0; i < fallbackUrls.length; i++) {
+            const fallbackUrl = fallbackUrls[i];
+            console.log(`🔄 Trying fallback ${i + 1}:`, fallbackUrl);
+            
+            try {
+                await tryOpenApp(fallbackUrl, `fallback-${i + 1}`);
+                
+                // Wait a bit and ask user
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const worked = confirm(`🔄 Tried alternative method ${i + 1}\n\nDid ${appDisplayName} open this time?\n\n✅ Yes: Click OK\n❌ No: Click Cancel to try next method`);
+                
+                if (worked) {
+                    console.log(`✅ Fallback ${i + 1} worked for ${appDisplayName}`);
+                    return;
+                }
+            } catch (error) {
+                console.log(`❌ Fallback ${i + 1} failed:`, error);
+            }
+        }
+        
+        // If all methods failed, show final options
+        showFinalFallback();
+    }
+    
+    function showFinalFallback() {
+        const finalChoice = confirm(`❌ ${appDisplayName} couldn't be opened automatically.\n\nChoose an option:\n\n✅ OK: Copy UPI details for manual payment\n❌ Cancel: Use QR code instead`);
+        
+        if (finalChoice) {
+            // Copy UPI details to clipboard
+            const upiDetails = `UPI ID: ${upiId}\nAmount: ₹${amount}\nNote: ${transactionNote}`;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(upiId).then(() => {
+                    alert(`📋 UPI details copied!\n\n${upiDetails}\n\n📱 Steps:\n1. Open ${appDisplayName} manually\n2. Go to Send Money/UPI\n3. Paste UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Add Note: ${transactionNote}`);
+                });
+            } else {
+                alert(`📱 Manual Payment Instructions:\n\n${upiDetails}\n\n📱 Steps:\n1. Open ${appDisplayName} manually\n2. Go to Send Money/UPI\n3. Enter UPI ID: ${upiId}\n4. Enter Amount: ₹${amount}\n5. Add Note: ${transactionNote}`);
+            }
+        } else {
+            // Highlight QR code
+            const qrSection = document.querySelector('.qr-code-container');
+            if (qrSection) {
+                qrSection.scrollIntoView({ behavior: 'smooth' });
+                qrSection.style.border = '3px solid #ff6b6b';
+                qrSection.style.backgroundColor = '#fff5f5';
+                
+                setTimeout(() => {
+                    qrSection.style.border = '2px dashed #28a745';
+                    qrSection.style.backgroundColor = '#f8f9fa';
+                }, 3000);
+            }
+            
+            alert('📱 Please use the QR code below to complete your payment.');
         }
     }
     
-    // Try to open the app
-    tryOpenApp();
-    
-    // Enhanced user feedback with multiple options
-    setTimeout(() => {
-        const userChoice = confirm(`💳 ${appDisplayName} Payment\n\n✅ If ${appDisplayName} opened: Complete your payment there\n❌ If ${appDisplayName} didn't open: Click OK for alternatives\n\nDid ${appDisplayName} open successfully?`);
-        
-        if (!userChoice) {
-            // Show alternative options
-            const alternatives = confirm(`🔄 ${appDisplayName} didn't open. Choose an option:\n\n✅ OK: Try alternative URL format\n❌ Cancel: Use QR code instead`);
-            
-            if (alternatives) {
-                // Try alternative URL formats
-                if (appName === 'gpay') {
-                    // Try Google Pay alternative formats
-                    const altUrls = [
-                        `gpay://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`,
-                        `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`
-                    ];
-                    
-                    altUrls.forEach((altUrl, index) => {
-                        setTimeout(() => {
-                            console.log(`🔄 Trying Google Pay alternative ${index + 1}:`, altUrl);
-                            window.location.href = altUrl;
-                        }, index * 1000);
-                    });
-                } else {
-                    // For other apps, try generic UPI format
-                    const genericUrl = `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
-                    console.log('🔄 Trying generic UPI format:', genericUrl);
-                    window.location.href = genericUrl;
-                }
-            } else {
-                // Highlight QR code
-                const qrSection = document.querySelector('.qr-code-container');
-                if (qrSection) {
-                    qrSection.scrollIntoView({ behavior: 'smooth' });
-                    qrSection.style.border = '3px solid #ff6b6b';
-                    qrSection.style.backgroundColor = '#fff5f5';
-                    
-                    setTimeout(() => {
-                        qrSection.style.border = '2px dashed #28a745';
-                        qrSection.style.backgroundColor = '#f8f9fa';
-                    }, 3000);
-                }
-                
-                alert('📱 Please use the QR code below to complete your payment.');
-            }
-        } else {
-            console.log(`✅ ${appDisplayName} opened successfully`);
-        }
-    }, 2000);
+    // Start the app opening process
+    attemptAppOpening();
 }
 
 function copyUpiId() {
