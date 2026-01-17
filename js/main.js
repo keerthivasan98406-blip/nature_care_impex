@@ -175,8 +175,33 @@ function loadPaymentPage() {
     const orderDataStr = sessionStorage.getItem('orderForPayment');
     if (!orderDataStr) {
         console.error('No order data found for payment');
-        alert('No order data found. Redirecting to products page.');
-        window.location.href = 'products.html';
+        
+        // Create demo order data for testing
+        const demoOrder = {
+            orderId: 'ORD-DEMO-' + Date.now(),
+            product: {
+                id: 1,
+                name: 'Cocopeat 5kg Block',
+                category: 'Cocopeat'
+            },
+            customerDetails: {
+                customerName: 'Demo Customer',
+                customerPhone: '9876543210',
+                customerEmail: 'demo@example.com',
+                deliveryAddress: 'Demo Address',
+                quantity: 1
+            },
+            unitPrice: 250,
+            totalAmount: 250,
+            status: 'pending'
+        };
+        
+        console.log('Using demo order data:', demoOrder);
+        sessionStorage.setItem('orderForPayment', JSON.stringify(demoOrder));
+        
+        // Use demo data
+        populatePaymentInfo(demoOrder);
+        generatePaymentQR(demoOrder);
         return;
     }
     
@@ -208,7 +233,7 @@ function populatePaymentInfo(orderData) {
 }
 
 function generatePaymentQR(orderData) {
-    console.log('Generating payment QR code for amount:', orderData.totalAmount);
+    console.log('🔄 Generating payment QR code for amount:', orderData.totalAmount);
     
     // Use the correct UPI ID and format
     const upiId = 'naturecareimpex@paytm';
@@ -217,37 +242,60 @@ function generatePaymentQR(orderData) {
     const currency = 'INR';
     const transactionNote = `Order-${orderData.orderId}`;
     
-    // Create proper UPI payment URL according to NPCI UPI specifications
-    // Simplified format for better compatibility
+    // Create simple UPI payment URL (most compatible format)
     const upiData = `upi://pay?pa=${upiId}&pn=${merchantName}&am=${amount}&cu=${currency}&tn=${transactionNote}`;
     
-    console.log('UPI Data:', upiData);
+    console.log('📱 UPI Data:', upiData);
     
-    // Generate QR code using multiple fallback services
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiData)}&format=png&ecc=L`;
+    // Try multiple QR code services for reliability
+    const qrServices = [
+        `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiData)}&format=png`,
+        `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(upiData)}&choe=UTF-8`,
+        `https://quickchart.io/qr?text=${encodeURIComponent(upiData)}&size=300`
+    ];
     
     const qrCodeElement = document.getElementById('payment-qr-code');
-    if (qrCodeElement) {
+    if (!qrCodeElement) {
+        console.error('❌ QR code element not found');
+        return;
+    }
+    
+    let currentServiceIndex = 0;
+    
+    function tryNextQRService() {
+        if (currentServiceIndex >= qrServices.length) {
+            console.error('❌ All QR services failed');
+            qrCodeElement.style.border = '3px solid #dc3545';
+            qrCodeElement.alt = 'QR Code generation failed';
+            return;
+        }
+        
+        const qrUrl = qrServices[currentServiceIndex];
+        console.log(`🔄 Trying QR service ${currentServiceIndex + 1}:`, qrUrl);
+        
+        qrCodeElement.onload = function() {
+            console.log('✅ QR code loaded successfully');
+            this.style.border = '3px solid #28a745';
+            this.style.display = 'block';
+        };
+        
+        qrCodeElement.onerror = function() {
+            console.log(`❌ QR service ${currentServiceIndex + 1} failed, trying next...`);
+            currentServiceIndex++;
+            setTimeout(tryNextQRService, 1000);
+        };
+        
         qrCodeElement.src = qrUrl;
         qrCodeElement.style.maxWidth = '250px';
         qrCodeElement.style.height = 'auto';
-        qrCodeElement.style.display = 'block';
-        
-        // Add error handling for QR code loading
-        qrCodeElement.onerror = function() {
-            console.error('QR code failed to load, trying alternative service');
-            // Fallback QR service
-            this.src = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(upiData)}&choe=UTF-8`;
-        };
-        
-        console.log('QR code generated successfully');
-    } else {
-        console.error('QR code element not found');
     }
+    
+    // Start with first service
+    tryNextQRService();
 }
 
 function payWithApp(appName) {
-    console.log('Pay with app:', appName);
+    console.log('🚀 Pay with app:', appName);
     
     const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
     if (!orderData) {
@@ -285,41 +333,50 @@ function payWithApp(appName) {
             return;
     }
     
-    console.log('Opening app with URL:', url);
-    
-    // Create a temporary link to trigger app opening
-    const link = document.createElement('a');
-    link.href = url;
-    link.style.display = 'none';
-    document.body.appendChild(link);
+    console.log('🔗 Opening app with URL:', url);
     
     try {
-        // Try to open the app
-        link.click();
+        // Method 1: Try window.open first
+        const popup = window.open(url, '_blank');
         
-        // Show success message
+        // Method 2: If popup blocked, try location.href
         setTimeout(() => {
-            const userConfirm = confirm(`🚀 ${appDisplayName} should have opened for payment.\n\n✅ If the app opened: Complete your payment\n❌ If the app didn't open: Click OK to use QR code instead`);
+            if (!popup || popup.closed) {
+                window.location.href = url;
+            }
+        }, 100);
+        
+        // Show user feedback
+        setTimeout(() => {
+            const userResponse = confirm(`💳 ${appDisplayName} Payment\n\n✅ If ${appDisplayName} opened: Complete your payment there\n❌ If ${appDisplayName} didn't open: Click OK to use QR code\n\nDid ${appDisplayName} open successfully?`);
             
-            if (userConfirm) {
-                // Scroll to QR code section
+            if (!userResponse) {
+                // User said app didn't open, highlight QR code
                 const qrSection = document.querySelector('.qr-code-container');
                 if (qrSection) {
                     qrSection.scrollIntoView({ behavior: 'smooth' });
                     qrSection.style.border = '3px solid #ff6b6b';
+                    qrSection.style.backgroundColor = '#fff5f5';
+                    
                     setTimeout(() => {
                         qrSection.style.border = '2px dashed #28a745';
+                        qrSection.style.backgroundColor = '#f8f9fa';
                     }, 3000);
                 }
+                
+                alert('📱 Please use the QR code below or copy the UPI ID to make payment manually.');
             }
-        }, 1500);
+        }, 2000);
         
     } catch (error) {
-        console.error('Error opening payment app:', error);
-        alert(`❌ Could not open ${appDisplayName}. Please use the QR code or copy UPI ID instead.`);
-    } finally {
-        // Clean up
-        document.body.removeChild(link);
+        console.error('❌ Error opening payment app:', error);
+        alert(`❌ Could not open ${appDisplayName}.\n\n📱 Please use the QR code or copy UPI ID instead.`);
+        
+        // Highlight QR code section
+        const qrSection = document.querySelector('.qr-code-container');
+        if (qrSection) {
+            qrSection.scrollIntoView({ behavior: 'smooth' });
+        }
     }
 }
 

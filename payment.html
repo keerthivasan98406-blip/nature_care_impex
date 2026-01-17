@@ -438,8 +438,22 @@
                                         font-weight: 600;
                                         transition: all 0.3s ease;
                                         box-shadow: 0 2px 4px rgba(76,175,80,0.3);
+                                        margin-right: 10px;
                                     " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(76,175,80,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(76,175,80,0.3)'">
                                         📋 Copy UPI ID
+                                    </button>
+                                    <button onclick="testPaymentSystem()" style="
+                                        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+                                        color: white;
+                                        border: none;
+                                        padding: 8px 16px;
+                                        border-radius: 6px;
+                                        cursor: pointer;
+                                        font-weight: 600;
+                                        transition: all 0.3s ease;
+                                        box-shadow: 0 2px 4px rgba(33,150,243,0.3);
+                                    ">
+                                        🔧 Test System
                                     </button>
                                     <p style="font-size: 12px; color: #666; margin: 8px 0 0 0;">Click to copy and paste in your UPI app</p>
                                 </div>
@@ -618,6 +632,43 @@
         // Make functions globally available
         window.copyUpiId = copyUpiId;
         window.payWithApp = payWithApp;
+        
+        // Test function for debugging
+        window.testPaymentSystem = function() {
+            console.log('🔧 Testing payment system...');
+            
+            // Check if order data exists
+            const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
+            if (!orderData) {
+                alert('❌ No order data found in sessionStorage');
+                return;
+            }
+            
+            console.log('✅ Order data found:', orderData);
+            
+            // Test QR code generation
+            const qrElement = document.getElementById('payment-qr-code');
+            if (!qrElement) {
+                alert('❌ QR code element not found');
+                return;
+            }
+            
+            console.log('✅ QR code element found');
+            
+            // Test UPI URL generation
+            const upiData = `upi://pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${orderData.totalAmount}&cu=INR&tn=Order-${orderData.orderId}`;
+            console.log('📱 Generated UPI URL:', upiData);
+            
+            // Test QR code URL
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiData)}&format=png`;
+            console.log('🔗 QR Code URL:', qrUrl);
+            
+            // Show test results
+            alert(`🔧 Payment System Test Results:\n\n✅ Order Data: Found\n✅ QR Element: Found\n✅ UPI URL: Generated\n✅ QR URL: Generated\n\nCheck console for details.`);
+            
+            // Force regenerate QR code
+            generatePaymentQR(orderData);
+        };
     </script>
 </body>
 
