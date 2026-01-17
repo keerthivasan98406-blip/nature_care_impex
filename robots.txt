@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://nature-care-impex-1.onrender.com/sitemap.xml
+
+# Disallow admin areas
+Disallow: /owner.html
+Disallow: /server/
+Disallow: /.git/
+Disallow: /.vscode/
+
+# Allow important pages
+Allow: /index.html
+Allow: /products.html
+Allow: /about.html
+Allow: /contact.html
+Allow: /track-order.html
+Allow: /css/
+Allow: /js/
+Allow: /assets/
