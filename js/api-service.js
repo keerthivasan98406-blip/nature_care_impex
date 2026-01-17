@@ -411,6 +411,54 @@ class APIService {
         return result;
     }
 
+    async deleteOrder(orderId) {
+        try {
+            console.log('🗑️ Deleting order from database:', orderId);
+            
+            const result = await this.apiCall(`/orders/${orderId}`, {
+                method: 'DELETE'
+            });
+            
+            // Remove from localStorage cache if database deletion successful
+            if (result.success) {
+                const orders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+                const filteredOrders = orders.filter(o => o.orderId !== orderId);
+                localStorage.setItem('customerOrders', JSON.stringify(filteredOrders));
+                console.log('✅ Order removed from localStorage cache');
+            }
+            
+            return result;
+        } catch (error) {
+            console.error('Delete order error:', error);
+            
+            // Fallback: remove from localStorage only
+            if (this.fallbackToLocalStorage) {
+                const orders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+                const originalLength = orders.length;
+                const filteredOrders = orders.filter(o => o.orderId !== orderId);
+                
+                if (filteredOrders.length < originalLength) {
+                    localStorage.setItem('customerOrders', JSON.stringify(filteredOrders));
+                    console.log('⚠️ Order removed from localStorage only (database unavailable)');
+                    
+                    return {
+                        success: true,
+                        message: 'Order deleted locally (database unavailable)',
+                        fallback: true
+                    };
+                } else {
+                    return {
+                        success: false,
+                        message: 'Order not found',
+                        fallback: true
+                    };
+                }
+            }
+            
+            throw error;
+        }
+    }
+
     async uploadScreenshot(orderId, file) {
         try {
             const formData = new FormData();

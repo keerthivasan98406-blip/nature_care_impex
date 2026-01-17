@@ -374,4 +374,40 @@ router.get('/stats/monthly', async (req, res) => {
     }
 });
 
+// Delete order
+router.delete('/:orderId', async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        
+        console.log('🗑️ Attempting to delete order:', orderId);
+        
+        const deletedOrder = await Order.findOneAndDelete({ orderId: orderId });
+        
+        if (!deletedOrder) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+        
+        console.log('✅ Order deleted from database:', orderId);
+        
+        res.json({
+            success: true,
+            message: 'Order deleted successfully',
+            data: {
+                orderId: deletedOrder.orderId,
+                customerName: deletedOrder.customerDetails.customerName
+            }
+        });
+    } catch (error) {
+        console.error('Error deleting order:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error deleting order',
+            error: error.message
+        });
+    }
+});
+
 module.exports = router;

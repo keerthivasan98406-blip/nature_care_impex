@@ -1725,7 +1725,7 @@ function editOrder(orderId) {
 
 // Delete Order Function
 async function deleteOrder(orderId, source) {
-    console.log('Deleting order:', orderId, 'from source:', source);
+    console.log('🗑️ Deleting order:', orderId, 'from source:', source);
     
     // Confirm deletion
     if (!confirm(`Are you sure you want to delete order ${orderId}?\n\nThis action cannot be undone.`)) {
@@ -1733,46 +1733,75 @@ async function deleteOrder(orderId, source) {
     }
     
     try {
+        let deleteSuccess = false;
+        
         if (source === 'admin') {
-            // Delete from admin orders
+            // Delete from admin orders (local array)
             const orderIndex = orders.findIndex(o => o.id === orderId);
             if (orderIndex !== -1) {
                 orders.splice(orderIndex, 1);
-                showNotification(`Order ${orderId} deleted successfully!`, 'success');
+                deleteSuccess = true;
+                console.log('✅ Order deleted from admin orders');
             } else {
                 showNotification('Order not found in admin orders', 'error');
                 return;
             }
         } else {
-            // Delete from customer orders (localStorage)
-            const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
-            const orderIndex = customerOrders.findIndex(o => o.orderId === orderId);
+            // Delete customer order from BOTH database and localStorage
+            console.log('🔄 Deleting customer order from database and localStorage...');
             
-            if (orderIndex !== -1) {
-                customerOrders.splice(orderIndex, 1);
-                localStorage.setItem('customerOrders', JSON.stringify(customerOrders));
-                showNotification(`Order ${orderId} deleted successfully!`, 'success');
-                
-                // Try to delete from database as well
-                if (window.apiService) {
-                    try {
-                        await window.apiService.deleteOrder(orderId);
+            // Step 1: Try to delete from database first
+            if (window.apiService) {
+                try {
+                    const result = await window.apiService.deleteOrder(orderId);
+                    if (result.success) {
                         console.log('✅ Order deleted from database');
-                    } catch (error) {
-                        console.log('⚠️ Could not delete from database:', error.message);
+                        deleteSuccess = true;
+                    } else {
+                        console.log('⚠️ Database deletion failed:', result.message);
                     }
+                } catch (error) {
+                    console.log('⚠️ Database deletion error:', error.message);
                 }
+            }
+            
+            // Step 2: Always delete from localStorage (even if database fails)
+            const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+            const originalLength = customerOrders.length;
+            const filteredOrders = customerOrders.filter(o => o.orderId !== orderId);
+            
+            if (filteredOrders.length < originalLength) {
+                localStorage.setItem('customerOrders', JSON.stringify(filteredOrders));
+                console.log('✅ Order deleted from localStorage');
+                deleteSuccess = true;
             } else {
-                showNotification('Order not found in customer orders', 'error');
-                return;
+                console.log('⚠️ Order not found in localStorage');
+            }
+            
+            // Step 3: Also remove from any cached admin orders that might have this customer order
+            const adminOrderIndex = orders.findIndex(o => o.id === orderId);
+            if (adminOrderIndex !== -1) {
+                orders.splice(adminOrderIndex, 1);
+                console.log('✅ Order removed from admin cache');
             }
         }
         
-        // Reload orders to refresh the display
-        await loadOrders();
+        if (deleteSuccess) {
+            showNotification(`Order ${orderId} deleted successfully!`, 'success');
+            
+            // Step 4: Reload orders to refresh the display
+            console.log('🔄 Reloading orders...');
+            await loadOrders();
+            
+            // Step 5: Update dashboard statistics
+            updateOrderSummary();
+            
+        } else {
+            showNotification('Order not found or could not be deleted', 'error');
+        }
         
     } catch (error) {
-        console.error('Error deleting order:', error);
+        console.error('❌ Error deleting order:', error);
         showNotification('Error deleting order: ' + error.message, 'error');
     }
 }
