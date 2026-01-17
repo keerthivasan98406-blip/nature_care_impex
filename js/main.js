@@ -210,26 +210,36 @@ function populatePaymentInfo(orderData) {
 function generatePaymentQR(orderData) {
     console.log('Generating payment QR code for amount:', orderData.totalAmount);
     
-    // Use the correct UPI ID from the payment page
-    const upiId = 'naturecareimpex@paytm'; // Updated to match the business UPI ID
+    // Use the correct UPI ID and format
+    const upiId = 'naturecareimpex@paytm';
     const merchantName = 'Nature Care Impex';
     const amount = orderData.totalAmount;
     const currency = 'INR';
-    const transactionNote = `Order ${orderData.orderId} - ${orderData.product?.name || 'Product'}`;
+    const transactionNote = `Order-${orderData.orderId}`;
     
-    // Create proper UPI payment URL according to UPI specifications
-    const upiData = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=${currency}&tn=${encodeURIComponent(transactionNote)}&mode=02&purpose=00`;
+    // Create proper UPI payment URL according to NPCI UPI specifications
+    // Simplified format for better compatibility
+    const upiData = `upi://pay?pa=${upiId}&pn=${merchantName}&am=${amount}&cu=${currency}&tn=${transactionNote}`;
     
     console.log('UPI Data:', upiData);
     
-    // Generate QR code using QR server API with higher resolution
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiData)}&ecc=M`;
+    // Generate QR code using multiple fallback services
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiData)}&format=png&ecc=L`;
     
     const qrCodeElement = document.getElementById('payment-qr-code');
     if (qrCodeElement) {
         qrCodeElement.src = qrUrl;
         qrCodeElement.style.maxWidth = '250px';
         qrCodeElement.style.height = 'auto';
+        qrCodeElement.style.display = 'block';
+        
+        // Add error handling for QR code loading
+        qrCodeElement.onerror = function() {
+            console.error('QR code failed to load, trying alternative service');
+            // Fallback QR service
+            this.src = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(upiData)}&choe=UTF-8`;
+        };
+        
         console.log('QR code generated successfully');
     } else {
         console.error('QR code element not found');
@@ -241,33 +251,76 @@ function payWithApp(appName) {
     
     const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
     if (!orderData) {
-        alert('Order data not found. Please try again.');
+        alert('❌ Order data not found. Please try again.');
         return;
     }
     
+    const upiId = 'naturecareimpex@paytm';
+    const merchantName = 'Nature Care Impex';
     const amount = orderData.totalAmount;
     const orderId = orderData.orderId;
+    const transactionNote = `Order-${orderId}`;
     
     let url = '';
+    let appDisplayName = '';
+    
     switch(appName) {
         case 'paytm':
-            url = `paytmmp://pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${amount}&cu=INR&tn=Order ${orderId}`;
+            // Paytm specific URL format
+            url = `paytmmp://pay?pa=${upiId}&pn=${merchantName}&am=${amount}&cu=INR&tn=${transactionNote}`;
+            appDisplayName = 'Paytm';
             break;
         case 'gpay':
-            url = `tez://upi/pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${amount}&cu=INR&tn=Order ${orderId}`;
+            // Google Pay URL format
+            url = `tez://upi/pay?pa=${upiId}&pn=${merchantName}&am=${amount}&cu=INR&tn=${transactionNote}`;
+            appDisplayName = 'Google Pay';
             break;
         case 'phonepe':
-            url = `phonepe://pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${amount}&cu=INR&tn=Order ${orderId}`;
+            // PhonePe URL format
+            url = `phonepe://pay?pa=${upiId}&pn=${merchantName}&am=${amount}&cu=INR&tn=${transactionNote}`;
+            appDisplayName = 'PhonePe';
             break;
+        default:
+            alert('❌ Invalid payment app selected');
+            return;
     }
     
-    // Try to open the app
-    window.location.href = url;
+    console.log('Opening app with URL:', url);
     
-    // Fallback message
-    setTimeout(() => {
-        alert(`If ${appName} didn't open automatically, please use the QR code or UPI ID to make payment.`);
-    }, 2000);
+    // Create a temporary link to trigger app opening
+    const link = document.createElement('a');
+    link.href = url;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    
+    try {
+        // Try to open the app
+        link.click();
+        
+        // Show success message
+        setTimeout(() => {
+            const userConfirm = confirm(`🚀 ${appDisplayName} should have opened for payment.\n\n✅ If the app opened: Complete your payment\n❌ If the app didn't open: Click OK to use QR code instead`);
+            
+            if (userConfirm) {
+                // Scroll to QR code section
+                const qrSection = document.querySelector('.qr-code-container');
+                if (qrSection) {
+                    qrSection.scrollIntoView({ behavior: 'smooth' });
+                    qrSection.style.border = '3px solid #ff6b6b';
+                    setTimeout(() => {
+                        qrSection.style.border = '2px dashed #28a745';
+                    }, 3000);
+                }
+            }
+        }, 1500);
+        
+    } catch (error) {
+        console.error('Error opening payment app:', error);
+        alert(`❌ Could not open ${appDisplayName}. Please use the QR code or copy UPI ID instead.`);
+    } finally {
+        // Clean up
+        document.body.removeChild(link);
+    }
 }
 
 function copyUpiId() {

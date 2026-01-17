@@ -545,7 +545,79 @@
         // Load payment details when page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadPaymentPage();
+            
+            // Add QR code validation
+            setTimeout(() => {
+                validateQRCode();
+            }, 2000);
         });
+        
+        // Function to validate QR code
+        function validateQRCode() {
+            const qrElement = document.getElementById('payment-qr-code');
+            if (qrElement && qrElement.src) {
+                console.log('✅ QR Code loaded successfully:', qrElement.src);
+                
+                // Test if QR code image loads properly
+                const testImg = new Image();
+                testImg.onload = function() {
+                    console.log('✅ QR Code image is valid and accessible');
+                    qrElement.style.border = '2px solid #28a745';
+                };
+                testImg.onerror = function() {
+                    console.error('❌ QR Code image failed to load');
+                    qrElement.style.border = '2px solid #dc3545';
+                    
+                    // Try alternative QR generation
+                    const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
+                    if (orderData) {
+                        const upiData = `upi://pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${orderData.totalAmount}&cu=INR&tn=Order-${orderData.orderId}`;
+                        qrElement.src = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(upiData)}&choe=UTF-8`;
+                    }
+                };
+                testImg.src = qrElement.src;
+            }
+        }
+        
+        // Enhanced copy UPI ID function
+        function copyUpiId() {
+            const upiId = 'naturecareimpex@paytm';
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(upiId).then(() => {
+                    // Show success animation
+                    const button = document.querySelector('.copy-upi-btn');
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '✅ Copied!';
+                    button.style.background = '#28a745';
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.style.background = 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)';
+                    }, 2000);
+                    
+                    alert('✅ UPI ID copied to clipboard!\n\n📱 Open any UPI app and paste: ' + upiId);
+                }).catch(() => {
+                    fallbackCopyUpiId(upiId);
+                });
+            } else {
+                fallbackCopyUpiId(upiId);
+            }
+        }
+        
+        function fallbackCopyUpiId(upiId) {
+            const tempInput = document.createElement('input');
+            tempInput.value = upiId;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            alert('✅ UPI ID copied: ' + upiId);
+        }
+        
+        // Make functions globally available
+        window.copyUpiId = copyUpiId;
+        window.payWithApp = payWithApp;
     </script>
 </body>
 

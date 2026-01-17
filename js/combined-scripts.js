@@ -361,11 +361,25 @@ function populatePaymentInfo(orderData) {
 function generatePaymentQR(orderData) {
     console.log('Generating payment QR code...');
     
-    const upiData = `upi://pay?pa=naturecareimpex@paytm&pn=Nature Care Impex&am=${orderData.totalAmount}&cu=INR&tn=Order ${orderData.orderId}`;
+    const upiId = 'naturecareimpex@paytm';
+    const merchantName = 'Nature Care Impex';
+    const amount = orderData.totalAmount;
+    const orderId = orderData.orderId;
+    const transactionNote = `Order-${orderId}`;
     
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiData)}`;
+    // Simplified UPI format for better compatibility
+    const upiData = `upi://pay?pa=${upiId}&pn=${merchantName}&am=${amount}&cu=INR&tn=${transactionNote}`;
     
-    document.getElementById('payment-qr-code').src = qrUrl;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiData)}&format=png&ecc=L`;
+    
+    const qrElement = document.getElementById('payment-qr-code');
+    if (qrElement) {
+        qrElement.src = qrUrl;
+        qrElement.onerror = function() {
+            // Fallback QR service
+            this.src = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(upiData)}&choe=UTF-8`;
+        };
+    }
     console.log('QR code generated');
 }
 
