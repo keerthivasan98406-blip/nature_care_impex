@@ -8,42 +8,7 @@ const CREDENTIALS = {
 
 // Sample data
 let orders = [
-    {
-        id: 'ORD-001',
-        date: '2024-01-05',
-        customer: 'Green Gardens Ltd',
-        email: 'contact@greengardens.com',
-        product: 'Cocopeat 5kg Block',
-        quantity: 100,
-        unitPrice: 250,
-        amount: 25000,
-        status: 'pending',
-        notes: 'Urgent delivery required'
-    },
-    {
-        id: 'ORD-002',
-        date: '2024-01-04',
-        customer: 'Eco Farms',
-        email: 'orders@ecofarms.in',
-        product: 'Coco Grow Bags',
-        quantity: 200,
-        unitPrice: 90,
-        amount: 18000,
-        status: 'completed',
-        notes: 'Regular customer'
-    },
-    {
-        id: 'ORD-003',
-        date: '2024-01-03',
-        customer: 'Nature Plus',
-        email: 'info@natureplus.com',
-        product: 'Bamboo Period Pads',
-        quantity: 50,
-        unitPrice: 120,
-        amount: 6000,
-        status: 'shipped',
-        notes: 'First time buyer'
-    }
+    // Default orders removed - only real orders from database will be shown
 ];
 
 let products = [
