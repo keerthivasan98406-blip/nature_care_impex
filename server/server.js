@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const connectDB = require('./config/database');
 
+// Deployment trigger: 2025-01-16 - Force Render deployment
 const app = express();
 const PORT = process.env.PORT || 3000;
 
