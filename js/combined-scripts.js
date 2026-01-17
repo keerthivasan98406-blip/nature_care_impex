@@ -424,7 +424,7 @@ function payWithApp(appName) {
     
     switch(appName) {
         case 'paytm':
-            appUrl = `paytmmp://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
+            appUrl = `paytm://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
             appName_display = 'Paytm';
             break;
         case 'gpay':
@@ -486,7 +486,7 @@ window.openPaymentAppDirect = function(appName) {
     let appDisplayName = '';
     
     if (appName === 'paytm') {
-        url = `paytmmp://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
+        url = `paytm://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
         appDisplayName = 'Paytm';
     } else if (appName === 'gpay') {
         url = `tez://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;

@@ -314,8 +314,27 @@ window.openPaymentAppDirect = function(appName) {
     let appDisplayName = '';
     
     if (appName === 'paytm') {
-        url = `paytmmp://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
+        // Try multiple Paytm URL formats for better compatibility
+        url = `paytm://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
         appDisplayName = 'Paytm';
+        
+        // Try primary Paytm URL
+        window.location.href = url;
+        
+        // If primary doesn't work, try alternative after delay
+        setTimeout(() => {
+            const altPaytmUrl = `paytmmp://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
+            console.log('🔄 Trying alternative Paytm URL:', altPaytmUrl);
+            window.location.href = altPaytmUrl;
+        }, 1000);
+        
+        // If still doesn't work, try generic UPI
+        setTimeout(() => {
+            const genericUrl = `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
+            console.log('🔄 Trying generic UPI URL for Paytm:', genericUrl);
+            window.location.href = genericUrl;
+        }, 2000);
+        
     } else if (appName === 'gpay') {
         url = `tez://upi/pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(note)}`;
         appDisplayName = 'Google Pay';
@@ -379,7 +398,7 @@ function payWithApp(appName) {
     
     switch(appName) {
         case 'paytm':
-            appUrl = `paytmmp://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
+            appUrl = `paytm://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
             appName_display = 'Paytm';
             break;
         case 'gpay':
