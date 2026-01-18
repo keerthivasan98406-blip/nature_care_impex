@@ -107,61 +107,36 @@
         .upi-app {
             width: 100%;
             max-width: 100%;
-            padding: 15px 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
+            padding: 20px;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            font-weight: 500;
-            font-size: 14px;
             min-height: 60px;
-            background: white;
-            color: #333;
             box-sizing: border-box;
         }
         
-        .upi-app:hover {
-            border-color: #4285F4;
-            box-shadow: 0 2px 8px rgba(66,133,244,0.2);
-            transform: translateY(-1px);
-        }
-        
         .upi-app.gpay {
-            border-color: #4285F4;
-        }
-        
-        .upi-app.gpay:hover {
-            border-color: #3367D6;
-            box-shadow: 0 2px 8px rgba(66,133,244,0.3);
+            background: linear-gradient(135deg, #4285F4 0%, #34A853 50%, #FBBC04 75%, #EA4335 100%);
         }
         
         .upi-app.phonepe {
-            border-color: #5F259F;
+            background: #5F259F;
         }
         
-        .upi-app.phonepe:hover {
-            border-color: #4A1A7F;
-            box-shadow: 0 2px 8px rgba(95,37,159,0.3);
-        }
-        
-        .upi-app svg {
-            width: 24px;
-            height: 24px;
+        .upi-app:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
         .upi-app img {
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             object-fit: contain;
-        }
-        
-        .upi-app span {
-            font-weight: 500;
-            color: #666;
+            filter: brightness(0) invert(1);
         }
         
         .upi-id-section {
@@ -560,12 +535,10 @@
                                     <p class="apps-instruction">Pay Directly via Apps:</p>
                                     <div class="app-buttons">
                                         <button class="upi-app gpay" onclick="openPaymentAppDirect('gpay')">
-                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" alt="Google Pay" width="24" height="24">
-                                            <span>Google Pay</span>
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" alt="Google Pay" width="32" height="32">
                                         </button>
                                         <button class="upi-app phonepe" onclick="openPaymentAppDirect('phonepe')">
-                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/PhonePe_logo.svg/512px-PhonePe_logo.svg.png" alt="PhonePe" width="24" height="24">
-                                            <span>PhonePe</span>
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/PhonePe_logo.svg/512px-PhonePe_logo.svg.png" alt="PhonePe" width="32" height="32">
                                         </button>
                                     </div>
                                 </div>
