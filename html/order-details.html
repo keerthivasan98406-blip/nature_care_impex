@@ -26,8 +26,9 @@
     <nav class="navbar">
         <div class="container nav-container">
             <a href="index.html" class="logo">
-                <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190433/photo_2025-12-31_22-10-18_k0jfc7.jpg"
+                <img src="../assets/logo.jpg"
                     alt="Natural Care Impex">
+                <span class="logo-text">Natural Care Impex</span>
             </a>
 
             <ul class="nav-links">
@@ -114,6 +115,26 @@
                             </div>
                         </div>
 
+                        <div class="form-section">
+                            <h3>Payment Method</h3>
+                            <div class="payment-method-selection">
+                                <div class="payment-option">
+                                    <input type="radio" id="online-payment" name="paymentMethod" value="online" checked>
+                                    <label for="online-payment">
+                                        <span class="payment-title">Online Payment</span>
+                                        <span class="payment-desc">Pay via UPI/QR Code + ₹20 Shipping</span>
+                                    </label>
+                                </div>
+                                <div class="payment-option">
+                                    <input type="radio" id="cod-payment" name="paymentMethod" value="cod">
+                                    <label for="cod-payment">
+                                        <span class="payment-title">Cash on Delivery (COD)</span>
+                                        <span class="payment-desc">Pay when you receive + ₹20 COD Charges</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Order Summary -->
                         <div class="order-summary">
                             <h3>Order Summary</h3>
@@ -129,9 +150,17 @@
                                 <span>Quantity:</span>
                                 <span id="summary-quantity">1</span>
                             </div>
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span id="summary-subtotal">₹0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span id="charges-label">Shipping:</span>
+                                <span id="charges-amount">₹20</span>
+                            </div>
                             <div class="summary-row total-row">
                                 <span>Total Amount:</span>
-                                <span id="summary-total">₹0</span>
+                                <span id="summary-total">₹20</span>
                             </div>
                         </div>
 

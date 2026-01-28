@@ -2,50 +2,10 @@
 
 class APIService {
     constructor() {
-        // Detect environment and set appropriate base URL
-        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const isRender = window.location.hostname.includes('onrender.com');
-        
-        if (isLocalhost) {
-            this.baseURL = 'http://localhost:3000/api';
-        } else if (isRender) {
-            this.baseURL = `${window.location.origin}/api`;
-        } else {
-            // GitHub Pages or other static hosting - use localStorage only
-            this.baseURL = '/api';
-        }
-        
+        // Use the current server URL
+        this.baseURL = 'http://localhost:3000/api';
         this.fallbackToLocalStorage = true;
         this.serverConnected = false;
-        
-        console.log('🔧 API Service initialized');
-        console.log('🌐 Environment:', isLocalhost ? 'localhost' : isRender ? 'Render' : 'Static hosting');
-        console.log('🔗 Base URL:', this.baseURL);
-        
-        // Test server connection
-        this.testConnection();
-    }
-    
-    async testConnection() {
-        try {
-            const response = await fetch(`${this.baseURL.replace('/api', '')}/api/health`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            
-            if (response.ok) {
-                this.serverConnected = true;
-                console.log('✅ Server connected successfully');
-            } else {
-                this.serverConnected = false;
-                console.log('⚠️ Server offline - Using localStorage fallback');
-                console.log('🔗 Attempted server URL:', this.baseURL.replace('/api', ''));
-            }
-        } catch (error) {
-            this.serverConnected = false;
-            console.log('⚠️ Server offline - Using localStorage fallback');
-            console.log('🔗 Attempted server URL:', this.baseURL.replace('/api', ''));
-        }
     }
 
     // Generic API call method
@@ -409,54 +369,6 @@ class APIService {
         }
         
         return result;
-    }
-
-    async deleteOrder(orderId) {
-        try {
-            console.log('🗑️ Deleting order from database:', orderId);
-            
-            const result = await this.apiCall(`/orders/${orderId}`, {
-                method: 'DELETE'
-            });
-            
-            // Remove from localStorage cache if database deletion successful
-            if (result.success) {
-                const orders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
-                const filteredOrders = orders.filter(o => o.orderId !== orderId);
-                localStorage.setItem('customerOrders', JSON.stringify(filteredOrders));
-                console.log('✅ Order removed from localStorage cache');
-            }
-            
-            return result;
-        } catch (error) {
-            console.error('Delete order error:', error);
-            
-            // Fallback: remove from localStorage only
-            if (this.fallbackToLocalStorage) {
-                const orders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
-                const originalLength = orders.length;
-                const filteredOrders = orders.filter(o => o.orderId !== orderId);
-                
-                if (filteredOrders.length < originalLength) {
-                    localStorage.setItem('customerOrders', JSON.stringify(filteredOrders));
-                    console.log('⚠️ Order removed from localStorage only (database unavailable)');
-                    
-                    return {
-                        success: true,
-                        message: 'Order deleted locally (database unavailable)',
-                        fallback: true
-                    };
-                } else {
-                    return {
-                        success: false,
-                        message: 'Order not found',
-                        fallback: true
-                    };
-                }
-            }
-            
-            throw error;
-        }
     }
 
     async uploadScreenshot(orderId, file) {

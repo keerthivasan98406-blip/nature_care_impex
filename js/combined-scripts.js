@@ -273,6 +273,12 @@ function setupOrderForm(orderData) {
     
     quantityInput.addEventListener('input', updateOrderSummary);
     
+    // Add payment method change handlers
+    const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
+    paymentMethods.forEach(method => {
+        method.addEventListener('change', updateOrderSummary);
+    });
+    
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         handleOrderFormSubmit(orderData);
@@ -285,9 +291,23 @@ function updateOrderSummary() {
     const quantity = parseInt(document.getElementById('order-quantity').value) || 1;
     const orderData = JSON.parse(sessionStorage.getItem('currentOrder'));
     const price = getProductPrice(orderData.product.id);
-    const total = quantity * price;
+    const subtotal = quantity * price;
+    const charges = 20; // ₹20 for both shipping and COD
+    const total = subtotal + charges;
+    
+    // Get selected payment method
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'online';
+    
+    // Update labels based on payment method
+    const chargesLabel = document.getElementById('charges-label');
+    if (paymentMethod === 'cod') {
+        chargesLabel.textContent = 'COD Charges:';
+    } else {
+        chargesLabel.textContent = 'Shipping:';
+    }
     
     document.getElementById('summary-quantity').textContent = quantity;
+    document.getElementById('summary-subtotal').textContent = `₹${subtotal.toLocaleString()}`;
     document.getElementById('summary-total').textContent = `₹${total.toLocaleString()}`;
 }
 
@@ -301,22 +321,39 @@ function handleOrderFormSubmit(orderData) {
         deliveryAddress: document.getElementById('delivery-address').value,
         productSize: document.getElementById('product-size').value,
         quantity: parseInt(document.getElementById('order-quantity').value),
-        orderNotes: document.getElementById('order-notes').value
+        orderNotes: document.getElementById('order-notes').value,
+        paymentMethod: document.querySelector('input[name="paymentMethod"]:checked').value
     };
     
     const price = getProductPrice(orderData.product.id);
-    const total = formData.quantity * price;
+    const subtotal = formData.quantity * price;
+    const charges = 20; // ₹20 for both shipping and COD
+    const total = subtotal + charges;
     
     const finalOrder = {
         ...orderData,
         customerDetails: formData,
         unitPrice: price,
+        subtotal: subtotal,
+        charges: charges,
         totalAmount: total,
         status: 'pending',
         productSize: formData.productSize,
+        paymentMethod: formData.paymentMethod,
         orderDate: new Date().toISOString().split('T')[0],
         orderMonth: new Date().toISOString().slice(0, 7)
     };
+    
+    // Handle different payment methods
+    if (formData.paymentMethod === 'cod') {
+        // For COD, directly create the order
+        finalOrder.status = 'cod_pending';
+        createOrder(finalOrder);
+    } else {
+        // For online payment, redirect to payment page
+        sessionStorage.setItem('pendingOrder', JSON.stringify(finalOrder));
+        window.location.href = 'payment.html';
+    }
     
     console.log('Final order:', finalOrder);
     
@@ -350,7 +387,15 @@ function populatePaymentInfo(orderData) {
     document.getElementById('payment-product-name').textContent = orderData.product.name;
     document.getElementById('payment-quantity').textContent = orderData.customerDetails.quantity;
     document.getElementById('payment-unit-price').textContent = `₹${orderData.unitPrice.toLocaleString()}`;
-    document.getElementById('payment-total-amount').textContent = `₹${orderData.totalAmount.toLocaleString()}`;
+    
+    // Check if COD is selected and update total accordingly
+    const codRadio = document.getElementById('cod-payment');
+    
+    if (codRadio && codRadio.checked) {
+        updateTotalWithCOD();
+    } else {
+        document.getElementById('payment-total-amount').textContent = `₹${orderData.totalAmount.toLocaleString()}`;
+    }
     
     document.getElementById('customer-name-display').textContent = orderData.customerDetails.customerName;
     document.getElementById('customer-phone-display').textContent = orderData.customerDetails.customerPhone;
@@ -358,12 +403,51 @@ function populatePaymentInfo(orderData) {
     document.getElementById('customer-address-display').textContent = orderData.customerDetails.deliveryAddress;
 }
 
+// Function to update total with COD charges
+function updateTotalWithCOD() {
+    const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
+    if (!orderData) return;
+    
+    const baseAmount = orderData.totalAmount;
+    const codCharges = 20; // Fixed COD charge of ₹20 for all orders
+    const finalAmount = baseAmount + codCharges;
+    
+    // Show COD charges row
+    const codChargesRow = document.getElementById('cod-charges-row');
+    const codChargesElement = document.getElementById('payment-cod-charges');
+    const totalAmountElement = document.getElementById('payment-total-amount');
+    
+    if (codChargesRow && codChargesElement && totalAmountElement) {
+        codChargesRow.style.display = 'flex';
+        codChargesElement.textContent = `₹${codCharges}`;
+        totalAmountElement.textContent = `₹${finalAmount.toLocaleString()}`;
+    }
+}
+
+// Function to update total without COD charges
+function updateTotalWithoutCOD() {
+    const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
+    if (!orderData) return;
+    
+    const baseAmount = orderData.totalAmount;
+    
+    // Hide COD charges row
+    const codChargesRow = document.getElementById('cod-charges-row');
+    const totalAmountElement = document.getElementById('payment-total-amount');
+    
+    if (codChargesRow && totalAmountElement) {
+        codChargesRow.style.display = 'none';
+        totalAmountElement.textContent = `₹${baseAmount.toLocaleString()}`;
+    }
+}
+
 function generatePaymentQR(orderData) {
     console.log('🔄 Generating UPI QR code for amount:', orderData.totalAmount);
     
     // SIMPLE UPI CONFIGURATION - WORKING UPI ID
     const upiId = 'naveethulhussain700-4@okaxis';
-    const amount = orderData.totalAmount;
+    const deliveryCharge = 20; // Fixed delivery charge for all orders
+    const amount = orderData.totalAmount + deliveryCharge; // Include delivery charge in QR payment
     const orderId = orderData.orderId;
     const transactionNote = `Order-${orderId}`;
     
@@ -552,101 +636,15 @@ function fallbackCopyUpiId(upiId) {
 }
 
 function handleScreenshotUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    if (!file.type.startsWith('image/')) {
-        alert('Please upload an image file.');
-        return;
-    }
-    
-    if (file.size > 5 * 1024 * 1024) {
-        alert('File size should be less than 5MB.');
-        return;
-    }
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        document.getElementById('preview-image').src = e.target.result;
-        document.getElementById('screenshot-preview').style.display = 'block';
-        
-        const instructionMsg = document.getElementById('upload-instruction');
-        let confirmBtn = document.getElementById('confirm-payment-btn');
-        
-        console.log('Screenshot uploaded - attempting to show button');
-        console.log('Instruction element:', instructionMsg);
-        console.log('Confirm button element:', confirmBtn);
-        
-        if (instructionMsg) {
-            instructionMsg.style.display = 'none';
-            console.log('Instruction hidden');
-        }
-        
-        if (!confirmBtn) {
-            console.log('Creating new confirm button');
-            const confirmSection = document.querySelector('.confirm-order-section');
-            if (confirmSection) {
-                confirmBtn = document.createElement('button');
-                confirmBtn.id = 'confirm-payment-btn';
-                confirmBtn.className = 'btn btn-primary';
-                confirmBtn.innerHTML = '✅ Confirm Order';
-                confirmBtn.onclick = confirmPayment;
-                confirmSection.appendChild(confirmBtn);
-            }
-        }
-        
-        if (confirmBtn) {
-            confirmBtn.style.display = 'block';
-            confirmBtn.style.visibility = 'visible';
-            confirmBtn.style.opacity = '1';
-            confirmBtn.classList.add('show');
-            confirmBtn.disabled = false;
-            
-            console.log('Button should now be visible');
-            console.log('Button display:', confirmBtn.style.display);
-            console.log('Button classes:', confirmBtn.className);
-            
-            confirmBtn.offsetHeight;
-            
-            alert('Screenshot uploaded successfully! You can now confirm your order.');
-            
-        } else {
-            console.error('Still cannot find/create confirm button!');
-            alert('Error: Cannot create confirm button. Please refresh the page.');
-        }
-        
-        const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
-        orderData.paymentScreenshot = {
-            file: file.name,
-            dataUrl: e.target.result,
-            uploadedAt: new Date().toISOString()
-        };
-        sessionStorage.setItem('orderForPayment', JSON.stringify(orderData));
-        
-        console.log('Screenshot uploaded - Confirm button shown, instruction hidden');
-    };
-    reader.readAsDataURL(file);
+    // Screenshot upload is no longer required
+    alert('Screenshot upload is no longer required! Your payment will be processed automatically.');
+    return;
 }
 
 function removeScreenshot() {
-    document.getElementById('screenshot-preview').style.display = 'none';
-    document.getElementById('screenshot-input').value = '';
-    
-    const instructionMsg = document.getElementById('upload-instruction');
-    const confirmBtn = document.getElementById('confirm-payment-btn');
-    
-    if (instructionMsg) instructionMsg.style.display = 'block';
-    if (confirmBtn) {
-        confirmBtn.classList.remove('show');
-        confirmBtn.disabled = true;
-        console.log('Confirm button hidden');
-    }
-    
-    const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
-    delete orderData.paymentScreenshot;
-    sessionStorage.setItem('orderForPayment', JSON.stringify(orderData));
-    
-    console.log('Screenshot removed - Confirm button hidden, instruction shown');
+    // Screenshot upload is no longer required
+    alert('Screenshot upload is no longer required! Your payment will be processed automatically.');
+    return;
 }
 
 async function confirmPayment() {
@@ -882,7 +880,7 @@ async function loadProductsData() {
             category: "cocopeat",
             image: "https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190898/photo_2025-12-31_22-18-07_c2hs4m.jpg",
             description: "Premium washed cocopeat blocks ideal for potting mixes and hydroponics. High water retention and porosity.",
-            sizes: ["5kg Block", "Pallet (200 Blocks)"],
+            sizes: ["S", "M", "L", "XL", "XXL"],
             price: 250,
             cost: 150,
             stock: 100
@@ -893,7 +891,7 @@ async function loadProductsData() {
             category: "eco-care",
             image: "https://cdn.moglix.com/p/B5wXshH1wq7TS-xxlarge.jpg",
             description: "Ready-to-use grow bags for greenhouse cultivation. UV treated for durability and optimal root growth.",
-            sizes: ["100x15x18 cm", "100x20x10 cm"],
+            sizes: ["S", "M", "L", "XL", "XXL"],
             price: 90,
             cost: 60,
             stock: 200
@@ -904,7 +902,7 @@ async function loadProductsData() {
             category: "cocopeat",
             image: "https://images.unsplash.com/photo-1591857177580-dc82b9e4e119?auto=format&fit=crop&w=800&q=80",
             description: "Compact 650g briquettes, perfect for home gardening and smaller applications. Expands to 9 liters.",
-            sizes: ["650g Brick", "Pack of 3"],
+            sizes: ["S", "M", "L", "XL", "XXL"],
             price: 180,
             cost: 120,
             stock: 150
@@ -915,7 +913,7 @@ async function loadProductsData() {
             category: "bamboo",
             image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbYHHF-lKgdGS9ftR4AwALD27xwGSO9hsldw&s",
             description: "Comfortable, absorbent, and eco-friendly bamboo period pads. Washable and reusable for a sustainable cycle.",
-            sizes: ["Small/Light", "Medium/Regular", "Large/Heavy"],
+            sizes: ["S", "M", "L", "XL", "XXL"],
             price: 120,
             cost: 80,
             stock: 80
@@ -926,7 +924,7 @@ async function loadProductsData() {
             category: "cocopeat",
             image: "https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190712/photo_2025-12-31_22-14-34_zu8ayl.jpg",
             description: "High-quality 400g coco peat bricks, perfect for home gardening and seed starting. Compact and easy to use.",
-            sizes: ["400g Brick", "Pack of 12"],
+            sizes: ["S", "M", "L", "XL", "XXL"],
             price: 200,
             cost: 140,
             stock: 120
@@ -975,6 +973,9 @@ async function refreshProducts() {
 // Enhanced DOMContentLoaded Event with async product loading
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOM loaded, initializing...');
+    
+    // Clear product cache to ensure fresh data with correct sizes
+    clearProductCache();
     
     await initializeProducts();
     
@@ -1737,3 +1738,53 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 console.log('📡 API Service loaded successfully');
 console.log('Nature Care Impex script loaded successfully!');
+// Function to clear cached product data and reload fresh
+function clearProductCache() {
+    localStorage.removeItem('allProducts');
+    localStorage.removeItem('productsLastUpdated');
+    console.log('🧹 Product cache cleared');
+}
+
+// Function to force refresh products from server
+async function forceRefreshProducts() {
+    clearProductCache();
+    products = await loadProductsData();
+    console.log('🔄 Products force refreshed:', products.length);
+    return products;
+}
+
+// Make functions available globally
+window.clearProductCache = clearProductCache;
+window.forceRefreshProducts = forceRefreshProducts;
+// Function to create COD orders directly
+async function createOrder(orderData) {
+    try {
+        console.log('Creating order:', orderData);
+        
+        const response = await fetch('/api/orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(orderData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Show success message
+            alert(`Order placed successfully! Order ID: ${result.data.orderId}`);
+            
+            // Redirect to track order page
+            window.location.href = `track-order.html?orderId=${result.data.orderId}`;
+        } else {
+            throw new Error(result.message || 'Failed to create order');
+        }
+    } catch (error) {
+        console.error('Error creating order:', error);
+        alert('Failed to place order. Please try again.');
+    }
+}
+
+// Make function globally available
+window.createOrder = createOrder;

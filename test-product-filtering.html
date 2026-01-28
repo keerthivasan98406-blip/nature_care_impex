@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Filtering Test - Nature Care Impex</title>
+    <link rel="stylesheet" href="style (1).css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-section {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-section h3 {
+            color: #1a1a1a;
+            margin-top: 0;
+        }
+        .category-info {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .category-count {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .debug-info {
+            background: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔍 Product Filtering Test</h1>
+        <p>This page tests the product category filtering functionality.</p>
+
+        <div class="test-section">
+            <h3>📊 Product Categories Analysis</h3>
+            <div id="category-analysis">Loading...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Filter Testing</h3>
+            <p>Click these buttons to test each filter:</p>
+            <button class="test-button" onclick="testFilter('all')">Test ALL Filter</button>
+            <button class="test-button" onclick="testFilter('cocopeat')">Test COCOPEAT Filter</button>
+            <button class="test-button" onclick="testFilter('bamboo')">Test BAMBOO Filter</button>
+            <button class="test-button" onclick="testFilter('eco-care')">Test ECO-CARE Filter</button>
+            <div id="filter-results" style="margin-top: 15px;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔗 Quick Links</h3>
+            <button class="test-button" onclick="window.location.href='products.html'">Open Products Page</button>
+            <button class="test-button" onclick="window.location.href='index.html'">Back to Home</button>
+        </div>
+
+        <div class="test-section">
+            <h3>🐛 Debug Information</h3>
+            <div id="debug-info" class="debug-info">Click any test button to see debug info...</div>
+        </div>
+    </div>
+
+    <script src="script (12).js"></script>
+    <script>
+        function analyzeProducts() {
+            const products = loadProductsData();
+            const categories = {};
+            
+            // Count products by category
+            products.forEach(product => {
+                if (!categories[product.category]) {
+                    categories[product.category] = [];
+                }
+                categories[product.category].push(product);
+            });
+            
+            const analysisDiv = document.getElementById('category-analysis');
+            let html = `<div class="category-info"><strong>Total Products:</strong> <span class="category-count">${products.length}</span></div>`;
+            
+            Object.keys(categories).forEach(category => {
+                const count = categories[category].length;
+                const productNames = categories[category].map(p => p.name).join(', ');
+                html += `
+                    <div class="category-info">
+                        <strong>${category.toUpperCase()}:</strong> <span class="category-count">${count} products</span><br>
+                        <small style="color: #666;">${productNames}</small>
+                    </div>
+                `;
+            });
+            
+            analysisDiv.innerHTML = html;
+            return { products, categories };
+        }
+
+        function testFilter(filterCategory) {
+            console.log('Testing filter:', filterCategory);
+            
+            const products = loadProductsData();
+            let filtered = products;
+            
+            if (filterCategory !== 'all') {
+                filtered = products.filter(p => p.category === filterCategory);
+            }
+            
+            const resultsDiv = document.getElementById('filter-results');
+            const debugDiv = document.getElementById('debug-info');
+            
+            // Show results
+            resultsDiv.innerHTML = `
+                <div style="background: white; padding: 15px; border-radius: 4px; border: 1px solid #ddd;">
+                    <strong>Filter: ${filterCategory.toUpperCase()}</strong><br>
+                    <span style="color: #007bff; font-weight: bold;">${filtered.length} products found</span><br>
+                    <small style="color: #666;">
+                        ${filtered.map(p => p.name).join(', ') || 'No products'}
+                    </small>
+                </div>
+            `;
+            
+            // Show debug info
+            debugDiv.innerHTML = `
+                Filter Category: "${filterCategory}"<br>
+                Total Products: ${products.length}<br>
+                Filtered Products: ${filtered.length}<br>
+                Filter Logic: ${filterCategory === 'all' ? 'Show all products' : `Show only products where category === "${filterCategory}"`}<br>
+                Products Found: [${filtered.map(p => `"${p.name}" (${p.category})`).join(', ')}]
+            `;
+            
+            // Test if this matches expected results
+            const expected = getExpectedResults(filterCategory);
+            const success = filtered.length === expected;
+            
+            if (success) {
+                resultsDiv.style.borderColor = '#28a745';
+                resultsDiv.style.backgroundColor = '#d4edda';
+            } else {
+                resultsDiv.style.borderColor = '#dc3545';
+                resultsDiv.style.backgroundColor = '#f8d7da';
+            }
+        }
+
+        function getExpectedResults(category) {
+            // Based on the current product data
+            const expected = {
+                'all': 5,        // All products
+                'cocopeat': 3,   // Cocopeat 5kg Block, Coco Bricks 650g, 12 Coco Bricks 400g
+                'eco-care': 1,   // Coco Grow Bags
+                'bamboo': 1      // Bamboo Period Pads
+            };
+            return expected[category] || 0;
+        }
+
+        // Run analysis on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            analyzeProducts();
+        });
+    </script>
+</body>
+</html>

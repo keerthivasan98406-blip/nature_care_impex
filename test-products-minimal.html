@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Products Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .product { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Minimal Products Test</h1>
+    <div id="status">Loading...</div>
+    <div id="products"></div>
+
+    <script>
+        console.log('🚀 Starting minimal test...');
+        
+        // Test 1: Direct API call
+        async function testAPI() {
+            try {
+                console.log('📡 Testing API directly...');
+                const response = await fetch('http://localhost:3000/api/products');
+                const data = await response.json();
+                
+                document.getElementById('status').innerHTML = `
+                    <div class="success">✅ API Response: ${response.status}</div>
+                    <div>Products found: ${data.data ? data.data.length : 0}</div>
+                `;
+                
+                if (data.success && data.data) {
+                    const productsDiv = document.getElementById('products');
+                    productsDiv.innerHTML = data.data.map(product => `
+                        <div class="product">
+                            <h3>${product.name}</h3>
+                            <p>ID: ${product.id}</p>
+                            <p>Category: ${product.category}</p>
+                            <p>Price: ₹${product.price}</p>
+                            <p>Stock: ${product.stock}</p>
+                        </div>
+                    `).join('');
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('❌ API Error:', error);
+                document.getElementById('status').innerHTML = `
+                    <div class="error">❌ API Error: ${error.message}</div>
+                `;
+                return null;
+            }
+        }
+        
+        // Run test when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('📄 DOM loaded, running test...');
+            testAPI();
+        });
+    </script>
+</body>
+</html>

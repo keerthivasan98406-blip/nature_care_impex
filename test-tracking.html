@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Order Tracking</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; }
+        button { padding: 10px 20px; margin: 5px; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; }
+    </style>
+</head>
+<body>
+    <h1>Order Tracking Test</h1>
+    
+    <div class="test-section">
+        <h3>1. Create Test Order</h3>
+        <button onclick="createTestOrder()">Create Test Order</button>
+        <div id="createResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. Test Order Lookup</h3>
+        <input type="text" id="testOrderId" placeholder="Enter Order ID" style="padding: 8px; width: 200px;">
+        <button onclick="testOrderLookup()">Test Lookup</button>
+        <div id="lookupResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. List All Orders</h3>
+        <button onclick="listAllOrders()">List All Orders</button>
+        <div id="listResult" class="result"></div>
+    </div>
+
+    <script src="js/api-service.js"></script>
+    <script>
+        const apiService = new APIService();
+        
+        async function createTestOrder() {
+            const resultDiv = document.getElementById('createResult');
+            resultDiv.innerHTML = 'Creating test order...';
+            
+            const testOrder = {
+                orderId: 'ORD-TEST-' + Date.now(),
+                customerDetails: {
+                    customerName: 'Test Customer',
+                    customerEmail: 'test@example.com',
+                    customerPhone: '1234567890',
+                    deliveryAddress: 'Test Address, Test City, 123456'
+                },
+                productDetails: {
+                    productId: 1,
+                    productName: 'Test Product',
+                    productCategory: 'test',
+                    quantity: 1,
+                    unitPrice: 100
+                },
+                totalAmount: 100,
+                status: 'pending',
+                paymentMethod: 'upi',
+                orderNotes: 'Test order for tracking functionality'
+            };
+            
+            try {
+                const result = await apiService.createOrder(testOrder);
+                resultDiv.innerHTML = `<strong>Result:</strong> ${JSON.stringify(result, null, 2)}`;
+                
+                if (result.success) {
+                    document.getElementById('testOrderId').value = testOrder.orderId;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
+            }
+        }
+        
+        async function testOrderLookup() {
+            const orderId = document.getElementById('testOrderId').value;
+            const resultDiv = document.getElementById('lookupResult');
+            
+            if (!orderId) {
+                resultDiv.innerHTML = 'Please enter an Order ID';
+                return;
+            }
+            
+            resultDiv.innerHTML = 'Looking up order...';
+            
+            try {
+                const result = await apiService.getOrder(orderId);
+                resultDiv.innerHTML = `<strong>Result:</strong> ${JSON.stringify(result, null, 2)}`;
+            } catch (error) {
+                resultDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
+            }
+        }
+        
+        async function listAllOrders() {
+            const resultDiv = document.getElementById('listResult');
+            resultDiv.innerHTML = 'Loading orders...';
+            
+            try {
+                const result = await apiService.getOrders();
+                resultDiv.innerHTML = `<strong>Result:</strong> ${JSON.stringify(result, null, 2)}`;
+            } catch (error) {
+                resultDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

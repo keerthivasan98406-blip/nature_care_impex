@@ -94,9 +94,12 @@
     <nav class="navbar">
         <div class="container nav-container">
             <a href="index.html" class="logo">
-                <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190433/photo_2025-12-31_22-10-18_k0jfc7.jpg"
+                <img src="assets/logo.jpg"
                     alt="Natural Care Impex">
+                <span class="logo-text">Natural Care Impex</span>
             </a>
+            
+            <div class="mobile-brand-name">Natural Care Impex</div>
 
             <ul class="nav-links">
                 <li><a href="index.html" class="nav-link">Home</a></li>
@@ -113,17 +116,8 @@
         </div>
     </nav>
 
-    <!-- Breadcrumb -->
-    <div class="container" style="padding: 10px 0; margin-top: 80px;">
-        <nav style="font-size: 14px; color: #666;">
-            <a href="index.html" style="color: #666; text-decoration: none;">Home</a> 
-            <span style="margin: 0 8px;">›</span> 
-            <span style="color: #333; font-weight: 600;">Products</span>
-        </nav>
-    </div>
-
     <!-- Page Header -->
-    <section class="section-padding" style="padding-bottom: 20px; padding-top: 30px;">
+    <section class="section-padding" style="padding-bottom: 20px; padding-top: 110px;">
         <div class="container">
             <div class="products-header-flex" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
                 <div class="text-center" style="flex: 1;">
@@ -205,6 +199,33 @@
     <!-- Scripts -->
     <script src="js/api-service.js"></script>
     <script src="js/main.js"></script>
+    
+    <!-- Debug Script -->
+    <script>
+        console.log('🚀 Products page loaded');
+        console.log('📍 Current URL:', window.location.href);
+        
+        // Check if scripts loaded
+        setTimeout(() => {
+            console.log('🔍 API Service:', !!window.apiService);
+            console.log('🔍 Main functions:', {
+                loadProductsData: !!window.loadProductsData,
+                renderAllProducts: !!window.renderAllProducts,
+                initializeProducts: !!window.initializeProducts
+            });
+            
+            // Force products loading if not working
+            if (window.loadProductsData && !window.products?.length) {
+                console.log('🔄 Force loading products...');
+                window.loadProductsData().then(products => {
+                    console.log('✅ Products loaded:', products?.length);
+                    if (products?.length && window.renderAllProducts) {
+                        window.renderAllProducts('all');
+                    }
+                });
+            }
+        }, 1000);
+    </script>
 </body>
 
 </html>

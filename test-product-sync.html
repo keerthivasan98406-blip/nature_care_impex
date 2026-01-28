@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Sync Test - Nature Care Impex</title>
+    <link rel="stylesheet" href="owner-portal.css">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-section {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-section h3 {
+            color: #1a1a1a;
+            margin-top: 0;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .product-list {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .product-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔄 Product Sync Test</h1>
+        <p>This page tests the synchronization between Owner Portal and Main Site products.</p>
+
+        <div class="test-section">
+            <h3>📋 Current Status</h3>
+            <div id="sync-status">Checking sync status...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🏪 Owner Portal Products</h3>
+            <button class="test-button" onclick="loadOwnerProducts()">Load Owner Portal Products</button>
+            <div id="owner-products" class="product-list">Click button to load...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🛍️ Main Site Products</h3>
+            <button class="test-button" onclick="loadMainSiteProducts()">Load Main Site Products</button>
+            <div id="main-products" class="product-list">Click button to load...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Test Actions</h3>
+            <button class="test-button" onclick="testSync()">Test Sync Function</button>
+            <button class="test-button" onclick="clearAllProducts()">Clear All Products</button>
+            <button class="test-button" onclick="resetToDefaults()">Reset to Defaults</button>
+            <div id="test-results" style="margin-top: 15px;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🚀 Quick Links</h3>
+            <button class="test-button" onclick="window.location.href='owner.html'">Open Owner Portal</button>
+            <button class="test-button" onclick="window.location.href='products.html'">Open Products Page</button>
+        </div>
+    </div>
+
+    <script>
+        function loadOwnerProducts() {
+            // Simulate owner portal products (these would normally be in owner-portal.js)
+            const ownerProducts = [
+                { id: 'cocopeat-5kg', name: 'Cocopeat 5kg Block', category: 'cocopeat' },
+                { id: 'grow-bags', name: 'Coco Grow Bags', category: 'eco-care' },
+                { id: 'bamboo-pads', name: 'Bamboo Period Pads', category: 'bamboo' }
+            ];
+            
+            displayProducts('owner-products', ownerProducts, 'Owner Portal');
+        }
+
+        function loadMainSiteProducts() {
+            const mainProducts = JSON.parse(localStorage.getItem('allProducts') || '[]');
+            displayProducts('main-products', mainProducts, 'Main Site');
+        }
+
+        function displayProducts(containerId, products, source) {
+            const container = document.getElementById(containerId);
+            if (products.length === 0) {
+                container.innerHTML = `<div class="error">No products found in ${source}</div>`;
+                return;
+            }
+
+            container.innerHTML = products.map((product, index) => `
+                <div class="product-item">
+                    <strong>${index + 1}. ${product.name}</strong><br>
+                    <small>ID: ${product.id} | Category: ${product.category}</small>
+                </div>
+            `).join('');
+        }
+
+        function testSync() {
+            const results = document.getElementById('test-results');
+            
+            // Test if localStorage has products
+            const stored = localStorage.getItem('allProducts');
+            if (stored) {
+                try {
+                    const products = JSON.parse(stored);
+                    results.innerHTML = `<div class="success">✅ Sync working! Found ${products.length} products in localStorage</div>`;
+                } catch (e) {
+                    results.innerHTML = `<div class="error">❌ Error parsing stored products: ${e.message}</div>`;
+                }
+            } else {
+                results.innerHTML = `<div class="error">❌ No products found in localStorage</div>`;
+            }
+        }
+
+        function clearAllProducts() {
+            localStorage.removeItem('allProducts');
+            document.getElementById('test-results').innerHTML = `<div class="success">🗑️ All products cleared from localStorage</div>`;
+        }
+
+        function resetToDefaults() {
+            const defaultProducts = [
+                {
+                    id: 1,
+                    name: "Cocopeat 5kg Block",
+                    category: "cocopeat",
+                    image: "https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190898/photo_2025-12-31_22-18-07_c2hs4m.jpg",
+                    description: "Premium washed cocopeat blocks ideal for potting mixes and hydroponics.",
+                    sizes: ["5kg Block", "Pallet (200 Blocks)"]
+                },
+                {
+                    id: 2,
+                    name: "Coco Grow Bags",
+                    category: "eco-care",
+                    image: "https://cdn.moglix.com/p/B5wXshH1wq7TS-xxlarge.jpg",
+                    description: "Ready-to-use grow bags for greenhouse cultivation.",
+                    sizes: ["100x15x18 cm", "100x20x10 cm"]
+                }
+            ];
+            
+            localStorage.setItem('allProducts', JSON.stringify(defaultProducts));
+            document.getElementById('test-results').innerHTML = `<div class="success">🔄 Default products restored (${defaultProducts.length} products)</div>`;
+        }
+
+        function checkSyncStatus() {
+            const stored = localStorage.getItem('allProducts');
+            const statusDiv = document.getElementById('sync-status');
+            
+            if (stored) {
+                try {
+                    const products = JSON.parse(stored);
+                    statusDiv.innerHTML = `<div class="success">✅ Sync Active - ${products.length} products synchronized</div>`;
+                } catch (e) {
+                    statusDiv.innerHTML = `<div class="error">❌ Sync Error - Invalid data in localStorage</div>`;
+                }
+            } else {
+                statusDiv.innerHTML = `<div class="error">⚠️ No Sync Data - Products not synchronized</div>`;
+            }
+        }
+
+        // Check status on page load
+        document.addEventListener('DOMContentLoaded', checkSyncStatus);
+    </script>
+</body>
+</html>

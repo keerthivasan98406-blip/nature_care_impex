@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working Buy Now Test</title>
+    <link rel="stylesheet" href="style (1).css">
+</head>
+<body>
+    <div style="padding: 50px;">
+        <h1>Buy Now Test</h1>
+        <button class="btn btn-primary" onclick="workingBuyNow()">Test Buy Now</button>
+        <div id="status" style="margin-top: 20px; padding: 20px; background: #f0f0f0;"></div>
+    </div>
+
+    <script>
+        function workingBuyNow() {
+            document.getElementById('status').innerHTML = 'Button clicked! Checking functions...';
+            
+            // Load the main script and test
+            const script = document.createElement('script');
+            script.src = 'script (12).js';
+            script.onload = function() {
+                setTimeout(() => {
+                    document.getElementById('status').innerHTML += '<br>Script loaded. Testing startOrderProcess...';
+                    
+                    if (typeof startOrderProcess === 'function') {
+                        document.getElementById('status').innerHTML += '<br>Function found! Calling it...';
+                        try {
+                            startOrderProcess('1');
+                        } catch (error) {
+                            document.getElementById('status').innerHTML += '<br>Error: ' + error.message;
+                        }
+                    } else {
+                        document.getElementById('status').innerHTML += '<br>Function NOT found!';
+                    }
+                }, 500);
+            };
+            document.head.appendChild(script);
+        }
+    </script>
+</body>
+</html>

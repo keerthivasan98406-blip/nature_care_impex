@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Test - No Screenshot Required</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .success {
+            border-color: #4caf50;
+            background: #f1f8e9;
+        }
+        .btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background: #218838;
+        }
+        .order-summary {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Payment System Test - No Screenshot Required</h1>
+        
+        <div class="test-section">
+            <h3>Test Order Details</h3>
+            <div class="order-summary">
+                <p><strong>Order ID:</strong> TEST-001</p>
+                <p><strong>Product:</strong> Cocopeat Block - Premium Quality</p>
+                <p><strong>Quantity:</strong> 2</p>
+                <p><strong>Total:</strong> ₹500</p>
+                <p><strong>Customer:</strong> Test Customer</p>
+                <p><strong>Phone:</strong> 9876543210</p>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Payment Instructions</h3>
+            <p>✅ <strong>No screenshot upload required!</strong></p>
+            <p>📱 Simply complete your UPI payment using:</p>
+            <ul>
+                <li>QR Code scanning</li>
+                <li>UPI ID: naveethulhussain700-4@okaxis</li>
+                <li>Direct app payment buttons</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test Actions</h3>
+            <button class="btn" onclick="setupTestOrder()">1. Setup Test Order</button>
+            <button class="btn" onclick="testConfirmPayment()">2. Test Confirm Payment</button>
+            <button class="btn" onclick="checkOrderStatus()">3. Check Order Status</button>
+        </div>
+        
+        <div id="test-results" class="test-section" style="display: none;">
+            <h3>Test Results</h3>
+            <div id="results-content"></div>
+        </div>
+    </div>
+
+    <script src="js/api-service.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        function setupTestOrder() {
+            const testOrder = {
+                orderId: 'TEST-' + Date.now(),
+                product: {
+                    id: '1',
+                    name: 'Cocopeat Block - Premium Quality',
+                    price: 250
+                },
+                customerDetails: {
+                    customerName: 'Test Customer',
+                    customerPhone: '9876543210',
+                    customerEmail: 'test@example.com',
+                    deliveryAddress: 'Test Address, Test City',
+                    quantity: 2,
+                    orderNotes: 'Test order for payment system'
+                },
+                totalAmount: 500,
+                timestamp: new Date().toISOString(),
+                status: 'pending'
+            };
+            
+            sessionStorage.setItem('orderForPayment', JSON.stringify(testOrder));
+            
+            showResults('✅ Test order setup complete!<br>Order ID: ' + testOrder.orderId);
+        }
+        
+        async function testConfirmPayment() {
+            try {
+                // Test the confirmPayment function
+                await confirmPayment();
+                showResults('✅ Payment confirmation test completed!<br>Check console for details.');
+            } catch (error) {
+                showResults('❌ Payment confirmation failed: ' + error.message);
+            }
+        }
+        
+        function checkOrderStatus() {
+            const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+            const testOrders = customerOrders.filter(order => order.orderId.startsWith('TEST-'));
+            
+            if (testOrders.length === 0) {
+                showResults('ℹ️ No test orders found in localStorage');
+                return;
+            }
+            
+            const latestOrder = testOrders[testOrders.length - 1];
+            showResults(`📊 Latest Test Order Status:
+                <br><strong>Order ID:</strong> ${latestOrder.orderId}
+                <br><strong>Status:</strong> ${latestOrder.status}
+                <br><strong>Total:</strong> ₹${latestOrder.totalAmount}
+                <br><strong>Created:</strong> ${new Date(latestOrder.createdAt || latestOrder.timestamp).toLocaleString()}
+                <br><strong>Has Screenshot:</strong> ${latestOrder.paymentScreenshot ? 'Yes' : 'No (Not Required)'}
+            `);
+        }
+        
+        function showResults(content) {
+            document.getElementById('results-content').innerHTML = content;
+            document.getElementById('test-results').style.display = 'block';
+            document.getElementById('test-results').className = 'test-section success';
+        }
+        
+        // Test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 Payment Test Page Loaded');
+            console.log('📋 Available functions:', {
+                confirmPayment: typeof confirmPayment,
+                handleScreenshotUpload: typeof handleScreenshotUpload,
+                removeScreenshot: typeof removeScreenshot
+            });
+        });
+    </script>
+</body>
+</html>

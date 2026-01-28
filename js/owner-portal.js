@@ -642,6 +642,90 @@ async function loadOrders() {
     }
 }
 
+// Refresh orders function
+async function refreshOrders() {
+    console.log('🔄 Manually refreshing orders...');
+    showNotification('Refreshing orders...', 'info');
+    
+    try {
+        await loadOrders();
+        showNotification('Orders refreshed successfully!', 'success');
+    } catch (error) {
+        console.error('Error refreshing orders:', error);
+        showNotification('Failed to refresh orders', 'error');
+    }
+}
+
+// Make refresh function globally available
+window.refreshOrders = refreshOrders;
+
+// Test function to create a sample order for debugging
+async function createTestOrder() {
+    console.log('🧪 Creating test order...');
+    showNotification('Creating test order...', 'info');
+    
+    const testOrder = {
+        orderId: 'TEST-' + Date.now(),
+        product: {
+            id: 1, // Must be a number according to schema
+            name: 'Cocopeat 5kg Block',
+            category: 'cocopeat',
+            image: 'https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190898/photo_2025-12-31_22-18-07_c2hs4m.jpg',
+            description: 'Premium washed cocopeat blocks ideal for potting mixes'
+        },
+        customerDetails: {
+            customerName: 'Test Customer',
+            customerEmail: 'test@example.com',
+            customerPhone: '9876543210',
+            deliveryAddress: 'Test Address, Test City, Test State - 123456',
+            quantity: 2,
+            orderNotes: 'Test order for debugging database connection'
+        },
+        unitPrice: 250,
+        totalAmount: 500,
+        status: 'screenshot', // Valid enum value
+        productSize: 'Standard',
+        paymentScreenshot: {
+            filename: 'test-screenshot.png',
+            originalName: 'test-screenshot.png',
+            mimetype: 'image/png',
+            size: 1024,
+            dataUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+            uploadedAt: new Date()
+        },
+        orderDate: new Date().toISOString().split('T')[0],
+        orderMonth: new Date().toISOString().slice(0, 7),
+        submittedAt: new Date(),
+        createdAt: new Date().toISOString()
+    };
+    
+    try {
+        if (window.apiService) {
+            console.log('📤 Sending test order:', testOrder);
+            const result = await window.apiService.createOrder(testOrder);
+            console.log('📡 Test order result:', result);
+            
+            if (result.success) {
+                showNotification('✅ Test order created successfully in database!', 'success');
+                console.log('✅ Test order saved to database:', result.data);
+                await loadOrders(); // Refresh orders
+            } else {
+                showNotification('❌ Failed to create test order: ' + result.message, 'error');
+                console.error('❌ Test order failed:', result);
+            }
+        } else {
+            showNotification('❌ API Service not available', 'error');
+            console.error('❌ API Service not available');
+        }
+    } catch (error) {
+        console.error('❌ Test order error:', error);
+        showNotification('❌ Test order error: ' + error.message, 'error');
+    }
+}
+
+// Make test function globally available
+window.createTestOrder = createTestOrder;
+
 function updateOrderSummary(allOrders = null) {
     if (!allOrders) {
         const adminOrders = orders;
@@ -1061,6 +1145,8 @@ window.viewFullscreenScreenshot = viewFullscreenScreenshot;
 window.closeFullscreenScreenshot = closeFullscreenScreenshot;
 
 function updateOrderStatus(orderId, newStatus) {
+    console.log('🔄 Updating order status:', orderId, '->', newStatus);
+    
     const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
     const orderIndex = customerOrders.findIndex(o => o.orderId === orderId);
     
@@ -1079,17 +1165,24 @@ function updateOrderStatus(orderId, newStatus) {
         customerOrders[orderIndex].statusHistory.push({
             status: newStatus,
             timestamp: new Date().toISOString(),
-            updatedBy: 'owner'
+            updatedBy: 'owner_portal'
         });
         
-        // Save to localStorage
+        // Save to localStorage first (immediate update)
         localStorage.setItem('customerOrders', JSON.stringify(customerOrders));
         
-        // Try to update in database as well
-        updateOrderStatusInDatabase(orderId, newStatus);
-        
-        // Trigger real-time update notification
-        triggerRealTimeUpdate(orderId, newStatus);
+        // Try to update in database (async)
+        updateOrderStatusInDatabase(orderId, newStatus).then(success => {
+            if (success) {
+                console.log('✅ Order status successfully updated in database');
+                // Trigger real-time update only after successful database update
+                triggerRealTimeUpdate(orderId, newStatus);
+            } else {
+                console.log('⚠️ Database update failed, but localStorage updated');
+                // Still trigger update for localStorage-only scenarios
+                triggerRealTimeUpdate(orderId, newStatus);
+            }
+        });
         
         showNotification(`Order status updated to ${newStatus}`, 'success');
         loadOrders(); // Refresh the orders list
@@ -1107,6 +1200,7 @@ function updateOrderStatus(orderId, newStatus) {
         console.log(`✅ Order ${orderId} status updated to ${newStatus}`);
     } else {
         showNotification('Order not found', 'error');
+        console.error('❌ Order not found:', orderId);
     }
 }
 
@@ -1114,15 +1208,52 @@ function updateOrderStatus(orderId, newStatus) {
 async function updateOrderStatusInDatabase(orderId, newStatus) {
     try {
         if (window.apiService) {
+            console.log('🔄 Updating order status in database:', orderId, '->', newStatus);
             const result = await window.apiService.updateOrderStatus(orderId, newStatus);
+            
             if (result.success) {
-                console.log('✅ Order status updated in database');
+                console.log('✅ Order status updated in database successfully');
+                
+                // Add status history to the database record
+                const statusHistory = {
+                    status: newStatus,
+                    timestamp: new Date().toISOString(),
+                    updatedBy: 'owner_portal'
+                };
+                
+                // Update the order with status history if the API supports it
+                try {
+                    // Get the current order to update its history
+                    const orderResult = await window.apiService.getOrder(orderId);
+                    if (orderResult.success && orderResult.data) {
+                        const updatedOrder = orderResult.data;
+                        if (!updatedOrder.statusHistory) {
+                            updatedOrder.statusHistory = [];
+                        }
+                        updatedOrder.statusHistory.push(statusHistory);
+                        updatedOrder.statusUpdatedAt = new Date().toISOString();
+                        
+                        console.log('📝 Order status history updated');
+                    }
+                } catch (historyError) {
+                    console.log('⚠️ Could not update status history:', historyError.message);
+                }
+                
+                return true;
             } else {
-                console.log('⚠️ Database update failed:', result.message);
+                console.log('❌ Database update failed:', result.message);
+                showNotification('Database update failed: ' + result.message, 'error');
+                return false;
             }
+        } else {
+            console.log('⚠️ API Service not available');
+            showNotification('API Service not available - order saved locally only', 'warning');
+            return false;
         }
     } catch (error) {
-        console.log('⚠️ Database update error:', error.message);
+        console.error('❌ Database update error:', error);
+        showNotification('Database error: ' + error.message, 'error');
+        return false;
     }
 }
 

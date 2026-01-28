@@ -122,9 +122,23 @@ function updateOrderSummary() {
     const quantity = parseInt(document.getElementById('order-quantity').value) || 1;
     const orderData = JSON.parse(sessionStorage.getItem('currentOrder'));
     const price = getProductPrice(orderData.product.id);
-    const total = quantity * price;
+    const subtotal = quantity * price;
+    const charges = 20; // ₹20 for both shipping and COD
+    const total = subtotal + charges;
+    
+    // Get selected payment method
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'online';
+    
+    // Update labels based on payment method
+    const chargesLabel = document.getElementById('charges-label');
+    if (paymentMethod === 'cod') {
+        chargesLabel.textContent = 'COD Charges:';
+    } else {
+        chargesLabel.textContent = 'Shipping:';
+    }
     
     document.getElementById('summary-quantity').textContent = quantity;
+    document.getElementById('summary-subtotal').textContent = `₹${subtotal.toLocaleString()}`;
     document.getElementById('summary-total').textContent = `₹${total.toLocaleString()}`;
 }
 
@@ -223,13 +237,72 @@ function populatePaymentInfo(orderData) {
     document.getElementById('payment-product-name').textContent = orderData.product.name;
     document.getElementById('payment-quantity').textContent = orderData.customerDetails.quantity;
     document.getElementById('payment-unit-price').textContent = `₹${orderData.unitPrice.toLocaleString()}`;
-    document.getElementById('payment-total-amount').textContent = `₹${orderData.totalAmount.toLocaleString()}`;
+    
+    // Always show delivery charges for all payment methods
+    const deliveryCharge = 20;
+    const baseAmount = orderData.totalAmount;
+    const finalAmount = baseAmount + deliveryCharge;
+    
+    // Show delivery charges row (always visible now)
+    const deliveryChargesRow = document.getElementById('cod-charges-row');
+    const deliveryChargesElement = document.getElementById('payment-cod-charges');
+    const totalAmountElement = document.getElementById('payment-total-amount');
+    
+    if (deliveryChargesRow && deliveryChargesElement && totalAmountElement) {
+        deliveryChargesRow.style.display = 'flex';
+        deliveryChargesElement.textContent = `₹${deliveryCharge}`;
+        totalAmountElement.textContent = `₹${finalAmount.toLocaleString()}`;
+        
+        // Update the label to show "Delivery Charges" instead of "COD Charges"
+        const deliveryLabel = deliveryChargesRow.querySelector('span:first-child');
+        if (deliveryLabel) {
+            deliveryLabel.textContent = 'Delivery Charges:';
+        }
+    }
     
     // Customer details
     document.getElementById('customer-name-display').textContent = orderData.customerDetails.customerName;
     document.getElementById('customer-phone-display').textContent = orderData.customerDetails.customerPhone;
     document.getElementById('customer-email-display').textContent = orderData.customerDetails.customerEmail;
     document.getElementById('customer-address-display').textContent = orderData.customerDetails.deliveryAddress;
+}
+
+// Function to update total with COD charges
+function updateTotalWithCOD() {
+    const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
+    if (!orderData) return;
+    
+    const baseAmount = orderData.totalAmount;
+    const codCharges = 20; // Fixed COD charge of ₹20 for all orders
+    const finalAmount = baseAmount + codCharges;
+    
+    // Show COD charges row
+    const codChargesRow = document.getElementById('cod-charges-row');
+    const codChargesElement = document.getElementById('payment-cod-charges');
+    const totalAmountElement = document.getElementById('payment-total-amount');
+    
+    if (codChargesRow && codChargesElement && totalAmountElement) {
+        codChargesRow.style.display = 'flex';
+        codChargesElement.textContent = `₹${codCharges}`;
+        totalAmountElement.textContent = `₹${finalAmount.toLocaleString()}`;
+    }
+}
+
+// Function to update total without COD charges
+function updateTotalWithoutCOD() {
+    const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
+    if (!orderData) return;
+    
+    const baseAmount = orderData.totalAmount;
+    
+    // Hide COD charges row
+    const codChargesRow = document.getElementById('cod-charges-row');
+    const totalAmountElement = document.getElementById('payment-total-amount');
+    
+    if (codChargesRow && totalAmountElement) {
+        codChargesRow.style.display = 'none';
+        totalAmountElement.textContent = `₹${baseAmount.toLocaleString()}`;
+    }
 }
 
 function generatePaymentQR(orderData) {
@@ -244,7 +317,8 @@ function generatePaymentQR(orderData) {
         'naveethulhussain700-4@upi'      // Generic fallback
     ];
     const merchantName = 'Nature Care Impex';
-    const amount = orderData.totalAmount;
+    const deliveryCharge = 20; // Fixed delivery charge for all orders
+    const amount = orderData.totalAmount + deliveryCharge; // Include delivery charge in QR payment
     const currency = 'INR';
     const transactionNote = `Order-${orderData.orderId}`;
     
@@ -252,7 +326,9 @@ function generatePaymentQR(orderData) {
     const simpleUpiData = `upi://pay?pa=${primaryUpiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
     
     console.log('📱 Simple UPI Data:', simpleUpiData);
-    console.log('💰 Amount:', amount);
+    console.log('💰 Product Amount:', orderData.totalAmount);
+    console.log('🚚 Delivery Charge:', deliveryCharge);
+    console.log('💰 Total Amount (including delivery):', amount);
     console.log('🆔 UPI ID:', primaryUpiId);
     
     const qrCodeElement = document.getElementById('payment-qr-code');
@@ -484,111 +560,15 @@ function fallbackCopyUpiId(upiId) {
 }
 
 function handleScreenshotUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    // Validate file
-    if (!file.type.startsWith('image/')) {
-        alert('Please upload an image file.');
-        return;
-    }
-    
-    if (file.size > 5 * 1024 * 1024) {
-        alert('File size should be less than 5MB.');
-        return;
-    }
-    
-    // Show preview
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        document.getElementById('preview-image').src = e.target.result;
-        document.getElementById('screenshot-preview').style.display = 'block';
-        
-        // Hide instruction and show the Confirm Order button
-        const instructionMsg = document.getElementById('upload-instruction');
-        let confirmBtn = document.getElementById('confirm-payment-btn');
-        
-        console.log('Screenshot uploaded - attempting to show button');
-        console.log('Instruction element:', instructionMsg);
-        console.log('Confirm button element:', confirmBtn);
-        
-        if (instructionMsg) {
-            instructionMsg.style.display = 'none';
-            console.log('Instruction hidden');
-        }
-        
-        // If button doesn't exist or isn't working, create a new one
-        if (!confirmBtn) {
-            console.log('Creating new confirm button');
-            const confirmSection = document.querySelector('.confirm-order-section');
-            if (confirmSection) {
-                confirmBtn = document.createElement('button');
-                confirmBtn.id = 'confirm-payment-btn';
-                confirmBtn.className = 'btn btn-primary';
-                confirmBtn.innerHTML = '✅ Confirm Order';
-                confirmBtn.onclick = confirmPayment;
-                confirmSection.appendChild(confirmBtn);
-            }
-        }
-        
-        if (confirmBtn) {
-            // Multiple approaches to ensure button shows
-            confirmBtn.style.display = 'block';
-            confirmBtn.style.visibility = 'visible';
-            confirmBtn.style.opacity = '1';
-            confirmBtn.classList.add('show');
-            confirmBtn.disabled = false;
-            
-            console.log('Button should now be visible');
-            console.log('Button display:', confirmBtn.style.display);
-            console.log('Button classes:', confirmBtn.className);
-            
-            // Force a reflow
-            confirmBtn.offsetHeight;
-            
-            // Show success message
-            alert('Screenshot uploaded successfully! You can now confirm your order.');
-            
-        } else {
-            console.error('Still cannot find/create confirm button!');
-            alert('Error: Cannot create confirm button. Please refresh the page.');
-        }
-        
-        // Store screenshot data
-        const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
-        orderData.paymentScreenshot = {
-            file: file.name,
-            dataUrl: e.target.result,
-            uploadedAt: new Date().toISOString()
-        };
-        sessionStorage.setItem('orderForPayment', JSON.stringify(orderData));
-        
-        console.log('Screenshot uploaded - Confirm button shown, instruction hidden');
-    };
-    reader.readAsDataURL(file);
+    // Screenshot upload is no longer required
+    alert('Screenshot upload is no longer required! Simply complete your UPI payment and click confirm order.');
+    return;
 }
 
 function removeScreenshot() {
-    document.getElementById('screenshot-preview').style.display = 'none';
-    document.getElementById('screenshot-input').value = '';
-    
-    // Show instruction and hide the Confirm Order button
-    const instructionMsg = document.getElementById('upload-instruction');
-    const confirmBtn = document.getElementById('confirm-payment-btn');
-    
-    if (instructionMsg) instructionMsg.style.display = 'block';
-    if (confirmBtn) {
-        confirmBtn.classList.remove('show');
-        confirmBtn.disabled = true;
-        console.log('Confirm button hidden');
-    }
-    
-    // Remove screenshot from order data
-    const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
-    delete orderData.paymentScreenshot;
-    sessionStorage.setItem('orderForPayment', JSON.stringify(orderData));
-    
-    console.log('Screenshot removed - Confirm button hidden, instruction shown');
+    // Screenshot upload is no longer required
+    alert('Screenshot upload is no longer required! Simply complete your UPI payment and click confirm order.');
+    return;
 }
 
 // Enhanced confirmPayment function with MongoDB integration
@@ -601,37 +581,25 @@ async function confirmPayment() {
         return;
     }
     
-    // Check if screenshot is uploaded by looking at the preview element
-    const screenshotPreview = document.getElementById('screenshot-preview');
-    const previewImage = document.getElementById('preview-image');
+    // Show confirmation dialog
+    const confirmMessage = `Please confirm your order:
+
+Order ID: ${orderData.orderId}
+Product: ${orderData.product.name}
+Quantity: ${orderData.customerDetails.quantity}
+Total Amount: ₹${orderData.totalAmount.toLocaleString()}
+
+Customer: ${orderData.customerDetails.customerName}
+Phone: ${orderData.customerDetails.customerPhone}
+
+Are you sure you want to place this order?`;
     
-    console.log('Screenshot preview element:', screenshotPreview);
-    console.log('Preview image src:', previewImage ? previewImage.src : 'not found');
-    console.log('Order data has screenshot:', !!orderData.paymentScreenshot);
-    
-    // Check multiple ways to confirm screenshot is uploaded
-    const hasScreenshotData = orderData.paymentScreenshot && orderData.paymentScreenshot.dataUrl;
-    const hasPreviewImage = previewImage && previewImage.src && previewImage.src !== '';
-    const previewVisible = screenshotPreview && screenshotPreview.style.display !== 'none';
-    
-    if (!hasScreenshotData && !hasPreviewImage && !previewVisible) {
-        alert('Please upload payment screenshot to confirm order.');
+    if (!confirm(confirmMessage)) {
         return;
     }
     
-    // If we don't have screenshot data but image is visible, create it
-    if (!hasScreenshotData && hasPreviewImage) {
-        orderData.paymentScreenshot = {
-            file: 'uploaded-screenshot.jpg',
-            dataUrl: previewImage.src,
-            uploadedAt: new Date().toISOString()
-        };
-        sessionStorage.setItem('orderForPayment', JSON.stringify(orderData));
-        console.log('Created screenshot data from preview image');
-    }
-    
     // Update order status and add timestamps
-    orderData.status = 'payment_submitted';
+    orderData.status = 'screenshot'; // Changed from 'confirmed' to 'screenshot'
     orderData.submittedAt = new Date().toISOString();
     orderData.createdAt = orderData.timestamp || new Date().toISOString();
     
@@ -704,7 +672,7 @@ function showOrderSuccessMessage(order, saveLocation) {
         locationMessage = '📱 Your order has been saved locally and will be synced to our database when available.';
     }
     
-    alert(`Payment confirmed successfully!
+    alert(`Order confirmed successfully!
 
 Order ID: ${order.orderId}
 Product: ${order.product.name}
@@ -714,7 +682,12 @@ ${locationMessage}
 
 Thank you for your order! We will contact you shortly to confirm delivery details.
 
-Your order is now visible in our system and will be processed soon.`);
+Payment Instructions:
+• Please complete payment using the UPI QR code or UPI ID provided
+• Keep your payment reference for tracking
+• We will verify payment and process your order
+
+Your order is now in our system and will be processed once payment is received.`);
     
     // Redirect to products page
     window.location.href = 'products.html';
@@ -842,7 +815,7 @@ async function loadProductsData() {
             category: "cocopeat",
             image: "https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190898/photo_2025-12-31_22-18-07_c2hs4m.jpg",
             description: "Premium washed cocopeat blocks ideal for potting mixes and hydroponics. High water retention and porosity.",
-            sizes: ["5kg Block", "Pallet (200 Blocks)"],
+            sizes: ["S", "M", "L", "XL", "XXL"],
             price: 250,
             cost: 150,
             stock: 100
@@ -853,7 +826,7 @@ async function loadProductsData() {
             category: "eco-care",
             image: "https://cdn.moglix.com/p/B5wXshH1wq7TS-xxlarge.jpg",
             description: "Ready-to-use grow bags for greenhouse cultivation. UV treated for durability and optimal root growth.",
-            sizes: ["100x15x18 cm", "100x20x10 cm"],
+            sizes: ["S", "M", "L", "XL", "XXL"],
             price: 90,
             cost: 60,
             stock: 200
@@ -864,7 +837,7 @@ async function loadProductsData() {
             category: "cocopeat",
             image: "https://images.unsplash.com/photo-1591857177580-dc82b9e4e119?auto=format&fit=crop&w=800&q=80",
             description: "Compact 650g briquettes, perfect for home gardening and smaller applications. Expands to 9 liters.",
-            sizes: ["650g Brick", "Pack of 3"],
+            sizes: ["S", "M", "L", "XL", "XXL"],
             price: 180,
             cost: 120,
             stock: 150
@@ -875,7 +848,7 @@ async function loadProductsData() {
             category: "bamboo",
             image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbYHHF-lKgdGS9ftR4AwALD27xwGSO9hsldw&s",
             description: "Comfortable, absorbent, and eco-friendly bamboo period pads. Washable and reusable for a sustainable cycle.",
-            sizes: ["Small/Light", "Medium/Regular", "Large/Heavy"],
+            sizes: ["S", "M", "L", "XL", "XXL"],
             price: 120,
             cost: 80,
             stock: 80
@@ -886,7 +859,7 @@ async function loadProductsData() {
             category: "cocopeat",
             image: "https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190712/photo_2025-12-31_22-14-34_zu8ayl.jpg",
             description: "High-quality 400g coco peat bricks, perfect for home gardening and seed starting. Compact and easy to use.",
-            sizes: ["400g Brick", "Pack of 12"],
+            sizes: ["S", "M", "L", "XL", "XXL"],
             price: 200,
             cost: 140,
             stock: 120
@@ -947,6 +920,9 @@ async function refreshProducts() {
 // Enhanced DOMContentLoaded Event with async product loading
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOM loaded, initializing...');
+    
+    // Clear product cache to ensure fresh data with correct sizes
+    clearProductCache();
     
     // Initialize products first
     await initializeProducts();
@@ -1677,70 +1653,71 @@ function payWithApp(app) {
     }, 2000);
 }
 
-function handleScreenshotUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+async function confirmOrder() {
+    let finalOrder;
     
-    // Validate file
-    if (!file.type.startsWith('image/')) {
-        alert('Please upload an image file.');
-        return;
-    }
-    
-    if (file.size > 5 * 1024 * 1024) {
-        alert('File size should be less than 5MB.');
-        return;
-    }
-    
-    // Show preview
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        document.getElementById('preview-image').src = e.target.result;
-        document.getElementById('screenshot-preview').style.display = 'block';
-        document.getElementById('confirm-order-btn').disabled = false;
-        
-        // Store screenshot data
-        currentOrder.screenshot = {
-            file: file,
-            dataUrl: e.target.result,
-            name: file.name
+    try {
+        // Create final order object
+        finalOrder = {
+            ...currentOrder,
+            status: 'screenshot', // Valid status from enum
+            createdAt: new Date().toISOString(),
+            paymentScreenshot: currentOrder.screenshot
         };
-    };
-    reader.readAsDataURL(file);
-}
-
-function removeScreenshot() {
-    document.getElementById('screenshot-preview').style.display = 'none';
-    document.getElementById('screenshot-input').value = '';
-    document.getElementById('confirm-order-btn').disabled = true;
-    currentOrder.screenshot = null;
-}
-
-function confirmOrder() {
-    if (!currentOrder.screenshot) {
-        alert('Please upload payment screenshot to confirm order.');
-        return;
+        
+        console.log('📤 Confirming order:', finalOrder);
+        
+        // Check if API service is available
+        if (!window.apiService) {
+            throw new Error('API Service not available');
+        }
+        
+        // Send order to server/database via API service
+        console.log('🔄 Calling apiService.createOrder...');
+        const result = await window.apiService.createOrder(finalOrder);
+        console.log('📡 API Response:', result);
+        
+        if (result.success) {
+            console.log('✅ Order successfully saved to database');
+            
+            // Close modal and show success
+            closePaymentModal();
+            showOrderSuccess();
+            
+            // Reset current order
+            currentOrder = null;
+            
+            // Show success message with database confirmation
+            setTimeout(() => {
+                alert('✅ Order saved to database successfully!\n\nOrder ID: ' + finalOrder.orderId + '\n\nYou can now check the Owner Portal to see your order.');
+            }, 1000);
+            
+        } else {
+            console.error('❌ Failed to save order:', result.message);
+            throw new Error('Database save failed: ' + result.message);
+        }
+        
+    } catch (error) {
+        console.error('❌ Order confirmation error:', error);
+        
+        // Fallback: Store order in localStorage only
+        console.log('⚠️ Falling back to localStorage storage');
+        let orders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+        orders.push(finalOrder);
+        localStorage.setItem('customerOrders', JSON.stringify(orders));
+        
+        // Close modal and show success
+        closePaymentModal();
+        showOrderSuccess();
+        
+        // Reset current order
+        currentOrder = null;
+        
+        // Show warning about offline mode
+        setTimeout(() => {
+            alert('⚠️ Order saved locally only!\n\nDatabase Error: ' + error.message + '\n\nOrder ID: ' + (finalOrder ? finalOrder.orderId : 'N/A') + '\n\nPlease contact support or try again later.');
+        }, 1000);
     }
-    
-    // Create final order object
-    const finalOrder = {
-        ...currentOrder,
-        status: 'screenshot', // Changed from 'pending' to 'screenshot'
-        createdAt: new Date().toISOString(),
-        paymentScreenshot: currentOrder.screenshot.dataUrl
-    };
-    
-    // Store order in localStorage (in real app, this would be sent to server)
-    let orders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
-    orders.push(finalOrder);
-    localStorage.setItem('customerOrders', JSON.stringify(orders));
-    
-    // Close modal and show success
-    closePaymentModal();
-    showOrderSuccess();
-    
-    // Reset current order
-    currentOrder = null;
 }
 
 function showOrderSuccess() {
@@ -1818,3 +1795,21 @@ document.addEventListener('keydown', function(e) {
 });
 
 console.log('Nature Care Impex script loaded successfully!');
+// Function to clear cached product data and reload fresh
+function clearProductCache() {
+    localStorage.removeItem('allProducts');
+    localStorage.removeItem('productsLastUpdated');
+    console.log('🧹 Product cache cleared');
+}
+
+// Function to force refresh products from server
+async function forceRefreshProducts() {
+    clearProductCache();
+    products = await loadProductsData();
+    console.log('🔄 Products force refreshed:', products.length);
+    return products;
+}
+
+// Make functions available globally
+window.clearProductCache = clearProductCache;
+window.forceRefreshProducts = forceRefreshProducts;

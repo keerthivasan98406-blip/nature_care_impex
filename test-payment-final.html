@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Payment Test</title>
+    <link rel="stylesheet" href="style (1).css">
+</head>
+<body>
+    <div style="padding: 50px; max-width: 600px; margin: 0 auto;">
+        <h1>Final Payment Test</h1>
+        
+        <!-- Simulate order data -->
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+            <h3>Test Order</h3>
+            <p><strong>Product:</strong> Cocopeat 5kg Block</p>
+            <p><strong>Total:</strong> ₹250</p>
+        </div>
+
+        <!-- Screenshot Upload -->
+        <div class="payment-confirmation-section">
+            <h3>Upload Payment Screenshot</h3>
+            <div class="screenshot-upload-area">
+                <div class="upload-zone" onclick="document.getElementById('screenshot-input').click()">
+                    <div class="upload-content">
+                        <div class="upload-icon">📷</div>
+                        <p class="upload-text">Click to upload payment screenshot</p>
+                        <small class="upload-note">Test the upload functionality</small>
+                    </div>
+                    <input type="file" id="screenshot-input" accept="image/*" style="display: none;" onchange="testScreenshotUpload(event)">
+                </div>
+                
+                <div id="screenshot-preview" class="screenshot-preview" style="display: none;">
+                    <img id="preview-image" src="" alt="Payment Screenshot">
+                    <button class="remove-screenshot-btn" onclick="testRemoveScreenshot()">&times;</button>
+                    <div class="screenshot-success" style="text-align: center; margin-top: 15px;">
+                        <p style="color: #28a745; font-weight: 600; margin: 10px 0;">✅ Screenshot uploaded successfully!</p>
+                        <button id="confirm-payment-btn-alt" class="btn btn-primary" onclick="testConfirmPayment()" style="
+                            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                            padding: 12px 24px;
+                            border: none;
+                            border-radius: 6px;
+                            color: white;
+                            font-weight: 600;
+                            cursor: pointer;
+                            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+                        ">
+                            ✅ Confirm Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Confirm Button -->
+        <div class="payment-actions" style="margin-top: 30px;">
+            <button id="confirm-payment-btn" class="btn btn-primary" onclick="testConfirmPayment()">
+                ✅ Confirm Order
+            </button>
+        </div>
+
+        <div id="test-log" style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-top: 20px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto;">
+            Test log will appear here...
+        </div>
+    </div>
+
+    <script>
+        // Create test order data
+        const testOrderData = {
+            orderId: 'TEST-' + Date.now(),
+            product: { name: 'Cocopeat 5kg Block' },
+            totalAmount: 250,
+            customerDetails: { customerName: 'Test User' }
+        };
+        sessionStorage.setItem('orderForPayment', JSON.stringify(testOrderData));
+        
+        function log(message) {
+            const logDiv = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        function testScreenshotUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            log('File selected: ' + file.name);
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('preview-image').src = e.target.result;
+                document.getElementById('screenshot-preview').style.display = 'block';
+                
+                // Update order data
+                const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
+                orderData.paymentScreenshot = {
+                    file: file.name,
+                    dataUrl: e.target.result,
+                    uploadedAt: new Date().toISOString()
+                };
+                sessionStorage.setItem('orderForPayment', JSON.stringify(orderData));
+                
+                log('Screenshot uploaded and stored successfully');
+                log('Confirm buttons should now be visible');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function testRemoveScreenshot() {
+            document.getElementById('screenshot-preview').style.display = 'none';
+            document.getElementById('screenshot-input').value = '';
+            
+            const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
+            delete orderData.paymentScreenshot;
+            sessionStorage.setItem('orderForPayment', JSON.stringify(orderData));
+            
+            log('Screenshot removed');
+        }
+        
+        function testConfirmPayment() {
+            log('Confirm payment button clicked');
+            
+            const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
+            const hasScreenshot = orderData && orderData.paymentScreenshot;
+            const previewImage = document.getElementById('preview-image');
+            const hasPreviewImage = previewImage && previewImage.src && previewImage.src !== '';
+            
+            log('Has screenshot data: ' + !!hasScreenshot);
+            log('Has preview image: ' + !!hasPreviewImage);
+            
+            if (!hasScreenshot && !hasPreviewImage) {
+                alert('Please upload payment screenshot to confirm order.');
+                log('ERROR: No screenshot found');
+                return;
+            }
+            
+            alert(`Order confirmed successfully!
+Order ID: ${orderData.orderId}
+Product: ${orderData.product.name}
+Total: ₹${orderData.totalAmount}`);
+            
+            log('Order confirmed successfully!');
+        }
+        
+        // Initial log
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Test page loaded');
+            log('Order data created in sessionStorage');
+        });
+    </script>
+</body>
+</html>

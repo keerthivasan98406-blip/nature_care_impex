@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Payment Button</title>
+    <link rel="stylesheet" href="style (1).css">
+    <style>
+        .test-container {
+            padding: 50px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .debug-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Payment Button Test</h1>
+        
+        <div class="test-section">
+            <h3>Screenshot Upload Test</h3>
+            <div class="screenshot-upload-area">
+                <div class="upload-zone" onclick="document.getElementById('test-screenshot-input').click()">
+                    <div class="upload-content">
+                        <div class="upload-icon">📷</div>
+                        <p class="upload-text">Click to upload payment screenshot</p>
+                        <small class="upload-note">Test upload functionality</small>
+                    </div>
+                    <input type="file" id="test-screenshot-input" accept="image/*" style="display: none;" onchange="testScreenshotUpload(event)">
+                </div>
+                
+                <div id="test-screenshot-preview" class="screenshot-preview" style="display: none;">
+                    <img id="test-preview-image" src="" alt="Test Screenshot">
+                    <button class="remove-screenshot-btn" onclick="testRemoveScreenshot()">&times;</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Button Control</h3>
+            <div class="payment-actions">
+                <button class="btn btn-secondary" onclick="testHideButton()">Hide Button</button>
+                <div class="confirm-order-section">
+                    <p id="upload-instruction" class="upload-instruction">
+                        📷 Please upload payment screenshot to confirm your order
+                    </p>
+                    <button id="confirm-payment-btn" class="btn btn-primary" onclick="testConfirmPayment()">
+                        ✅ Confirm Order
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Manual Controls</h3>
+            <button class="btn btn-primary" onclick="testShowButton()">Show Button</button>
+            <button class="btn btn-secondary" onclick="testHideButton()">Hide Button</button>
+            <button class="btn btn-secondary" onclick="checkButtonStatus()">Check Status</button>
+        </div>
+
+        <div id="debug-output" class="debug-info">
+            Debug info will appear here...
+        </div>
+    </div>
+
+    <script>
+        function testScreenshotUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            updateDebug('File selected: ' + file.name);
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('test-preview-image').src = e.target.result;
+                document.getElementById('test-screenshot-preview').style.display = 'block';
+                
+                // Show button logic
+                const instructionMsg = document.getElementById('upload-instruction');
+                const confirmBtn = document.getElementById('confirm-payment-btn');
+                
+                updateDebug('Hiding instruction and showing button...');
+                
+                if (instructionMsg) {
+                    instructionMsg.style.display = 'none';
+                    updateDebug('Instruction hidden');
+                }
+                
+                if (confirmBtn) {
+                    confirmBtn.classList.add('show');
+                    confirmBtn.disabled = false;
+                    updateDebug('Button class added and enabled');
+                } else {
+                    updateDebug('ERROR: Button not found!');
+                }
+                
+                checkButtonStatus();
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function testRemoveScreenshot() {
+            document.getElementById('test-screenshot-preview').style.display = 'none';
+            document.getElementById('test-screenshot-input').value = '';
+            
+            const instructionMsg = document.getElementById('upload-instruction');
+            const confirmBtn = document.getElementById('confirm-payment-btn');
+            
+            updateDebug('Removing screenshot and hiding button...');
+            
+            if (instructionMsg) {
+                instructionMsg.style.display = 'block';
+                updateDebug('Instruction shown');
+            }
+            
+            if (confirmBtn) {
+                confirmBtn.classList.remove('show');
+                confirmBtn.disabled = true;
+                updateDebug('Button class removed and disabled');
+            }
+            
+            checkButtonStatus();
+        }
+        
+        function testShowButton() {
+            const confirmBtn = document.getElementById('confirm-payment-btn');
+            if (confirmBtn) {
+                confirmBtn.classList.add('show');
+                confirmBtn.disabled = false;
+                updateDebug('Manual show: Button class added');
+            }
+            checkButtonStatus();
+        }
+        
+        function testHideButton() {
+            const confirmBtn = document.getElementById('confirm-payment-btn');
+            if (confirmBtn) {
+                confirmBtn.classList.remove('show');
+                confirmBtn.disabled = true;
+                updateDebug('Manual hide: Button class removed');
+            }
+            checkButtonStatus();
+        }
+        
+        function checkButtonStatus() {
+            const confirmBtn = document.getElementById('confirm-payment-btn');
+            if (confirmBtn) {
+                const computedStyle = window.getComputedStyle(confirmBtn);
+                const hasShowClass = confirmBtn.classList.contains('show');
+                const isDisabled = confirmBtn.disabled;
+                
+                updateDebug(`Button Status:
+- Has 'show' class: ${hasShowClass}
+- Disabled: ${isDisabled}
+- Display: ${computedStyle.display}
+- Visibility: ${computedStyle.visibility}
+- Opacity: ${computedStyle.opacity}`);
+            } else {
+                updateDebug('Button not found!');
+            }
+        }
+        
+        function testConfirmPayment() {
+            updateDebug('Confirm payment clicked!');
+            alert('Confirm payment button works!');
+        }
+        
+        function updateDebug(message) {
+            const debugOutput = document.getElementById('debug-output');
+            const timestamp = new Date().toLocaleTimeString();
+            debugOutput.innerHTML += `[${timestamp}] ${message}<br>`;
+            debugOutput.scrollTop = debugOutput.scrollHeight;
+        }
+        
+        // Initial status check
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDebug('Page loaded - checking initial status...');
+            checkButtonStatus();
+        });
+    </script>
+</body>
+</html>

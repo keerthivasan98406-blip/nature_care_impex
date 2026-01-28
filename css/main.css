@@ -75,12 +75,12 @@ img, video, iframe {
 }
 
 body {
-    font-family: 'Lato', sans-serif;
-    color: var(--color-text-main);
-    background-color: var(--color-bg-light);
-    line-height: 1.8;
-    /* Increased line height */
-    letter-spacing: 0.02em;
+    font-family: "Amazon Ember", Arial, sans-serif;
+    color: #0F1111;
+    background-color: #FFFFFF;
+    line-height: 1.4;
+    font-size: 14px;
+    letter-spacing: 0.01em;
     overflow-x: hidden;
 }
 
@@ -230,8 +230,23 @@ img {
         padding: 0 15px;
     }
     
+    .logo {
+        flex-direction: column;
+        margin-top: -5px;
+    }
+    
     .logo img {
-        height: 40px;
+        height: 60px;
+        width: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #FFD700; /* Golden ring */
+        box-shadow: 0 0 0 2px #000000; /* Black outer ring */
+        margin-bottom: 3px;
+    }
+    
+    .logo-text {
+        font-size: 10px;
     }
     
     /* Hero ultra-mobile */
@@ -468,12 +483,35 @@ img {
 
 .logo {
     display: flex;
+    flex-direction: column;
     align-items: center;
+    text-decoration: none;
+    color: white;
+    margin-top: -10px; /* Move logo up */
 }
 
 .logo img {
-    max-height: 50px; /* Adjust height to fit navbar */
-    width: auto;
+    max-height: 70px; /* Adjust height to fit navbar */
+    width: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #FFD700; /* Golden ring */
+    box-shadow: 0 0 0 2px #000000; /* Black outer ring */
+    transition: transform 0.3s ease;
+    margin-bottom: 5px; /* Space between logo and text */
+}
+
+.logo img:hover {
+    transform: scale(1.05);
+}
+
+.logo-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: #000000; /* Black color */
+    text-align: center;
+    line-height: 1.2;
+    margin-top: 2px;
 }
 
 .nav-links {
@@ -1228,8 +1266,8 @@ footer {
 .payment-option {
     border: 2px solid #ddd;
     border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 15px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
     cursor: pointer;
     transition: all 0.3s;
 }
@@ -1243,7 +1281,7 @@ footer {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 8px;
 }
 
 .payment-header label {
@@ -1296,49 +1334,48 @@ footer {
 .app-buttons {
     display: flex;
     flex-direction: row;
-    gap: 12px;
+    gap: 8px;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-}
-    margin: 20px 0;
+    margin: 12px 0;
 }
 
 .upi-app {
-    padding: 12px 20px;
+    padding: 8px 16px;
     background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
     color: white;
     border: none;
-    border-radius: 12px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
     transition: all 0.3s ease;
-    min-width: 140px;
-    min-height: 50px;
+    min-width: 120px;
+    min-height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
     position: relative;
     overflow: hidden;
-    letter-spacing: 0.5px;
-    margin: 8px 0;
+    letter-spacing: 0.3px;
+    margin: 4px 0;
 }
 
 .upi-app::before {
     content: '';
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .upi-app:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
 }
 
 .upi-app:active {
@@ -1357,7 +1394,7 @@ footer {
 
 .upi-app[onclick*="paytm"]:hover {
     background: linear-gradient(135deg, #0082C6 0%, #005A8B 100%);
-    box-shadow: 0 6px 20px rgba(0, 186, 242, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 186, 242, 0.4);
 }
 
 /* GPay Button */
@@ -1372,7 +1409,7 @@ footer {
 
 .upi-app[onclick*="gpay"]:hover {
     background: linear-gradient(135deg, #3367D6 0%, #2E7D32 50%, #F57F17 75%, #C62828 100%);
-    box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4);
+    box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
 }
 
 /* PhonePe Button */
@@ -1387,7 +1424,7 @@ footer {
 
 .upi-app[onclick*="phonepe"]:hover {
     background: linear-gradient(135deg, #3C1361 0%, #2A0E44 100%);
-    box-shadow: 0 6px 20px rgba(95, 37, 159, 0.4);
+    box-shadow: 0 4px 12px rgba(95, 37, 159, 0.4);
 }
 
 .upi-id {
@@ -2211,11 +2248,19 @@ footer {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 30px;
+    width: 100%;
 }
 
 .qr-code-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .qr-code {
@@ -2223,7 +2268,8 @@ footer {
     height: 200px;
     border: 2px solid #e9ecef;
     border-radius: 8px;
-    margin-bottom: 15px;
+    margin: 0 auto 15px auto;
+    display: block;
 }
 
 .qr-instruction {
@@ -2386,19 +2432,32 @@ footer {
     }
     
     .qr-payment-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         gap: 20px;
         padding: 20px 15px;
+        width: 100%;
     }
     
     .qr-code {
         width: 200px;
         height: 200px;
         max-width: 90%;
+        margin: 0 auto;
+        display: block;
     }
     
     .qr-code-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 100%;
         padding: 15px;
-        margin: 15px 0;
+        margin: 15px auto;
     }
     
     .app-buttons {
@@ -2481,10 +2540,19 @@ footer {
     .qr-code {
         width: 180px;
         height: 180px;
+        margin: 0 auto;
+        display: block;
     }
     
     .qr-code-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 100%;
         padding: 10px;
+        margin: 0 auto;
     }
     
     .app-buttons {
@@ -2602,5 +2670,546 @@ footer {
     
     .upload-instruction {
         text-align: center;
+    }
+}
+
+/* Amazon-style Typography */
+h1 {
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: #0F1111;
+}
+
+h2 {
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: #0F1111;
+}
+
+h3 {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #0F1111;
+}
+
+p {
+    font-size: 14px;
+    line-height: 1.4;
+    color: #0F1111;
+}
+
+/* Amazon-style buttons */
+.btn {
+    font-size: 13px;
+    line-height: 1.4;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 400;
+}
+
+/* Amazon-style links */
+a {
+    color: #007185;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #C7511F;
+    text-decoration: underline;
+}
+
+/* Navigation text sizing */
+.nav-links a {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+/* Product text sizing */
+.product-title {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.3;
+}
+
+.product-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #B12704;
+}
+
+.product-description {
+    font-size: 14px;
+    line-height: 1.4;
+}
+/* Payment Method Selection - Enhanced Styling */
+.payment-method-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.payment-option {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.payment-option::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.5s;
+}
+
+.payment-option:hover {
+    border-color: #4a7c59;
+    background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(74, 124, 89, 0.2);
+}
+
+.payment-option:hover::before {
+    left: 100%;
+}
+
+.payment-option input[type="radio"] {
+    margin-right: 15px;
+    transform: scale(1.3);
+    accent-color: #4a7c59;
+}
+
+.payment-option input[type="radio"]:checked + label {
+    color: #4a7c59;
+    font-weight: 700;
+}
+
+.payment-option:has(input[type="radio"]:checked) {
+    border-color: #4a7c59;
+    background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+    box-shadow: 0 4px 20px rgba(74, 124, 89, 0.3);
+    transform: translateY(-1px);
+}
+
+.payment-option:has(input[type="radio"]:checked)::after {
+    content: '✓';
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #4a7c59;
+    color: white;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.payment-option label {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    width: 100%;
+    position: relative;
+    padding-left: 40px;
+}
+
+.payment-option label::before {
+    content: '';
+    position: absolute;
+    left: -35px;
+    top: 2px;
+    width: 24px;
+    height: 24px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Online Payment Icon */
+.payment-option:first-child label::before {
+    content: '💳';
+    font-size: 20px;
+    left: -30px;
+    top: 0px;
+}
+
+/* COD Payment Icon */
+.payment-option:last-child label::before {
+    content: '💰';
+    font-size: 20px;
+    left: -30px;
+    top: 0px;
+}
+
+.payment-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #2c5530;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.payment-desc {
+    font-size: 14px;
+    color: #666;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+/* Add payment method badges */
+.payment-option:first-child .payment-title::after {
+    content: 'INSTANT';
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    margin-left: auto;
+}
+
+.payment-option:last-child .payment-title::after {
+    content: 'SECURE';
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    margin-left: auto;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .payment-option {
+        padding: 15px;
+    }
+    
+    .payment-title {
+        font-size: 16px;
+    }
+    
+    .payment-desc {
+        font-size: 13px;
+    }
+}
+/* Additional QR Code Centering */
+.qr-instruction, 
+.qr-validation-msg,
+.qr-section p {
+    text-align: center !important;
+    margin: 10px auto !important;
+    display: block !important;
+}
+
+.qr-section {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    width: 100% !important;
+}
+
+/* Ensure QR code canvas is centered */
+canvas {
+    margin: 0 auto !important;
+    display: block !important;
+}
+
+/* Center QR code validation message */
+.qr-validation-msg {
+    color: #28a745 !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    margin: 15px auto !important;
+    display: block !important;
+}
+/* Mobile brand name - hidden on desktop */
+.mobile-brand-name {
+    display: none;
+}
+
+/* Mobile Navigation - Logo on left, centered website name, menu on right */
+@media (max-width: 768px) {
+    .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        height: 60px;
+        padding: 0 15px;
+    }
+    
+    .navbar .logo {
+        flex-direction: row;
+        align-items: center;
+        margin-top: 0;
+        position: static;
+        flex-shrink: 0;
+    }
+    
+    .navbar .logo img {
+        display: block;
+        width: 40px;
+        height: 40px;
+        margin-right: 0;
+        margin-bottom: 0;
+    }
+    
+    .navbar .logo-text {
+        display: none; /* Hide text under logo on mobile */
+    }
+    
+    /* Show and center the mobile brand name */
+    .mobile-brand-name {
+        display: block;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 15px;
+        font-weight: 600;
+        color: white;
+        text-align: center;
+        z-index: 10;
+        pointer-events: none;
+        white-space: nowrap;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Ensure hamburger menu is on the right */
+    .hamburger {
+        position: relative;
+        z-index: 20;
+        flex-shrink: 0;
+    }
+    
+    .nav-links {
+        position: absolute;
+        right: 60px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mobile-brand-name {
+        font-size: 13px;
+        max-width: 150px;
+    }
+    
+    .navbar .logo img {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .nav-container {
+        height: 55px;
+        padding: 0 10px;
+    }
+}
+
+@media (max-width: 360px) {
+    .mobile-brand-name {
+        font-size: 12px;
+        max-width: 120px;
+    }
+}
+/* Override any conflicting mobile brand name styles */
+@media (max-width: 768px) {
+    .navbar .mobile-brand-name {
+        display: block !important;
+        position: absolute !important;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        font-size: 15px !important;
+        font-weight: 600 !important;
+        color: white !important;
+        text-align: center !important;
+        z-index: 999 !important;
+        pointer-events: none !important;
+        white-space: nowrap !important;
+        background: rgba(0,0,0,0.2) !important;
+        padding: 5px 10px !important;
+        border-radius: 15px !important;
+        border: 1px solid rgba(255,255,255,0.3) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar .mobile-brand-name {
+        font-size: 13px !important;
+        padding: 4px 8px !important;
+    }
+}
+/* Mobile Brand Name - Bold Black Text Only */
+@media screen and (max-width: 768px) {
+    .mobile-brand-name {
+        display: block !important;
+        visibility: visible !important;
+        position: absolute !important;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        font-family: "Amazon Ember", Arial, sans-serif !important;
+        font-size: 16px !important;
+        font-weight: 900 !important;
+        color: #000000 !important;
+        text-align: center !important;
+        z-index: 9999 !important;
+        pointer-events: none !important;
+        white-space: nowrap !important;
+        background: none !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        text-shadow: none !important;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .mobile-brand-name {
+        font-size: 14px !important;
+        font-weight: 900 !important;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .mobile-brand-name {
+        font-size: 13px !important;
+        font-weight: 900 !important;
+    }
+}
+/* Force Remove Background - Mobile Brand Name */
+@media screen and (max-width: 768px) {
+    .mobile-brand-name {
+        background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        border-radius: 0 !important;
+        border: 0 !important;
+        box-shadow: 0 0 0 transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        text-shadow: 0 0 0 transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+}
+
+/* Override any existing mobile brand name styles */
+.navbar .mobile-brand-name,
+.nav-container .mobile-brand-name,
+nav .mobile-brand-name {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    text-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+/* FORCE MOBILE BRAND NAME - BOLD BLACK TEXT */
+@media screen and (max-width: 768px) {
+    .mobile-brand-name {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: absolute !important;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        font-family: Arial, sans-serif !important;
+        font-size: 16px !important;
+        font-weight: 900 !important;
+        color: #000000 !important;
+        text-align: center !important;
+        z-index: 99999 !important;
+        pointer-events: none !important;
+        white-space: nowrap !important;
+        background: none !important;
+        background-color: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        outline: none !important;
+        text-decoration: none !important;
+        text-shadow: none !important;
+        box-shadow: none !important;
+        width: auto !important;
+        height: auto !important;
+        line-height: 1 !important;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .mobile-brand-name {
+        font-size: 14px !important;
+        font-weight: 900 !important;
+        color: #000000 !important;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .mobile-brand-name {
+        font-size: 13px !important;
+        font-weight: 900 !important;
+        color: #000000 !important;
+    }
+}
+
+/* Force override any conflicting styles */
+.navbar .mobile-brand-name,
+.nav-container .mobile-brand-name,
+nav .mobile-brand-name,
+header .mobile-brand-name {
+    color: #000000 !important;
+    font-weight: 900 !important;
+    background: transparent !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+/* HIDE mobile brand name on DESKTOP - Show ONLY on mobile */
+@media screen and (min-width: 769px) {
+    .mobile-brand-name {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+    
+    .navbar .mobile-brand-name,
+    .nav-container .mobile-brand-name,
+    nav .mobile-brand-name,
+    header .mobile-brand-name {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
     }
 }

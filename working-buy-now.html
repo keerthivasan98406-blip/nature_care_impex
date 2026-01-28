@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working Buy Now Test</title>
+    <link rel="stylesheet" href="style (1).css">
+</head>
+<body>
+    <div class="container" style="padding: 50px 0;">
+        <h1>Working Buy Now Test</h1>
+        
+        <div class="product-card" style="max-width: 400px; margin: 0 auto;">
+            <div class="product-info">
+                <div class="product-category">cocopeat</div>
+                <h3 class="product-title">Cocopeat 5kg Block</h3>
+                <p class="product-desc">Premium washed cocopeat blocks ideal for potting mixes and hydroponics.</p>
+                <div class="product-actions">
+                    <button class="btn btn-primary" onclick="showTestModal()">Buy Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Modal -->
+    <div id="test-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Order Details</h3>
+                <span class="close" onclick="closeTestModal()">&times;</span>
+            </div>
+            <div class="modal-form">
+                <div class="product-summary" style="padding: 20px; background: #f8f9fa; border-radius: 8px; margin-bottom: 20px;">
+                    <h4>Cocopeat 5kg Block</h4>
+                    <div style="font-size: 1.2rem; font-weight: bold; color: #D4AF37;">₹250</div>
+                </div>
+                
+                <form id="test-order-form">
+                    <div class="form-group">
+                        <label for="test-name">Full Name *</label>
+                        <input type="text" id="test-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="test-phone">Phone Number *</label>
+                        <input type="tel" id="test-phone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="test-email">Email Address *</label>
+                        <input type="email" id="test-email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="test-address">Delivery Address *</label>
+                        <textarea id="test-address" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="test-quantity">Quantity *</label>
+                            <input type="number" id="test-quantity" min="1" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="test-total">Total Amount</label>
+                            <input type="text" id="test-total" value="₹250" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeTestModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Proceed to Payment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTestModal() {
+            console.log('showTestModal called');
+            document.getElementById('test-modal').style.display = 'block';
+        }
+        
+        function closeTestModal() {
+            console.log('closeTestModal called');
+            document.getElementById('test-modal').style.display = 'none';
+        }
+        
+        document.getElementById('test-order-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Form submitted! This would proceed to payment.');
+            closeTestModal();
+        });
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('test-modal');
+            if (event.target === modal) {
+                closeTestModal();
+            }
+        }
+        
+        console.log('Working Buy Now test page loaded');
+    </script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Price Synchronization</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 1000px; margin: 0 auto; }
+        .section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        input, select { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        .product-card { border: 1px solid #ddd; padding: 15px; margin: 10px; border-radius: 8px; display: inline-block; width: 250px; }
+        .price { font-size: 1.2rem; font-weight: bold; color: #D4AF37; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test Price Synchronization</h1>
+    
+    <div class="section">
+        <h3>Step 1: Add Test Product with Custom Price</h3>
+        <p>Add a product through the owner portal simulation with a custom price.</p>
+        <input type="text" id="testProductName" placeholder="Product Name" value="Test Product">
+        <input type="number" id="testProductPrice" placeholder="Price" value="999">
+        <select id="testProductCategory">
+            <option value="cocopeat">Cocopeat</option>
+            <option value="bamboo">Bamboo</option>
+            <option value="eco-care">Eco-Care</option>
+        </select>
+        <button onclick="addTestProduct()">Add Test Product</button>
+        <div id="addResult" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h3>Step 2: Check Product Storage</h3>
+        <p>Verify that the product is stored correctly with the right price.</p>
+        <button onclick="checkProductStorage()">Check Storage</button>
+        <div id="storageResult" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h3>Step 3: Test Price Retrieval</h3>
+        <p>Test the getProductPrice function with different product IDs.</p>
+        <input type="text" id="testProductId" placeholder="Product ID">
+        <button onclick="testPriceRetrieval()">Test Price Retrieval</button>
+        <div id="priceResult" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h3>Step 4: Simulate Main Website Display</h3>
+        <p>Show how products would appear on the main website.</p>
+        <button onclick="simulateMainWebsite()">Simulate Main Website</button>
+        <div id="websiteResult" class="result"></div>
+    </div>
+
+    <script src="js/api-service.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        const apiService = new APIService();
+        
+        async function addTestProduct() {
+            const resultDiv = document.getElementById('addResult');
+            resultDiv.innerHTML = 'Adding test product...';
+            
+            const testProduct = {
+                name: document.getElementById('testProductName').value,
+                category: document.getElementById('testProductCategory').value,
+                description: 'Test product for price synchronization testing',
+                price: parseFloat(document.getElementById('testProductPrice').value),
+                cost: 50,
+                stock: 100,
+                minStock: 10,
+                image: 'https://via.placeholder.com/300x200?text=Test+Product',
+                sizes: ["Standard"],
+                isActive: true
+            };
+            
+            try {
+                // Try API first
+                let result = null;
+                try {
+                    result = await apiService.createProduct(testProduct);
+                    if (result.success) {
+                        resultDiv.innerHTML = `✅ Product added to database: ${testProduct.name} - ₹${testProduct.price}`;
+                        resultDiv.className = 'result success';
+                    } else {
+                        throw new Error(result.message);
+                    }
+                } catch (error) {
+                    // Fallback to localStorage
+                    const products = JSON.parse(localStorage.getItem('allProducts') || '[]');
+                    const newId = Math.max(...products.map(p => parseInt(p.id) || 0), 0) + 1;
+                    testProduct.id = newId;
+                    products.push(testProduct);
+                    localStorage.setItem('allProducts', JSON.stringify(products));
+                    
+                    resultDiv.innerHTML = `⚠️ Added to localStorage (API failed): ${testProduct.name} - ₹${testProduct.price}`;
+                    resultDiv.className = 'result warning';
+                }
+                
+                // Set the product ID for testing
+                document.getElementById('testProductId').value = testProduct.id || 'latest';
+                
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        function checkProductStorage() {
+            const resultDiv = document.getElementById('storageResult');
+            
+            try {
+                const products = JSON.parse(localStorage.getItem('allProducts') || '[]');
+                
+                if (products.length === 0) {
+                    resultDiv.innerHTML = '❌ No products found in localStorage';
+                    resultDiv.className = 'result error';
+                    return;
+                }
+                
+                const productList = products.map(product => `
+                    <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <strong>ID:</strong> ${product.id}<br>
+                        <strong>Name:</strong> ${product.name}<br>
+                        <strong>Price:</strong> ₹${product.price}<br>
+                        <strong>Category:</strong> ${product.category}
+                    </div>
+                `).join('');
+                
+                resultDiv.innerHTML = `
+                    <strong>✅ Found ${products.length} products in localStorage:</strong><br>
+                    ${productList}
+                `;
+                resultDiv.className = 'result success';
+                
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error reading storage: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        function testPriceRetrieval() {
+            const productId = document.getElementById('testProductId').value;
+            const resultDiv = document.getElementById('priceResult');
+            
+            if (!productId) {
+                resultDiv.innerHTML = '❌ Please enter a Product ID';
+                resultDiv.className = 'result error';
+                return;
+            }
+            
+            try {
+                // Test the getProductPrice function
+                const price = getProductPrice(productId);
+                
+                // Also check what's in localStorage
+                const products = JSON.parse(localStorage.getItem('allProducts') || '[]');
+                const product = products.find(p => p.id == productId || p.id === String(productId));
+                
+                resultDiv.innerHTML = `
+                    <strong>Price Retrieval Test:</strong><br>
+                    <strong>Product ID:</strong> ${productId}<br>
+                    <strong>Retrieved Price:</strong> ₹${price}<br>
+                    <strong>Product Found in Storage:</strong> ${product ? 'Yes' : 'No'}<br>
+                    ${product ? `<strong>Stored Price:</strong> ₹${product.price}<br><strong>Product Name:</strong> ${product.name}` : ''}
+                `;
+                resultDiv.className = 'result success';
+                
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        function simulateMainWebsite() {
+            const resultDiv = document.getElementById('websiteResult');
+            
+            try {
+                const products = JSON.parse(localStorage.getItem('allProducts') || '[]');
+                
+                if (products.length === 0) {
+                    resultDiv.innerHTML = '❌ No products to display';
+                    resultDiv.className = 'result error';
+                    return;
+                }
+                
+                const productCards = products.map(product => {
+                    const price = product.price || getProductPrice(product.id);
+                    return `
+                        <div class="product-card">
+                            <h4>${product.name}</h4>
+                            <p><strong>Category:</strong> ${product.category}</p>
+                            <p><strong>Description:</strong> ${product.description}</p>
+                            <div class="price">₹${price.toLocaleString()}</div>
+                            <p><strong>Stock:</strong> ${product.stock}</p>
+                        </div>
+                    `;
+                }).join('');
+                
+                resultDiv.innerHTML = `
+                    <strong>✅ Main Website Product Display:</strong><br>
+                    ${productCards}
+                `;
+                resultDiv.className = 'result success';
+                
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html>

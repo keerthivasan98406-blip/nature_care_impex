@@ -86,9 +86,12 @@
     <nav class="navbar">
         <div class="container nav-container">
             <a href="index.html" class="logo">
-                <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190433/photo_2025-12-31_22-10-18_k0jfc7.jpg"
+                <img src="assets/logo.jpg"
                     alt="Natural Care Impex">
+                <span class="logo-text">Natural Care Impex</span>
             </a>
+            
+            <div class="mobile-brand-name">Natural Care Impex</div>
 
             <ul class="nav-links">
                 <li><a href="index.html" class="nav-link">Home</a></li>
@@ -194,7 +197,109 @@
     </footer>
 
     <script src="js/api-service.js"></script>
+    <script src="js/api-service.js"></script>
     <script>
+        // Real-time update listener for cross-tab communication
+        let currentOrderId = null;
+        
+        // Listen for storage changes (real-time updates from owner portal)
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'orderStatusSync') {
+                const syncData = JSON.parse(e.newValue || '{}');
+                console.log('🔄 Received real-time update:', syncData);
+                
+                // If we're currently tracking this order, refresh the display
+                if (currentOrderId && syncData.orderId === currentOrderId) {
+                    console.log('✅ Refreshing current order display');
+                    setTimeout(() => {
+                        refreshCurrentOrder();
+                    }, 500); // Small delay to ensure database is updated
+                }
+                
+                // Show notification about the update
+                showUpdateNotification(syncData);
+            }
+        });
+        
+        // Function to refresh the currently displayed order
+        async function refreshCurrentOrder() {
+            if (!currentOrderId) return;
+            
+            try {
+                // Try to get updated order from database first
+                if (window.apiService) {
+                    const result = await window.apiService.getOrder(currentOrderId);
+                    if (result.success && result.data) {
+                        console.log('✅ Refreshed order from database');
+                        displayOrderDetails(result.data);
+                        return;
+                    }
+                }
+                
+                // Fallback to localStorage
+                const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+                const updatedOrder = customerOrders.find(o => o.orderId === currentOrderId);
+                if (updatedOrder) {
+                    console.log('✅ Refreshed order from localStorage');
+                    displayOrderDetails(updatedOrder);
+                }
+            } catch (error) {
+                console.error('Error refreshing order:', error);
+            }
+        }
+        
+        // Show notification when order status is updated
+        function showUpdateNotification(syncData) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #2ecc71;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+                font-weight: bold;
+                max-width: 300px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            notification.innerHTML = `
+                <div style="margin-bottom: 5px;">📦 Order Update!</div>
+                <div style="font-size: 0.9em; opacity: 0.9;">
+                    Order ${syncData.orderId} status changed to: <strong>${syncData.newStatus}</strong>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove notification after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+        
+        // Add CSS animations for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
         // Update label when search method changes
         document.getElementById('trackMethod').addEventListener('change', function() {
             const label = document.getElementById('trackLabel');
@@ -237,6 +342,7 @@
                         if (result.success && result.data) {
                             console.log('✅ Order found in database');
                             foundOrder = result.data;
+                            currentOrderId = foundOrder.orderId; // Set current order for real-time updates
                             displayOrderDetails(foundOrder);
                             return;
                         }
@@ -261,13 +367,16 @@
 
                 if (foundOrder) {
                     console.log('✅ Order found in localStorage');
+                    currentOrderId = foundOrder.orderId; // Set current order for real-time updates
                     displayOrderDetails(foundOrder);
                 } else {
                     console.log('❌ Order not found');
+                    currentOrderId = null;
                     showNotFound();
                 }
             } catch (error) {
                 console.error('Error tracking order:', error);
+                currentOrderId = null;
                 resultsDiv.innerHTML = '<div style="background: #fee; padding: 20px; border-radius: 10px; text-align: center;"><p>❌ Error searching for order. Please try again.</p></div>';
             }
         }
@@ -303,9 +412,40 @@
                 'cancelled': 'Cancelled'
             };
             
+            // Generate status history HTML if available
+            let statusHistoryHTML = '';
+            if (order.statusHistory && order.statusHistory.length > 0) {
+                statusHistoryHTML = `
+                    <div style="margin-top: 20px;">
+                        <h4>📋 Status History:</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            ${order.statusHistory.map(history => {
+                                const historyDate = new Date(history.timestamp).toLocaleString();
+                                const historyStatus = statusLabels[history.status] || history.status;
+                                return `
+                                    <div style="padding: 8px 0; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="color: ${statusColors[history.status] || '#666'}; font-weight: bold;">
+                                            ${historyStatus}
+                                        </span>
+                                        <span style="font-size: 0.9em; color: #666;">
+                                            ${historyDate}
+                                        </span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
             resultsDiv.innerHTML = `
                 <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                    <h3 style="color: #2ecc71; margin-bottom: 20px;">✅ Order Found!</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="color: #2ecc71; margin: 0;">✅ Order Found!</h3>
+                        <div style="background: #e8f5e8; padding: 8px 12px; border-radius: 20px; font-size: 0.9em; color: #2ecc71;">
+                            🔄 Real-time tracking enabled
+                        </div>
+                    </div>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
                         <div>
@@ -327,11 +467,14 @@
                             <span style="color: ${statusColors[status]}; font-weight: bold; font-size: 18px;">
                                 ${statusLabels[status] || status}
                             </span>
+                            ${order.statusUpdatedAt ? `<span style="font-size: 0.8em; color: #666; margin-left: 10px;">
+                                (Updated: ${new Date(order.statusUpdatedAt).toLocaleString()})
+                            </span>` : ''}
                         </p>
                     </div>
                     
                     <div>
-                        <h4>Order Timeline:</h4>
+                        <h4>📦 Order Timeline:</h4>
                         <ul style="list-style: none; padding: 0;">
                             <li style="padding: 8px 0; ${['pending', 'payment_submitted', 'screenshot', 'processing', 'shipped', 'delivered'].includes(status) ? 'color: #2ecc71;' : 'color: #999;'}">
                                 ${['pending', 'payment_submitted', 'screenshot', 'processing', 'shipped', 'delivered'].includes(status) ? '✅' : '⏳'} Order Placed
@@ -351,9 +494,11 @@
                         </ul>
                     </div>
                     
+                    ${statusHistoryHTML}
+                    
                     ${order.customerDetails?.deliveryAddress ? `
                         <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                            <p style="margin: 0;"><strong>Delivery Address:</strong></p>
+                            <p style="margin: 0;"><strong>📍 Delivery Address:</strong></p>
                             <p style="margin: 5px 0 0 0;">${order.customerDetails.deliveryAddress || order.customerDetails.address}</p>
                         </div>
                     ` : ''}
@@ -361,6 +506,9 @@
                     <div style="margin-top: 20px; text-align: center;">
                         <button onclick="window.print()" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">
                             🖨️ Print Details
+                        </button>
+                        <button onclick="refreshCurrentOrder()" style="padding: 10px 20px; background: #f39c12; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">
+                            🔄 Refresh Status
                         </button>
                         <a href="products.html" style="padding: 10px 20px; background: #2ecc71; color: white; border: none; border-radius: 5px; text-decoration: none; display: inline-block;">
                             🛍️ Continue Shopping

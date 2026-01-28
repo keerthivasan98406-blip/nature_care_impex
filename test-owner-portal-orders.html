@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Owner Portal Orders</title>
+    <style>
+        body { padding: 50px; font-family: Arial, sans-serif; }
+        .test-section { margin: 30px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .btn { padding: 10px 20px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .order-list { background: #f8f9fa; padding: 15px; border-radius: 4px; margin: 10px 0; }
+        .order-item { padding: 10px; border-bottom: 1px solid #ddd; }
+        .order-item:last-child { border-bottom: none; }
+    </style>
+</head>
+<body>
+    <h1>Owner Portal Orders Test</h1>
+    
+    <div class="test-section">
+        <h3>Create Test Order</h3>
+        <p>This will create a sample order in localStorage that should appear in the owner portal.</p>
+        <button class="btn btn-primary" onclick="createTestOrder()">Create Test Order</button>
+        <button class="btn btn-secondary" onclick="clearAllOrders()">Clear All Orders</button>
+    </div>
+
+    <div class="test-section">
+        <h3>Current Orders in System</h3>
+        <div id="orders-display" class="order-list">
+            No orders found.
+        </div>
+        <button class="btn btn-secondary" onclick="refreshOrders()">Refresh Orders</button>
+    </div>
+
+    <div class="test-section">
+        <h3>Owner Portal Access</h3>
+        <p>Use these credentials to access the owner portal:</p>
+        <p><strong>Username:</strong> admin</p>
+        <p><strong>Password:</strong> 2025</p>
+        <a href="owner.html" class="btn btn-primary" target="_blank">Open Owner Portal</a>
+    </div>
+
+    <script>
+        function createTestOrder() {
+            const testOrder = {
+                orderId: 'ORD-TEST-' + Date.now(),
+                timestamp: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                submittedAt: new Date().toISOString(),
+                status: 'payment_submitted',
+                product: {
+                    id: 1,
+                    name: 'Cocopeat 5kg Block'
+                },
+                customerDetails: {
+                    customerName: 'Test Customer',
+                    customerEmail: 'test@example.com',
+                    customerPhone: '9876543210',
+                    deliveryAddress: '123 Test Street, Test City, Test State - 123456',
+                    quantity: 2,
+                    orderNotes: 'Test order created from test page',
+                    name: 'Test Customer',
+                    email: 'test@example.com',
+                    phone: '9876543210',
+                    address: '123 Test Street, Test City, Test State - 123456',
+                    notes: 'Test order created from test page',
+                    total: 500
+                },
+                unitPrice: 250,
+                totalAmount: 500,
+                paymentScreenshot: {
+                    file: 'test-screenshot.jpg',
+                    dataUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkZha2UgU2NyZWVuc2hvdDwvdGV4dD48L3N2Zz4=',
+                    uploadedAt: new Date().toISOString()
+                }
+            };
+
+            // Get existing orders
+            let customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+            
+            // Add test order
+            customerOrders.push(testOrder);
+            
+            // Save back to localStorage
+            localStorage.setItem('customerOrders', JSON.stringify(customerOrders));
+            
+            alert(`Test order created successfully!
+Order ID: ${testOrder.orderId}
+This order should now appear in the Owner Portal.`);
+            
+            refreshOrders();
+        }
+
+        function clearAllOrders() {
+            localStorage.removeItem('customerOrders');
+            alert('All orders cleared from localStorage.');
+            refreshOrders();
+        }
+
+        function refreshOrders() {
+            const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+            const display = document.getElementById('orders-display');
+            
+            if (customerOrders.length === 0) {
+                display.innerHTML = 'No orders found.';
+                return;
+            }
+            
+            display.innerHTML = `
+                <h4>Found ${customerOrders.length} order(s):</h4>
+                ${customerOrders.map(order => `
+                    <div class="order-item">
+                        <strong>Order ID:</strong> ${order.orderId}<br>
+                        <strong>Customer:</strong> ${order.customerDetails.name || order.customerDetails.customerName}<br>
+                        <strong>Product:</strong> ${order.product.name}<br>
+                        <strong>Amount:</strong> ₹${order.totalAmount || order.customerDetails.total}<br>
+                        <strong>Status:</strong> ${order.status}<br>
+                        <strong>Has Screenshot:</strong> ${order.paymentScreenshot ? 'Yes' : 'No'}<br>
+                        <strong>Date:</strong> ${new Date(order.createdAt || order.timestamp).toLocaleString()}
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        // Load orders on page load
+        document.addEventListener('DOMContentLoaded', refreshOrders);
+    </script>
+</body>
+</html>

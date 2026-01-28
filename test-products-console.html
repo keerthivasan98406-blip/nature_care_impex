@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Console Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #console { background: #000; color: #0f0; padding: 10px; height: 400px; overflow-y: scroll; font-family: monospace; }
+        .product { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Products Console Test</h1>
+    <div id="console"></div>
+    <div id="products-grid"></div>
+
+    <!-- Include the actual scripts -->
+    <script src="js/api-service.js"></script>
+    <script src="js/main.js"></script>
+    
+    <script>
+        // Override console.log to display in our div
+        const originalLog = console.log;
+        const consoleDiv = document.getElementById('console');
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            consoleDiv.innerHTML += message + '\n';
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        };
+        
+        console.log('🚀 Console test started');
+        console.log('📍 Current URL:', window.location.href);
+        console.log('🔍 Checking for API service...');
+        
+        // Test API service availability
+        setTimeout(() => {
+            console.log('🔍 API Service available:', !!window.apiService);
+            console.log('🔍 Main functions available:', {
+                loadProductsData: !!window.loadProductsData,
+                renderAllProducts: !!window.renderAllProducts,
+                initializeProducts: !!window.initializeProducts
+            });
+            
+            // Test direct API call
+            if (window.apiService) {
+                console.log('📡 Testing API service...');
+                window.apiService.getProducts()
+                    .then(result => {
+                        console.log('✅ API Service result:', result);
+                        if (result.success && result.data) {
+                            console.log('📊 Products received:', result.data.length);
+                            result.data.forEach((product, index) => {
+                                console.log(`Product ${index + 1}:`, {
+                                    id: product.id,
+                                    name: product.name,
+                                    category: product.category,
+                                    price: product.price
+                                });
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.log('❌ API Service error:', error);
+                    });
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

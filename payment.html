@@ -276,30 +276,6 @@
             line-height: 1.4;
         }
         
-        .screenshot-upload-area {
-            margin-top: 25px;
-        }
-        
-        .upload-zone {
-            border: 3px dashed #2196f3;
-            border-radius: 12px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-        }
-        
-        .upload-zone:hover {
-            border-color: #1976d2;
-            background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
-        }
-        
-        .upload-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-        
         .payment-actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -460,9 +436,12 @@
     <nav class="navbar">
         <div class="container nav-container">
             <a href="index.html" class="logo">
-                <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190433/photo_2025-12-31_22-10-18_k0jfc7.jpg"
+                <img src="assets/logo.jpg"
                     alt="Natural Care Impex">
+                <span class="logo-text">Natural Care Impex</span>
             </a>
+            
+            <div class="mobile-brand-name">Natural Care Impex</div>
 
             <ul class="nav-links">
                 <li><a href="index.html" class="nav-link">Home</a></li>
@@ -599,38 +578,27 @@
 
                 <!-- Payment Confirmation -->
                 <div class="payment-confirmation-section">
-                    <h3>Payment Confirmation</h3>
-                    <p class="confirmation-instruction">After making the payment, please upload a screenshot to confirm your order.</p>
+                    <h3>Order Confirmation</h3>
+                    <p class="confirmation-instruction">Complete your payment using the QR code or UPI ID above, then confirm your order below.</p>
+                    <p style="font-size: 14px; color: #666; margin: 10px 0;">
+                        💡 <strong>No screenshot required!</strong> Simply complete your UPI payment and click confirm. We will verify the payment automatically.
+                    </p>
                     
-                    <div class="screenshot-upload-area">
-                        <div class="upload-zone" onclick="document.getElementById('screenshot-input').click()">
-                            <div class="upload-content">
-                                <div class="upload-icon">📷</div>
-                                <p class="upload-text">Click to upload payment screenshot</p>
-                                <small class="upload-note">Supported: JPG, PNG (Max 5MB)</small>
-                            </div>
-                            <input type="file" id="screenshot-input" accept="image/*" style="display: none;" onchange="handleScreenshotUpload(event)">
-                        </div>
-                        
-                        <div id="screenshot-preview" class="screenshot-preview" style="display: none;">
-                            <img id="preview-image" src="" alt="Payment Screenshot">
-                            <button class="remove-screenshot-btn" onclick="removeScreenshot()">&times;</button>
-                            <div class="screenshot-success" style="text-align: center; margin-top: 15px;">
-                                <p style="color: #28a745; font-weight: 600; margin: 10px 0;">✅ Screenshot uploaded successfully!</p>
-                                <button id="confirm-payment-btn-alt" class="btn btn-primary" onclick="confirmPayment()" style="
-                                    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-                                    padding: 12px 24px;
-                                    border: none;
-                                    border-radius: 6px;
-                                    color: white;
-                                    font-weight: 600;
-                                    cursor: pointer;
-                                    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-                                ">
-                                    ✅ Confirm Order
-                                </button>
-                            </div>
-                        </div>
+                    <div class="confirmation-actions">
+                        <button id="confirm-payment-btn" class="btn btn-primary" onclick="confirmPayment()" style="
+                            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                            padding: 12px 24px;
+                            border: none;
+                            border-radius: 6px;
+                            color: white;
+                            font-weight: 600;
+                            cursor: pointer;
+                            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+                            width: 100%;
+                            margin-top: 20px;
+                        ">
+                            ✅ I have completed payment - Confirm Order
+                        </button>
                     </div>
                 </div>
 
@@ -730,7 +698,7 @@
         
         // Enhanced copy UPI ID function
         function copyUpiId() {
-            const upiId = 'naturecareimpex@paytm';
+            const upiId = 'naveethulhussain700-4@okaxis';
             
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(upiId).then(() => {

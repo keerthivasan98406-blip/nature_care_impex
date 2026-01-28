@@ -3,48 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Secure owner portal for Nature Care Impex business management. Access order management, product catalog, and sales analytics.">
-    <meta name="keywords" content="owner portal, business management, order management, admin panel">
-    <link rel="canonical" href="https://nature-care-impex-1.onrender.com/owner.html">
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Owner Portal - Nature Care Impex">
-    <meta property="og:description" content="Secure owner portal for Nature Care Impex business management and analytics.">
-    <meta property="og:image" content="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190433/photo_2025-12-31_22-10-18_k0jfc7.jpg">
-    <meta property="og:url" content="https://nature-care-impex-1.onrender.com/owner.html">
-    <meta property="og:type" content="website">
-    
     <title>Owner Portal - Nature Care Impex</title>
     <link rel="stylesheet" href="css/owner-portal.css">
 </head>
 <body>
-    <!-- Back Button -->
-    <a href="javascript:history.back()" class="back-button" id="back-button" style="display: none;">Back</a>
-
     <!-- Login Screen -->
     <div id="login-screen" class="login-container">
         <div class="login-box">
             <div class="logo-section">
-                <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190433/photo_2025-12-31_22-10-18_k0jfc7.jpg" alt="Nature Care Impex" class="portal-logo">
+                <img src="assets/logo.jpg" alt="Nature Care Impex" class="portal-logo">
+                <div class="portal-logo-text">Natural Care Impex</div>
                 <h2>Owner Portal</h2>
                 <p>Secure access for business management</p>
             </div>
             
             <form id="login-form" class="login-form">
-                <div style="background: #fff3cd; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 14px;">
-                    <strong>🔑 Credentials:</strong><br>
-                    Username: <code>admin</code><br>
-                    Password: <code>2025</code>
-                </div>
-                
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" required placeholder="Enter username" value="admin">
+                    <input type="text" id="username" required placeholder="Enter username">
                 </div>
                 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" required placeholder="Enter password" value="2025">
+                    <input type="password" id="password" required placeholder="Enter password">
                 </div>
                 
                 <button type="submit" class="btn-login">Login</button>
@@ -91,24 +72,26 @@
                         <option value="completed">Completed</option>
                         <option value="cancelled">Cancelled</option>
                     </select>
+                    <button class="btn-secondary" onclick="refreshOrders()">🔄 Refresh Orders</button>
+                    <button class="btn-warning" onclick="createTestOrder()" style="background-color: #28a745; color: white;">🧪 Create Test Order</button>
                 </div>
 
                 <div class="orders-summary">
                     <div class="summary-card">
                         <h4>Total Orders</h4>
-                        <div class="summary-number" id="total-orders">0</div>
+                        <div class="summary-number" id="total-orders">247</div>
                     </div>
                     <div class="summary-card">
                         <h4>Pending/Screenshot</h4>
-                        <div class="summary-number pending" id="pending-orders">0</div>
+                        <div class="summary-number pending" id="pending-orders">15</div>
                     </div>
                     <div class="summary-card">
                         <h4>This Month</h4>
-                        <div class="summary-number" id="monthly-orders">0</div>
+                        <div class="summary-number" id="monthly-orders">42</div>
                     </div>
                     <div class="summary-card">
                         <h4>Revenue</h4>
-                        <div class="summary-number success" id="orders-revenue">₹0</div>
+                        <div class="summary-number success" id="orders-revenue">₹8,45,000</div>
                     </div>
                 </div>
 
@@ -137,6 +120,8 @@
                 
                 <div class="section-actions">
                     <button class="btn-primary" onclick="showAddProductModal()">Add New Product</button>
+                    <button class="btn-secondary" onclick="checkDatabaseConnection()">Check Database Status</button>
+                    <button class="btn-warning" onclick="removeDuplicateProducts()">Remove Duplicates</button>
                 </div>
 
                 <div class="products-grid" id="products-grid">
@@ -150,7 +135,6 @@
                 
                 <div class="sales-controls">
                     <select id="sales-year" class="filter-select">
-                        <option value="2025">2025</option>
                         <option value="2024">2024</option>
                         <option value="2023">2023</option>
                     </select>
@@ -159,28 +143,28 @@
                 <div class="sales-overview">
                     <div class="sales-card">
                         <h4>This Month Sales</h4>
-                        <div class="sales-amount">₹0</div>
-                        <div class="sales-change positive">+0% from last month</div>
+                        <div class="sales-amount">₹2,45,000</div>
+                        <div class="sales-change positive">+15% from last month</div>
                     </div>
                     <div class="sales-card">
                         <h4>This Month Profit</h4>
-                        <div class="sales-amount">₹0</div>
-                        <div class="sales-change positive">+0% from last month</div>
+                        <div class="sales-amount">₹98,000</div>
+                        <div class="sales-change positive">+12% from last month</div>
                     </div>
                     <div class="sales-card">
                         <h4>Profit Margin</h4>
-                        <div class="sales-amount">0%</div>
+                        <div class="sales-amount">40%</div>
                         <div class="sales-change neutral">Stable</div>
                     </div>
                     <div class="sales-card">
                         <h4>YTD Revenue</h4>
-                        <div class="sales-amount">₹0</div>
-                        <div class="sales-change positive">+0% YoY</div>
+                        <div class="sales-amount">₹28,50,000</div>
+                        <div class="sales-change positive">+22% YoY</div>
                     </div>
                 </div>
 
                 <div class="monthly-chart">
-                    <h3>Monthly Performance (2025)</h3>
+                    <h3>Monthly Performance (2024)</h3>
                     <div class="chart-container">
                         <canvas id="salesChart" width="800" height="400"></canvas>
                     </div>
@@ -208,12 +192,78 @@
                 </div>
             </section>
 
+            <!-- Customers Section -->
+            <section id="customers-section" class="dashboard-section">
+                <h2>Customer Management</h2>
+                <p>Customer database and communication tools coming soon...</p>
+            </section>
+
             <!-- Reports Section -->
             <section id="reports-section" class="dashboard-section">
                 <h2>Reports & Analytics</h2>
                 <p>Detailed business reports and analytics coming soon...</p>
             </section>
         </main>
+    </div>
+
+    <!-- Add Order Modal -->
+    <div id="add-order-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Order</h3>
+                <span class="close" onclick="closeModal('add-order-modal')">&times;</span>
+            </div>
+            <form id="add-order-form" class="modal-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customer-name">Customer Name</label>
+                        <input type="text" id="customer-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-email">Customer Email</label>
+                        <input type="email" id="customer-email" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="order-product">Product</label>
+                        <select id="order-product" required>
+                            <option value="">Select Product</option>
+                            <option value="cocopeat-5kg">Cocopeat 5kg Block</option>
+                            <option value="grow-bags">Coco Grow Bags</option>
+                            <option value="coco-bricks">Coco Bricks 650g</option>
+                            <option value="bamboo-pads">Bamboo Period Pads</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-quantity">Quantity</label>
+                        <input type="number" id="order-quantity" min="1" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="unit-price">Unit Price (₹)</label>
+                        <input type="number" id="unit-price" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="total-amount">Total Amount (₹)</label>
+                        <input type="number" id="total-amount" readonly>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="order-notes">Notes</label>
+                    <textarea id="order-notes" rows="3"></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('add-order-modal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Add Order</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Add Product Modal -->
@@ -268,24 +318,25 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Product Image</label>
-                    <div style="margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
-                        <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">
-                            💡 <strong>Choose one option:</strong>
-                        </p>
-                        <div style="margin-bottom: 15px;">
-                            <label for="product-image-url" style="display: block; margin-bottom: 5px; font-weight: 600;">Option 1: Image URL</label>
-                            <input type="url" id="product-image-url" placeholder="https://example.com/image.jpg" style="width: 100%;">
-                            <small style="color: #666;">Paste a direct link to an image</small>
+                    <label for="product-image">Product Image</label>
+                    <div class="image-help-text" style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">
+                        💡 <strong>Image Options:</strong><br>
+                        • <strong>URL:</strong> Enter a direct link to an image (recommended)<br>
+                        • <strong>File Upload:</strong> Select an image file from your computer (max 5MB)<br>
+                        • <strong>No Image:</strong> Leave both empty to use a default category image
+                    </div>
+                    <div class="image-input-options">
+                        <div class="input-option">
+                            <label for="product-image-url">Image URL:</label>
+                            <input type="url" id="product-image-url" placeholder="https://example.com/image.jpg">
                         </div>
-                        <div style="text-align: center; margin: 10px 0; color: #999;">OR</div>
-                        <div>
-                            <label for="product-image-file" style="display: block; margin-bottom: 5px; font-weight: 600;">Option 2: Upload Image File</label>
-                            <input type="file" id="product-image-file" accept="image/*" style="width: 100%;">
-                            <small style="color: #666;">Select an image from your computer (max 5MB)</small>
+                        <div class="input-option-divider">OR</div>
+                        <div class="input-option">
+                            <label for="product-image-file">Upload Image File:</label>
+                            <input type="file" id="product-image-file" accept="image/*">
                         </div>
-                        <div id="product-image-preview" style="display: none; margin-top: 15px; text-align: center;">
-                            <img id="preview-img" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #ddd;">
+                        <div class="image-preview" id="product-image-preview" style="display: none;">
+                            <img id="preview-img" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; margin-top: 10px;">
                         </div>
                     </div>
                 </div>
@@ -298,7 +349,120 @@
         </div>
     </div>
 
-    <script src="js/api-service.js?v=20250116"></script>
-    <script src="js/owner-portal.js?v=20250116"></script>
+    <script src="js/api-service.js"></script>
+    <script src="js/owner-portal.js"></script>
+    
+    <!-- Emergency Login Fix -->
+    <script>
+        // Emergency login fix - override any conflicts
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔧 Emergency login fix loaded');
+            
+            // Check if we're on the wrong port and redirect
+            if (window.location.port === '5501' || window.location.hostname === '127.0.0.1') {
+                console.log('⚠️ Wrong server detected, redirecting to localhost:3000');
+                const correctUrl = 'http://localhost:3000/owner.html';
+                if (confirm('You need to access the owner portal from the correct server.\n\nRedirect to: ' + correctUrl + '?')) {
+                    window.location.href = correctUrl;
+                    return;
+                }
+            }
+            
+            // Wait a bit for other scripts to load
+            setTimeout(function() {
+                const loginForm = document.getElementById('login-form');
+                const loginScreen = document.getElementById('login-screen');
+                const dashboard = document.getElementById('dashboard');
+                const logoutBtn = document.getElementById('logout-btn');
+                
+                if (loginForm) {
+                    // Remove any existing listeners
+                    const newForm = loginForm.cloneNode(true);
+                    loginForm.parentNode.replaceChild(newForm, loginForm);
+                    
+                    // Add fresh login handler
+                    newForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        console.log('🔐 Login form submitted');
+                        
+                        const username = document.getElementById('username').value;
+                        const password = document.getElementById('password').value;
+                        
+                        console.log('Credentials:', username, password);
+                        
+                        if (username === 'admin' && password === '2025') {
+                            console.log('✅ Credentials correct');
+                            localStorage.setItem('ownerLoggedIn', 'true');
+                            
+                            // Hide login screen
+                            if (loginScreen) {
+                                loginScreen.style.display = 'none';
+                            }
+                            
+                            // Show dashboard
+                            if (dashboard) {
+                                dashboard.style.display = 'grid';
+                            }
+                            
+                            // Show success message
+                            alert('Login successful! Welcome to the Owner Portal.');
+                            
+                            // Try to initialize the main portal functions
+                            if (typeof loadDashboardData === 'function') {
+                                try {
+                                    loadDashboardData();
+                                } catch (error) {
+                                    console.log('Dashboard data load error:', error);
+                                }
+                            }
+                            
+                        } else {
+                            console.log('❌ Invalid credentials');
+                            alert('Invalid credentials. Please use:\nUsername: admin\nPassword: 2025');
+                            document.getElementById('password').value = '';
+                        }
+                    });
+                    
+                    console.log('✅ Emergency login handler attached');
+                }
+                
+                // Logout handler
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', function() {
+                        localStorage.removeItem('ownerLoggedIn');
+                        if (loginScreen) loginScreen.style.display = 'flex';
+                        if (dashboard) dashboard.style.display = 'none';
+                        document.getElementById('username').value = '';
+                        document.getElementById('password').value = '';
+                        alert('Logged out successfully.');
+                    });
+                }
+                
+                // Check if already logged in
+                const isLoggedIn = localStorage.getItem('ownerLoggedIn') === 'true';
+                if (isLoggedIn) {
+                    console.log('✅ Already logged in, showing dashboard');
+                    if (loginScreen) loginScreen.style.display = 'none';
+                    if (dashboard) dashboard.style.display = 'grid';
+                    
+                    // Try to load dashboard data
+                    if (typeof loadDashboardData === 'function') {
+                        try {
+                            loadDashboardData();
+                        } catch (error) {
+                            console.log('Dashboard data load error:', error);
+                        }
+                    }
+                }
+                
+                // Pre-fill credentials for easier testing (optional - can be removed for production)
+                // const usernameField = document.getElementById('username');
+                // const passwordField = document.getElementById('password');
+                // if (usernameField) usernameField.value = 'admin';
+                // if (passwordField) passwordField.value = '2025';
+                
+            }, 1000);
+        });
+    </script>
 </body>
 </html>

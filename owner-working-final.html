@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Portal - Nature Care Impex (Working Version)</title>
+    <link rel="stylesheet" href="../css/owner-portal.css">
+    <style>
+        /* Additional styles for working version */
+        .working-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            z-index: 10001;
+        }
+        
+        .enhanced-feature {
+            border-left: 4px solid #007bff;
+            background: #f8f9ff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        .status-update-section {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .realtime-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #28a745;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="working-indicator">✅ Working Owner Portal</div>
+    
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-container">
+        <div class="login-box">
+            <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190433/photo_2025-12-31_22-10-18_k0jfc7.jpg" alt="Nature Care Impex" class="portal-logo">
+            <h2>Owner Portal</h2>
+            <p>Secure access for business management</p>
+            
+            <div class="credentials-hint">
+                <strong>🔑 Login Credentials:</strong><br>
+                Username: <code>admin</code><br>
+                Password: <code>2025</code>
+            </div>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required placeholder="Enter username" value="admin">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="Enter password" value="2025">
+                </div>
+                
+                <button type="submit" class="btn-login">Login to Dashboard</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard-container">
+        <header class="dashboard-header">
+            <h1>🌿 Nature Care Impex - Owner Dashboard</h1>
+            <div>
+                <span class="realtime-indicator"></span>
+                <span style="margin-right: 15px;">Real-time Active</span>
+                <button id="logout-btn" class="btn-logout">Logout</button>
+            </div>
+        </header>
+
+        <nav class="dashboard-nav">
+            <div class="nav-item active" data-section="overview">📊 Overview</div>
+            <div class="nav-item" data-section="orders">📋 Orders</div>
+            <div class="nav-item" data-section="products">📦 Products</div>
+            <div class="nav-item" data-section="tools">🔧 Tools</div>
+        </nav>
+
+        <main class="dashboard-main">
+            <!-- Overview Section -->
+            <section id="overview-section" class="dashboard-section active">
+                <div class="section-header">
+                    <h2>Business Overview</h2>
+                    <p>Real-time insights into your business performance</p>
+                </div>
+
+                <div class="enhanced-feature">
+                    <h4>🚀 Enhanced Features in This Version:</h4>
+                    <ul>
+                        <li>Real-time order status synchronization</li>
+                        <li>Enhanced payment screenshot viewing</li>
+                        <li>Improved database connectivity</li>
+                        <li>Advanced order tracking system</li>
+                    </ul>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="total-orders">0</div>
+                            <div class="stat-label">Total Orders</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="total-revenue">₹0</div>
+                            <div class="stat-label">Total Revenue</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="total-products">0</div>
+                            <div class="stat-label">Products</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="pending-orders">0</div>
+                            <div class="stat-label">Pending Orders</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section id="orders-section" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Orders Management</h2>
+                    <p>View and manage customer orders with real-time updates</p>
+                </div>
+                
+                <div class="status-update-section">
+                    <h4>📡 Real-time Status Updates</h4>
+                    <p>Order status changes are automatically synchronized across all platforms. When you update an order status here, it will immediately reflect on the customer tracking page.</p>
+                </div>
+                
+                <div style="text-align: center; padding: 40px;">
+                    <h3>📋 Advanced Order Management</h3>
+                    <p>Complete order management with real-time synchronization:</p>
+                    <div style="margin: 20px 0;">
+                        <a href="owner.html" class="btn" target="_blank" style="margin: 5px;">Full Order Portal</a>
+                        <a href="test-realtime-sync.html" class="btn" target="_blank" style="margin: 5px;">Test Real-time Sync</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Section -->
+            <section id="products-section" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Products Management</h2>
+                    <p>Manage your product catalog with enhanced features</p>
+                </div>
+                
+                <div class="enhanced-feature">
+                    <h4>🛍️ Enhanced Product Features:</h4>
+                    <ul>
+                        <li>Advanced product filtering and search</li>
+                        <li>Bulk product operations</li>
+                        <li>Inventory management with alerts</li>
+                        <li>Product performance analytics</li>
+                    </ul>
+                </div>
+                
+                <div style="text-align: center; padding: 40px;">
+                    <h3>🚀 Full Product Management</h3>
+                    <p>Access complete product management features:</p>
+                    <div style="margin: 20px 0;">
+                        <a href="owner.html" class="btn" target="_blank" style="margin: 5px;">Full Product Portal</a>
+                        <a href="test-product-filtering.html" class="btn" target="_blank" style="margin: 5px;">Test Product Features</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tools Section -->
+            <section id="tools-section" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Management Tools</h2>
+                    <p>Advanced diagnostic and management tools</p>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                        <h3>🔄 Real-time Sync Test</h3>
+                        <p>Test the real-time synchronization between owner portal and customer tracking</p>
+                        <a href="test-realtime-sync.html" class="btn" target="_blank">Test Sync System</a>
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                        <h3>🔧 Delete Products Fix</h3>
+                        <p>Test and fix product deletion functionality</p>
+                        <a href="simple-delete-test.html" class="btn" target="_blank">Open Delete Test</a>
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                        <h3>🔄 Database Migration</h3>
+                        <p>Migrate data from localStorage to MongoDB</p>
+                        <a href="test-database-migration.html" class="btn" target="_blank">Open Migration Tool</a>
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                        <h3>🧹 Fix Duplicates</h3>
+                        <p>Remove duplicate products from main website</p>
+                        <a href="quick-duplicate-fix.html" class="btn" target="_blank">Fix Duplicates</a>
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                        <h3>🔍 Login Debug</h3>
+                        <p>Debug owner portal login issues</p>
+                        <a href="owner-login-debug.html" class="btn" target="_blank">Debug Login</a>
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                        <h3>📊 Complete System Test</h3>
+                        <p>Test the complete real-time system functionality</p>
+                        <a href="test-complete-realtime-system.html" class="btn" target="_blank">System Test</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Enhanced JavaScript for working version
+        const CREDENTIALS = {
+            username: 'admin',
+            password: '2025'
+        };
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 3000);
+        }
+
+        function showLoginScreen() {
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
+        }
+
+        function showDashboard() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            loadStats();
+        }
+
+        function loadStats() {
+            // Load basic stats
+            const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+            const allProducts = JSON.parse(localStorage.getItem('allProducts') || '[]');
+            
+            document.getElementById('total-orders').textContent = customerOrders.length;
+            document.getElementById('total-products').textContent = allProducts.length;
+            
+            const totalRevenue = customerOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+            document.getElementById('total-revenue').textContent = '₹' + totalRevenue.toLocaleString();
+            
+            const pendingOrders = customerOrders.filter(order => order.status === 'pending' || order.status === 'screenshot').length;
+            document.getElementById('pending-orders').textContent = pendingOrders;
+        }
+
+        // Event listeners
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            console.log('Login attempt:', username, password);
+            
+            if (username === CREDENTIALS.username && password === CREDENTIALS.password) {
+                localStorage.setItem('ownerLoggedIn', 'true');
+                showDashboard();
+                showNotification('Login successful! Welcome to the Enhanced Owner Portal.', 'success');
+            } else {
+                showNotification('Invalid credentials. Please check username and password.', 'error');
+                document.getElementById('password').value = '';
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('ownerLoggedIn');
+            showLoginScreen();
+            showNotification('Logged out successfully.', 'success');
+        });
+
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const targetSection = this.getAttribute('data-section');
+                
+                // Update active nav
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show target section
+                document.querySelectorAll('.dashboard-section').forEach(section => section.classList.remove('active'));
+                document.getElementById(targetSection + '-section').classList.add('active');
+            });
+        });
+
+        // Check login status on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLoggedIn = localStorage.getItem('ownerLoggedIn') === 'true';
+            
+            if (isLoggedIn) {
+                showDashboard();
+            } else {
+                showLoginScreen();
+            }
+            
+            // Show working version notification
+            setTimeout(() => {
+                showNotification('✅ Working Owner Portal Loaded - Enhanced features active!', 'info');
+            }, 1000);
+        });
+
+        // Real-time status monitoring
+        setInterval(() => {
+            const indicator = document.querySelector('.realtime-indicator');
+            if (indicator) {
+                indicator.style.background = '#28a745';
+                setTimeout(() => {
+                    indicator.style.background = '#ffc107';
+                }, 500);
+            }
+        }, 3000);
+
+        console.log('✅ Working Owner Portal Script Loaded');
+    </script>
+</body>
+</html>

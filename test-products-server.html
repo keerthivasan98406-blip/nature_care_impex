@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Server Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .product { border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { color: red; }
+        .success { color: green; }
+        .warning { color: orange; }
+    </style>
+</head>
+<body>
+    <h1>Products Server Connection Test</h1>
+    <div id="debug-log"></div>
+    <div id="products-container"></div>
+
+    <script>
+        function debugLog(message, type = 'info') {
+            const log = document.getElementById('debug-log');
+            const div = document.createElement('div');
+            div.className = `debug ${type}`;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(div);
+            console.log(message);
+        }
+
+        async function testAPIConnection() {
+            debugLog('🔄 Testing API connection...');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/products');
+                debugLog(`📡 API Response Status: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    debugLog(`✅ API Response: ${JSON.stringify(data, null, 2)}`, 'success');
+                    
+                    if (data.success && data.data) {
+                        debugLog(`📊 Found ${data.data.length} products`, 'success');
+                        displayProducts(data.data);
+                    } else {
+                        debugLog('❌ API response format invalid', 'error');
+                    }
+                } else {
+                    debugLog(`❌ API request failed: ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                debugLog(`❌ API connection error: ${error.message}`, 'error');
+            }
+        }
+
+        function displayProducts(products) {
+            const container = document.getElementById('products-container');
+            container.innerHTML = '<h2>Products from Database:</h2>';
+            
+            products.forEach(product => {
+                const div = document.createElement('div');
+                div.className = 'product';
+                div.innerHTML = `
+                    <h3>${product.name}</h3>
+                    <p><strong>ID:</strong> ${product.id}</p>
+                    <p><strong>Category:</strong> ${product.category}</p>
+                    <p><strong>Price:</strong> ₹${product.price}</p>
+                    <p><strong>Description:</strong> ${product.description}</p>
+                    <p><strong>Stock:</strong> ${product.stock}</p>
+                    <img src="${product.image}" alt="${product.name}" style="max-width: 200px; height: auto;">
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('🚀 Test page loaded');
+            testAPIConnection();
+        });
+    </script>
+</body>
+</html>

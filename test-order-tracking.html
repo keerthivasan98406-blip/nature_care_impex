@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Tracking Test - Nature Care Impex</title>
+    <link rel="stylesheet" href="owner-portal.css">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-section {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-section h3 {
+            color: #1a1a1a;
+            margin-top: 0;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .order-list {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .order-item {
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            margin: 5px 0;
+            background: #f9f9f9;
+        }
+        .order-id {
+            font-weight: bold;
+            color: #007bff;
+            font-size: 1.1rem;
+        }
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+        .copy-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>📦 Order Tracking Test</h1>
+        <p>This page helps you test the order tracking functionality by showing available orders and providing test Order IDs.</p>
+
+        <div class="test-section">
+            <h3>🛍️ Available Orders for Testing</h3>
+            <button class="test-button" onclick="loadTestOrders()">Load Available Orders</button>
+            <div id="orders-list" class="order-list">Click button to load available orders...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Create Test Order</h3>
+            <p>Create a sample order for testing the tracking system:</p>
+            <button class="test-button" onclick="createTestOrder()">Create Test Order</button>
+            <div id="test-order-result" style="margin-top: 15px;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 Quick Test</h3>
+            <p>Use these buttons to quickly test the tracking page:</p>
+            <button class="test-button" onclick="window.location.href='track-order.html'">Open Tracking Page</button>
+            <button class="test-button" onclick="testWithSampleId()">Test with Sample ID</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Instructions</h3>
+            <ol>
+                <li><strong>Load Available Orders:</strong> See what orders are currently in the system</li>
+                <li><strong>Copy an Order ID:</strong> Click the "Copy" button next to any order</li>
+                <li><strong>Open Tracking Page:</strong> Go to the tracking page</li>
+                <li><strong>Paste Order ID:</strong> Enter the copied Order ID in the search box</li>
+                <li><strong>Track Order:</strong> Click "Track Order" to see the status timeline</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function loadTestOrders() {
+            const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+            const ordersList = document.getElementById('orders-list');
+            
+            if (customerOrders.length === 0) {
+                ordersList.innerHTML = `
+                    <div class="error">No orders found in system.</div>
+                    <p>Try placing an order first from the <a href="products.html">products page</a> or create a test order above.</p>
+                `;
+                return;
+            }
+
+            ordersList.innerHTML = customerOrders.map((order, index) => {
+                const customerName = order.customerDetails?.customerName || order.customerDetails?.name || 'Unknown Customer';
+                const productName = order.product?.name || 'Unknown Product';
+                const orderAmount = order.totalAmount || order.customerDetails?.total || 0;
+                const orderStatus = order.status || 'pending';
+                const orderDate = order.createdAt ? order.createdAt.split('T')[0] : 'Unknown Date';
+                
+                return `
+                    <div class="order-item">
+                        <div class="order-id">
+                            ${order.orderId}
+                            <button class="copy-btn" onclick="copyOrderId('${order.orderId}')">Copy</button>
+                        </div>
+                        <div><strong>Customer:</strong> ${customerName}</div>
+                        <div><strong>Product:</strong> ${productName}</div>
+                        <div><strong>Amount:</strong> ₹${orderAmount.toLocaleString()}</div>
+                        <div><strong>Status:</strong> <span style="color: ${getStatusColor(orderStatus)}">${orderStatus}</span></div>
+                        <div><strong>Date:</strong> ${orderDate}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function createTestOrder() {
+            const testOrder = {
+                orderId: 'ORD-' + Date.now(),
+                createdAt: new Date().toISOString(),
+                product: {
+                    id: 1,
+                    name: 'Test Product - Cocopeat 5kg Block'
+                },
+                customerDetails: {
+                    customerName: 'Test Customer',
+                    customerEmail: 'test@example.com',
+                    customerPhone: '9876543210',
+                    deliveryAddress: 'Test Address, Test City, Test State - 123456',
+                    quantity: 2,
+                    total: 500,
+                    orderNotes: 'This is a test order for tracking functionality'
+                },
+                totalAmount: 500,
+                status: 'screenshot', // Set to screenshot status for testing
+                productSize: 'Standard',
+                paymentScreenshot: {
+                    dataUrl: 'data:image/png;base64,test',
+                    uploadedAt: new Date().toISOString()
+                }
+            };
+
+            // Add to localStorage
+            const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+            customerOrders.push(testOrder);
+            localStorage.setItem('customerOrders', JSON.stringify(customerOrders));
+
+            const resultDiv = document.getElementById('test-order-result');
+            resultDiv.innerHTML = `
+                <div class="success">✅ Test order created successfully!</div>
+                <div style="margin-top: 10px; padding: 10px; background: white; border-radius: 4px; border: 1px solid #ddd;">
+                    <strong>Order ID:</strong> ${testOrder.orderId}
+                    <button class="copy-btn" onclick="copyOrderId('${testOrder.orderId}')">Copy</button>
+                    <br><strong>Status:</strong> Payment Received
+                    <br><strong>Amount:</strong> ₹500
+                </div>
+            `;
+        }
+
+        function copyOrderId(orderId) {
+            navigator.clipboard.writeText(orderId).then(() => {
+                alert(`Order ID "${orderId}" copied to clipboard!`);
+            }).catch(() => {
+                // Fallback for older browsers
+                const tempInput = document.createElement('input');
+                tempInput.value = orderId;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                alert(`Order ID "${orderId}" copied to clipboard!`);
+            });
+        }
+
+        function testWithSampleId() {
+            // Create a quick test order if none exists
+            const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+            
+            if (customerOrders.length === 0) {
+                createTestOrder();
+                setTimeout(() => {
+                    const newOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+                    if (newOrders.length > 0) {
+                        const sampleId = newOrders[0].orderId;
+                        window.location.href = `track-order.html?orderId=${sampleId}`;
+                    }
+                }, 500);
+            } else {
+                const sampleId = customerOrders[0].orderId;
+                window.location.href = `track-order.html?orderId=${sampleId}`;
+            }
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                'pending': '#ffc107',
+                'screenshot': '#17a2b8',
+                'processing': '#007bff',
+                'shipped': '#6f42c1',
+                'completed': '#28a745',
+                'cancelled': '#dc3545'
+            };
+            return colors[status] || '#6c757d';
+        }
+
+        // Auto-load orders on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTestOrders();
+        });
+    </script>
+</body>
+</html>
