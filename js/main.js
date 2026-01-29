@@ -1,4 +1,4 @@
-/* Natural Care Impex - Main Script */
+/* Nature Care Impex - Main Script */
 
 // Buy Now Ordering System - Define functions first
 let currentOrder = null;
