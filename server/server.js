@@ -33,6 +33,11 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// Favicon route
+app.get('/favicon.ico', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'assets', 'logo.jpg'));
+});
+
 // Serve HTML files for specific routes
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
