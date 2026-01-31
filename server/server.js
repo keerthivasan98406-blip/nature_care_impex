@@ -38,6 +38,29 @@ app.get('/favicon.ico', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'assets', 'logo.jpg'));
 });
 
+// Robots.txt route
+app.get('/robots.txt', (req, res) => {
+    res.type('text/plain');
+    res.sendFile(path.join(__dirname, '..', 'robots.txt'));
+});
+
+// Apple app site association routes
+app.get('/.well-known/apple-app-site-association', (req, res) => {
+    res.type('application/json');
+    res.sendFile(path.join(__dirname, '..', '.well-known', 'apple-app-site-association'));
+});
+
+app.get('/apple-app-site-association', (req, res) => {
+    res.type('application/json');
+    res.sendFile(path.join(__dirname, '..', 'apple-app-site-association'));
+});
+
+// Sitemap route
+app.get('/sitemap.xml', (req, res) => {
+    res.type('application/xml');
+    res.sendFile(path.join(__dirname, '..', 'sitemap.xml'));
+});
+
 // Serve HTML files for specific routes
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
