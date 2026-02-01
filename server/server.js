@@ -16,6 +16,14 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Private Network Access headers for development (Chrome security policy)
+if (process.env.NODE_ENV === 'development') {
+    app.use((req, res, next) => {
+        res.setHeader('Access-Control-Allow-Private-Network', 'true');
+        next();
+    });
+}
+
 // Serve static files from the parent directory (where HTML files are)
 app.use(express.static(path.join(__dirname, '..')));
 
