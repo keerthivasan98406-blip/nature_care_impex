@@ -9,14 +9,14 @@ const connectDB = async () => {
         const connectionTimeout = parseInt(process.env.DB_CONNECTION_TIMEOUT) || 5000;
         
         console.log('🔄 Attempting to connect to MongoDB...');
+        console.log('🔍 Atlas URI available:', atlasUri ? 'Yes' : 'No');
+        console.log('🔍 Atlas URI starts with:', atlasUri ? atlasUri.substring(0, 20) + '...' : 'N/A');
         
         // Try MongoDB Atlas first if URI is provided
         if (atlasUri && atlasUri !== 'mongodb+srv://username:password@cluster.mongodb.net/database_name') {
             try {
                 console.log('🌐 Trying MongoDB Atlas...');
                 const conn = await mongoose.connect(atlasUri, {
-                    useNewUrlParser: true,
-                    useUnifiedTopology: true,
                     serverSelectionTimeoutMS: connectionTimeout,
                     ssl: true,
                     tlsAllowInvalidCertificates: true,
@@ -32,14 +32,14 @@ const connectDB = async () => {
                 console.error('❌ MongoDB Atlas connection error:', error.message);
                 console.log('💡 Tip: Check your IP whitelist and connection string');
             }
+        } else {
+            console.log('⚠️ MongoDB Atlas URI not configured or using placeholder');
         }
         
         // Try local MongoDB as fallback
         try {
             console.log('🏠 Trying local MongoDB...');
             const localConn = await mongoose.connect(localUri, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true,
                 serverSelectionTimeoutMS: 3000,
             });
             
