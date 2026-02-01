@@ -2,10 +2,29 @@
 
 class APIService {
     constructor() {
-        // Use the current server URL
-        this.baseURL = 'http://localhost:3000/api';
+        // Auto-detect environment and set appropriate server URL
+        this.baseURL = this.getServerURL();
         this.fallbackToLocalStorage = true;
         this.serverConnected = false;
+    }
+
+    // Determine the correct server URL based on environment
+    getServerURL() {
+        const currentHost = window.location.hostname;
+        const currentProtocol = window.location.protocol;
+        
+        // If running on localhost, use local server
+        if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+            return 'http://localhost:3000/api';
+        }
+        
+        // If running on production (Render), use production server
+        if (currentHost.includes('onrender.com')) {
+            return `${currentProtocol}//${currentHost}/api`;
+        }
+        
+        // Default fallback to current domain
+        return `${currentProtocol}//${currentHost}/api`;
     }
 
     // Generic API call method
@@ -475,12 +494,14 @@ window.apiService = new APIService();
 // Auto-initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🔌 API Service initialized');
+    console.log('🌐 Environment detected:', window.location.hostname);
+    console.log('🔗 Using server URL:', window.apiService.baseURL);
     
     // Check server health
     const health = await window.apiService.healthCheck();
     if (health.success) {
         console.log('✅ Server is online - MongoDB integration active');
-        console.log('🔗 Server URL:', window.apiService.baseURL);
+        console.log('🔗 Server URL confirmed:', window.apiService.baseURL);
         
         // Initialize database if needed
         try {
