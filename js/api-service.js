@@ -4,8 +4,9 @@ class APIService {
     constructor() {
         // Auto-detect environment and set appropriate server URL
         this.baseURL = this.getServerURL();
-        this.fallbackToLocalStorage = true;
+        this.fallbackToLocalStorage = false; // DISABLED - Force database storage
         this.serverConnected = false;
+        this.databaseOnlyMode = true; // NEW - Force database-only operations
     }
 
     // Determine the correct server URL based on environment
@@ -48,7 +49,13 @@ class APIService {
         } catch (error) {
             console.error(`API Error (${endpoint}):`, error);
             
-            // Fallback to localStorage for offline functionality
+            // REMOVED: Automatic fallback to localStorage
+            // In database-only mode, we throw the error instead of falling back
+            if (this.databaseOnlyMode) {
+                throw new Error(`Database operation failed: ${error.message}`);
+            }
+            
+            // Only fallback if explicitly enabled (for backward compatibility)
             if (this.fallbackToLocalStorage) {
                 console.log('Falling back to localStorage...');
                 return this.handleFallback(endpoint, options);
@@ -152,35 +159,25 @@ class APIService {
 
     async createProduct(productData) {
         try {
+            console.log('📤 Creating product in database:', productData);
+            
             const result = await this.apiCall('/products', {
                 method: 'POST',
                 body: JSON.stringify(productData)
             });
             
-            // DON'T update localStorage here - let the owner portal handle syncing
-            // This prevents duplicates when database save is successful
+            if (result.success) {
+                console.log('✅ Product successfully saved to MongoDB database');
+                // Update localStorage cache ONLY after successful database save
+                const products = JSON.parse(localStorage.getItem('allProducts') || '[]');
+                products.push(result.data);
+                localStorage.setItem('allProducts', JSON.stringify(products));
+            }
             
             return result;
         } catch (error) {
-            console.error('Create product error:', error);
-            
-            // Fallback: save to localStorage only
-            if (this.fallbackToLocalStorage) {
-                const products = JSON.parse(localStorage.getItem('allProducts') || '[]');
-                const newId = Math.max(...products.map(p => parseInt(p.id) || 0), 0) + 1;
-                const newProduct = { ...productData, id: newId };
-                products.push(newProduct);
-                localStorage.setItem('allProducts', JSON.stringify(products));
-                
-                return {
-                    success: true,
-                    data: newProduct,
-                    fallback: true,
-                    message: 'Product saved locally (database unavailable)'
-                };
-            }
-            
-            throw error;
+            console.error('❌ Database product creation failed:', error);
+            throw new Error(`Failed to save product to database: ${error.message}`);
         }
     }
 
@@ -324,42 +321,25 @@ class APIService {
                 createdAt: orderData.createdAt || new Date().toISOString()
             };
 
-            console.log('📤 Sending order to API:', formattedOrderData);
+            console.log('📤 Sending order to MongoDB database:', formattedOrderData);
 
             const result = await this.apiCall('/orders', {
                 method: 'POST',
                 body: JSON.stringify(formattedOrderData)
             });
             
-            // Update localStorage cache
             if (result.success) {
+                console.log('✅ Order successfully saved to MongoDB database');
+                // Update localStorage cache ONLY after successful database save
                 const orders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
                 orders.push(result.data);
                 localStorage.setItem('customerOrders', JSON.stringify(orders));
-                console.log('✅ Order saved to database and localStorage');
             }
             
             return result;
         } catch (error) {
-            console.error('Create order error:', error);
-            
-            // Fallback: save to localStorage only
-            if (this.fallbackToLocalStorage) {
-                const orders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
-                orders.push(orderData);
-                localStorage.setItem('customerOrders', JSON.stringify(orders));
-                
-                console.log('⚠️ Order saved to localStorage only (database unavailable)');
-                
-                return {
-                    success: true,
-                    data: orderData,
-                    fallback: true,
-                    message: 'Order saved locally (database unavailable)'
-                };
-            }
-            
-            throw error;
+            console.error('❌ Database order creation failed:', error);
+            throw new Error(`Failed to save order to database: ${error.message}`);
         }
     }
 

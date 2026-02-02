@@ -1613,55 +1613,30 @@ async function handleAddProduct(e) {
         
         console.log('Creating new product:', newProduct);
         
-        // Try to save to MongoDB first
-        let savedProduct = null;
-        let databaseSuccess = false;
+        // FORCE DATABASE STORAGE - No fallback to localStorage
+        if (!window.apiService) {
+            throw new Error('API Service not available - cannot save to database');
+        }
         
-        if (window.apiService) {
-            try {
-                console.log('🔄 Attempting to save to MongoDB...');
-                const result = await window.apiService.createProduct(newProduct);
-                if (result.success) {
-                    savedProduct = result.data;
-                    databaseSuccess = !result.fallback;
-                    console.log('✅ Product saved to MongoDB:', savedProduct);
-                    
-                    if (result.fallback) {
-                        showNotification('Product saved locally (database unavailable)', 'warning');
-                    } else {
-                        showNotification('Product added successfully to database!', 'success');
-                    }
-                } else {
-                    console.log('⚠️ MongoDB save failed:', result.message);
-                    showNotification('Database save failed: ' + result.message, 'error');
-                }
-            } catch (error) {
-                console.log('⚠️ MongoDB error:', error.message);
-                showNotification('Database error: ' + error.message, 'error');
+        try {
+            console.log('🔄 Saving product to MongoDB database...');
+            const result = await window.apiService.createProduct(newProduct);
+            
+            if (!result.success) {
+                throw new Error(result.message || 'Failed to save product to database');
             }
-        } else {
-            console.log('⚠️ API Service not available');
-            showNotification('API Service not available', 'warning');
-        }
-        
-        // ONLY add to local products array if database save failed
-        if (!savedProduct || !databaseSuccess) {
-            console.log('🔄 Using localStorage fallback...');
-            // Generate unique ID for local storage
-            const newId = Math.max(...products.map(p => parseInt(p.id) || 0), 0) + 1;
-            savedProduct = { ...newProduct, id: newId };
             
-            // Add to local array only when database is not available
-            products.push(savedProduct);
+            savedProduct = result.data;
+            console.log('✅ Product successfully saved to MongoDB database:', savedProduct);
+            showNotification('✅ Product successfully added to database!', 'success');
             
-            // Save to localStorage as fallback
-            localStorage.setItem('allProducts', JSON.stringify(products));
-        }
-        
-        // If database succeeded, refresh products from database to avoid duplicates
-        if (databaseSuccess) {
-            console.log('✅ Database save successful, refreshing from database...');
-            // Don't add to local array - let loadProducts() fetch fresh data from database
+            // Refresh products from database to get latest data
+            await loadProducts();
+            
+        } catch (error) {
+            console.error('❌ Database save failed:', error);
+            showNotification('❌ Failed to save product to database: ' + error.message, 'error');
+            throw error; // Don't continue if database save fails
         }
         
         // Force sync with main site immediately after adding product
@@ -1688,26 +1663,28 @@ async function handleAddProduct(e) {
             console.log('⚠️ Failed to trigger real-time update:', error.message);
         }
         
-        // Also trigger a refresh of the main website's product cache
+        // Update main website cache with fresh database data
         try {
-            // Force the main website to reload products from database
-            if (window.apiService) {
-                const result = await window.apiService.getProducts();
-                if (result.success && result.data) {
-                    // Update localStorage with fresh database data for main website
-                    const websiteProducts = result.data.map(product => ({
-                        id: product.id,
-                        name: product.name,
-                        category: product.category,
-                        image: product.image,
-                        description: product.description,
-                        sizes: product.sizes || ["Standard"],
-                        price: product.price,
-                        cost: product.cost,
-                        stock: product.stock
-                    }));
-                    localStorage.setItem('allProducts', JSON.stringify(websiteProducts));
-                    console.log('✅ Main website cache updated with new product');
+            const result = await window.apiService.getProducts();
+            if (result.success && result.data) {
+                // Update localStorage with fresh database data for main website
+                const websiteProducts = result.data.map(product => ({
+                    id: product.id,
+                    name: product.name,
+                    category: product.category,
+                    image: product.image,
+                    description: product.description,
+                    sizes: product.sizes || ["Standard"],
+                    price: product.price,
+                    cost: product.cost,
+                    stock: product.stock
+                }));
+                localStorage.setItem('allProducts', JSON.stringify(websiteProducts));
+                console.log('✅ Main website cache updated with fresh database data');
+            }
+        } catch (error) {
+            console.log('⚠️ Failed to update main website cache:', error.message);
+        }
                 }
             }
         } catch (error) {

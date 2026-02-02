@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const multer = require('multer');
 const Order = require('../models/Order');
@@ -22,6 +23,15 @@ const upload = multer({
 // Get all orders
 router.get('/', async (req, res) => {
     try {
+        // Check if database is connected
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available',
+                error: 'MongoDB connection not established'
+            });
+        }
+
         const { status, month, email, limit = 50, page = 1 } = req.query;
         let filter = {};
         
@@ -151,25 +161,38 @@ router.post('/track', async (req, res) => {
 // Create new order
 router.post('/', async (req, res) => {
     try {
+        // Check if database is connected
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not available - order cannot be saved',
+                error: 'MongoDB connection not established'
+            });
+        }
+
         const orderData = {
             ...req.body,
             orderDate: new Date().toISOString().split('T')[0],
             orderMonth: new Date().toISOString().slice(0, 7)
         };
 
+        console.log('📝 Creating order in MongoDB:', orderData.orderId);
+
         const order = new Order(orderData);
         await order.save();
 
+        console.log('✅ Order successfully saved to MongoDB database:', order.orderId);
+
         res.status(201).json({
             success: true,
-            message: 'Order created successfully',
+            message: 'Order created successfully in database',
             data: order
         });
     } catch (error) {
-        console.error('Error creating order:', error);
+        console.error('❌ Error creating order in database:', error);
         res.status(400).json({
             success: false,
-            message: 'Error creating order',
+            message: 'Error creating order in database',
             error: error.message
         });
     }
