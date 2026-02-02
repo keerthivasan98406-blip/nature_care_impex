@@ -1685,20 +1685,9 @@ async function handleAddProduct(e) {
         } catch (error) {
             console.log('⚠️ Failed to update main website cache:', error.message);
         }
-                }
-            }
-        } catch (error) {
-            console.log('⚠️ Failed to update main website cache:', error.message);
-        }
         
         console.log('✅ Product creation completed:', savedProduct);
-        
-        // Show final success message
-        if (databaseSuccess) {
-            showNotification('✅ Product successfully added to database!', 'success');
-        } else {
-            showNotification('✅ Product added successfully! (Saved locally - will sync when database is available)', 'success');
-        }
+        showNotification('✅ Product successfully added to database!', 'success');
         
         // Close modal and refresh
         closeModal('add-product-modal');
