@@ -12,7 +12,7 @@ services:
       - key: PORT
         value: 10000
       - key: MONGODB_ATLAS_URI
-        sync: false
+        value: mongodb+srv://p59050352_db_user:keerthivasan@cluster0.boime9a.mongodb.net/nature_care_impex?retryWrites=true&w=majority&ssl=true&tlsAllowInvalidCertificates=true
       - key: OWNER_USERNAME
         value: admin
       - key: OWNER_PASSWORD
