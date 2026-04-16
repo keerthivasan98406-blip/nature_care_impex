@@ -1345,7 +1345,7 @@ canvas { margin: 0 auto !important; display: block !important; }
     .hamburger.active .bar:nth-child(2) { opacity: 0; }
     .hamburger.active .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
     .nav-links {
-        display: none;
+        display: none !important;
         position: fixed;
         top: 64px;
         left: 0;
@@ -1353,9 +1353,9 @@ canvas { margin: 0 auto !important; display: block !important; }
         background: #1A4A30;
         flex-direction: column;
         align-items: stretch;
-        z-index: 9999;
-        border-top: 2px solid var(--gold);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        z-index: 99999;
+        border-top: 2px solid #C9A84C;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         padding: 0;
         margin: 0;
     }
