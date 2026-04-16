@@ -25,7 +25,16 @@
         rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/main.css?v=3">
+    <style>
+    @media (max-width: 768px) {
+        #navLinks { display: none !important; position: fixed !important; top: 64px !important; left: 0 !important; width: 100% !important; background: #fff !important; flex-direction: column !important; z-index: 99999 !important; border-top: 2px solid #C9A84C !important; box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important; margin: 0 !important; padding: 0 !important; }
+        #navLinks.active { display: flex !important; }
+        #navLinks li { width: 100% !important; border-bottom: 1px solid #eee !important; }
+        #navLinks a { display: block !important; padding: 16px 24px !important; color: #1A4A30 !important; font-weight: 600 !important; font-size: 0.95rem !important; text-transform: uppercase !important; letter-spacing: 0.08em !important; }
+        #hamburgerBtn { display: flex !important; }
+    }
+    </style>
     <style>
         .track-container {
             max-width: 800px;
@@ -104,8 +113,8 @@
                 <span class="bar"></span>
                 <span class="bar"></span>
             </button>
-
-    <!-- Track Order Section -->
+        </div>
+    </nav>
     <section class="track-container">
         <h1>📦 Track Your Order</h1>
         <p>Enter your Order ID or Email to track your order status</p>
@@ -199,7 +208,6 @@
         </div>
     </footer>
 
-    <script src="js/api-service.js"></script>
     <script src="js/api-service.js"></script>
     <script>
         // Real-time update listener for cross-tab communication
@@ -550,6 +558,7 @@
         document.getElementById('trackInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') trackOrder();
         });
+    </script>
     <script>
         function toggleNav() {
             var nav = document.getElementById('navLinks');
