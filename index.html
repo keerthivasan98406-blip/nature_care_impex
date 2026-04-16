@@ -260,27 +260,40 @@
 <body>
 
     <!-- Navigation -->
-    <nav class="navbar">
+    <nav class="navbar" id="mainNav">
         <div class="container nav-container">
             <a href="index.html" class="logo">
                 <img src="assets/logo.jpg" alt="Nature Care Impex — Premium Organic Products">
                 <span class="logo-text">Nature Care Impex</span>
             </a>
             <div class="mobile-brand-name">Nature Care Impex</div>
-            <ul class="nav-links">
-                <li><a href="index.html" class="nav-link active">Home</a></li>
-                <li><a href="products.html" class="nav-link">Products</a></li>
-                <li><a href="track-order.html" class="nav-link">Track Order</a></li>
-                <li><a href="about.html" class="nav-link">Our Story</a></li>
-                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="nav-link active" onclick="closeNav()">Home</a></li>
+                <li><a href="products.html" class="nav-link" onclick="closeNav()">Products</a></li>
+                <li><a href="track-order.html" class="nav-link" onclick="closeNav()">Track Order</a></li>
+                <li><a href="about.html" class="nav-link" onclick="closeNav()">Our Story</a></li>
+                <li><a href="contact.html" class="nav-link" onclick="closeNav()">Contact</a></li>
             </ul>
-            <button class="hamburger" aria-label="Open menu" type="button">
+            <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" type="button" onclick="toggleNav()">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
             </button>
         </div>
     </nav>
+
+    <script>
+        function toggleNav() {
+            var nav = document.getElementById('navLinks');
+            var btn = document.getElementById('hamburgerBtn');
+            nav.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+        function closeNav() {
+            document.getElementById('navLinks').classList.remove('active');
+            document.getElementById('hamburgerBtn').classList.remove('active');
+        }
+    </script>
 
     <!-- Hero Carousel -->
     <section class="hero-carousel" aria-label="Hero banner">
@@ -559,48 +572,7 @@
         dots.forEach((dot, i) => dot.addEventListener('click', () => showSlide(i)));
         setInterval(() => showSlide(currentSlide + 1), 5500);
 
-        // ── Hamburger menu ──────────────────────────────────
-        const hamburger = document.querySelector('.hamburger');
-        const navLinks  = document.querySelector('.nav-links');
-
-        if (hamburger && navLinks) {
-            hamburger.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                const isOpen = navLinks.classList.contains('active');
-                if (isOpen) {
-                    navLinks.classList.remove('active');
-                    hamburger.classList.remove('active');
-                } else {
-                    navLinks.classList.add('active');
-                    hamburger.classList.add('active');
-                }
-            });
-
-            // Close on nav link click
-            navLinks.querySelectorAll('a').forEach(function(link) {
-                link.addEventListener('click', function() {
-                    navLinks.classList.remove('active');
-                    hamburger.classList.remove('active');
-                });
-            });
-
-            // Close on outside tap/click
-            document.addEventListener('click', function(e) {
-                if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
-                    navLinks.classList.remove('active');
-                    hamburger.classList.remove('active');
-                }
-            });
-
-            // Close on Escape
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    navLinks.classList.remove('active');
-                    hamburger.classList.remove('active');
-                }
-            });
-        }
+        // ── Hamburger handled by inline toggleNav() above ──
 
         // Reveal on scroll
         const reveals = document.querySelectorAll('.reveal-up');
