@@ -274,11 +274,11 @@
                 <li><a href="about.html" class="nav-link">Our Story</a></li>
                 <li><a href="contact.html" class="nav-link">Contact</a></li>
             </ul>
-            <div class="hamburger" aria-label="Open menu" role="button" tabindex="0">
+            <button class="hamburger" aria-label="Open menu" type="button">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
-            </div>
+            </button>
         </div>
     </nav>
 
@@ -539,6 +539,8 @@
 
     <script src="js/github-pages-fallback.min.js"></script>
     <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
         // Carousel
         let currentSlide = 0;
         const slides = document.querySelectorAll('.carousel-slide');
@@ -557,13 +559,48 @@
         dots.forEach((dot, i) => dot.addEventListener('click', () => showSlide(i)));
         setInterval(() => showSlide(currentSlide + 1), 5500);
 
-        // Hamburger
+        // ── Hamburger menu ──────────────────────────────────
         const hamburger = document.querySelector('.hamburger');
         const navLinks  = document.querySelector('.nav-links');
-        hamburger.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            hamburger.classList.toggle('active');
-        });
+
+        if (hamburger && navLinks) {
+            hamburger.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const isOpen = navLinks.classList.contains('active');
+                if (isOpen) {
+                    navLinks.classList.remove('active');
+                    hamburger.classList.remove('active');
+                } else {
+                    navLinks.classList.add('active');
+                    hamburger.classList.add('active');
+                }
+            });
+
+            // Close on nav link click
+            navLinks.querySelectorAll('a').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    navLinks.classList.remove('active');
+                    hamburger.classList.remove('active');
+                });
+            });
+
+            // Close on outside tap/click
+            document.addEventListener('click', function(e) {
+                if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+                    navLinks.classList.remove('active');
+                    hamburger.classList.remove('active');
+                }
+            });
+
+            // Close on Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    navLinks.classList.remove('active');
+                    hamburger.classList.remove('active');
+                }
+            });
+        }
 
         // Reveal on scroll
         const reveals = document.querySelectorAll('.reveal-up');
@@ -576,6 +613,8 @@
         window.addEventListener('scroll', () => {
             document.querySelector('.navbar').classList.toggle('scrolled', window.scrollY > 40);
         });
+
+    }); // end DOMContentLoaded
     </script>
 </body>
 </html>
