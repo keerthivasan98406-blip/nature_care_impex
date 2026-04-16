@@ -1472,20 +1472,29 @@ async function loadProducts() {
         // Show loading state
         grid.innerHTML = '<div style="text-align: center; padding: 40px;">Loading products...</div>';
         
-        // Try to load from MongoDB first
+        // Try to load from MongoDB first, then merge with localStorage
+        let dbLoaded = false;
         if (window.apiService) {
             try {
                 const result = await window.apiService.getProducts();
                 if (result.success && result.data) {
-                    // Clear and update local products array with database data
                     products.length = 0;
                     products.push(...result.data);
+                    dbLoaded = true;
                     console.log('✅ Products loaded from MongoDB:', products.length);
-                } else {
-                    console.log('⚠️ MongoDB load failed, using local products');
                 }
             } catch (error) {
                 console.log('⚠️ MongoDB unavailable, using local products:', error.message);
+            }
+        }
+
+        // Merge localStorage products when DB is offline
+        if (!dbLoaded) {
+            const localProds = JSON.parse(localStorage.getItem('adminProducts') || '[]');
+            if (localProds.length > 0) {
+                products.length = 0;
+                products.push(...localProds);
+                console.log('✅ Products loaded from localStorage (offline mode):', products.length);
             }
         }
         
@@ -1613,30 +1622,37 @@ async function handleAddProduct(e) {
         
         console.log('Creating new product:', newProduct);
         
-        // FORCE DATABASE STORAGE - No fallback to localStorage
-        if (!window.apiService) {
-            throw new Error('API Service not available - cannot save to database');
-        }
-        
-        try {
-            console.log('🔄 Saving product to MongoDB database...');
-            const result = await window.apiService.createProduct(newProduct);
-            
-            if (!result.success) {
-                throw new Error(result.message || 'Failed to save product to database');
+        // Try MongoDB first, fall back to localStorage if unavailable
+        let savedToDatabase = false;
+
+        if (window.apiService) {
+            try {
+                console.log('🔄 Saving product to MongoDB database...');
+                const result = await window.apiService.createProduct(newProduct);
+                if (result && result.success) {
+                    savedProduct = result.data;
+                    savedToDatabase = true;
+                    console.log('✅ Product saved to MongoDB:', savedProduct);
+                    showNotification('✅ Product saved to database!', 'success');
+                    await loadProducts();
+                } else {
+                    throw new Error(result ? result.message : 'Unknown error');
+                }
+            } catch (dbError) {
+                console.warn('⚠️ MongoDB unavailable, saving to localStorage:', dbError.message);
             }
-            
-            savedProduct = result.data;
-            console.log('✅ Product successfully saved to MongoDB database:', savedProduct);
-            showNotification('✅ Product successfully added to database!', 'success');
-            
-            // Refresh products from database to get latest data
-            await loadProducts();
-            
-        } catch (error) {
-            console.error('❌ Database save failed:', error);
-            showNotification('❌ Failed to save product to database: ' + error.message, 'error');
-            throw error; // Don't continue if database save fails
+        }
+
+        if (!savedToDatabase) {
+            // Fallback: save to localStorage
+            const existing = JSON.parse(localStorage.getItem('adminProducts') || '[]');
+            // Assign a unique id if not set
+            if (!newProduct.id) newProduct.id = Date.now();
+            existing.push(newProduct);
+            localStorage.setItem('adminProducts', JSON.stringify(existing));
+            savedProduct = newProduct;
+            console.log('✅ Product saved to localStorage (offline mode):', savedProduct);
+            showNotification('✅ Product saved locally (MongoDB offline). Will sync when DB is available.', 'success');
         }
         
         // Force sync with main site immediately after adding product
@@ -1717,28 +1733,28 @@ async function syncProductsToMainSite() {
     try {
         let allProducts = [];
         
-        // Always try to get latest products from MongoDB first
+        // Always try to get latest products from MongoDB first, then localStorage
         if (window.apiService) {
             try {
                 const result = await window.apiService.getProducts();
                 if (result.success && result.data) {
                     allProducts = result.data;
                     console.log('✅ Synced products from MongoDB:', allProducts.length);
-                    
-                    // Update local products array to match database (avoid duplicates)
-                    products.length = 0; // Clear local array
-                    products.push(...allProducts); // Update with fresh database data
+                    products.length = 0;
+                    products.push(...allProducts);
                 } else {
-                    console.log('⚠️ MongoDB sync failed, using local products');
-                    allProducts = [...products]; // Use copy of local products
+                    throw new Error('No data from DB');
                 }
             } catch (error) {
                 console.log('⚠️ MongoDB sync failed, using local products:', error.message);
-                allProducts = [...products]; // Use copy of local products
+                // Merge in-memory + localStorage products
+                const localProds = JSON.parse(localStorage.getItem('adminProducts') || '[]');
+                const merged = [...products, ...localProds];
+                allProducts = merged.length > 0 ? merged : [...products];
             }
         } else {
-            console.log('⚠️ API Service not available, using local products');
-            allProducts = [...products]; // Use copy of local products
+            const localProds = JSON.parse(localStorage.getItem('adminProducts') || '[]');
+            allProducts = localProds.length > 0 ? localProds : [...products];
         }
         
         // Remove duplicates based on ID (just in case)

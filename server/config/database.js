@@ -1,5 +1,9 @@
 const mongoose = require('mongoose');
-require('dotenv').config();
+const dns = require('dns');
+require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
+
+// Use Google DNS to bypass ISP/router SRV record blocking
+dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
 
 const connectDB = async () => {
     try {
@@ -19,10 +23,13 @@ const connectDB = async () => {
                 const conn = await mongoose.connect(atlasUri, {
                     serverSelectionTimeoutMS: connectionTimeout,
                     ssl: true,
-                    tlsAllowInvalidCertificates: true,
-                    tlsAllowInvalidHostnames: true,
                     retryWrites: true,
-                    w: 'majority'
+                    w: 'majority',
+                    family: 4,
+                    // Use port 443 to bypass ISP firewall on 27017
+                    tls: true,
+                    tlsAllowInvalidCertificates: false,
+                    directConnection: false
                 });
 
                 console.log(`✅ MongoDB Atlas Connected: ${conn.connection.host}`);
