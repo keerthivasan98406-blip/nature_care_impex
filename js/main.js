@@ -1052,28 +1052,10 @@ function initScrollAnimations() {
     reveals.forEach(el => observer.observe(el));
 }
 
-// Mobile Menu Toggle
+// Mobile Menu Toggle — handled by inline toggleNav() on each page
 function initMobileMenu() {
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
-
-    if (hamburger) {
-        hamburger.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-
-            // Animate Hamburger
-            const bars = document.querySelectorAll('.bar');
-            if (navLinks.classList.contains('active')) {
-                bars[0].style.transform = "rotate(-45deg) translate(-5px, 6px)";
-                bars[1].style.opacity = "0";
-                bars[2].style.transform = "rotate(45deg) translate(-5px, -6px)";
-            } else {
-                bars[0].style.transform = "none";
-                bars[1].style.opacity = "1";
-                bars[2].style.transform = "none";
-            }
-        });
-    }
+    // Navigation is handled by toggleNav() / closeNav() inline functions
+    // No conflicting listener needed here
 }
 
 // Carousel Logic
