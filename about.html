@@ -91,19 +91,18 @@
             
             <div class="mobile-brand-name">Nature Care Impex</div>
 
-            <ul class="nav-links">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="products.html" class="nav-link">Products</a></li>
-                <li><a href="track-order.html" class="nav-link">Track Order</a></li>
-                <li><a href="about.html" class="nav-link active">Our Story</a></li>
-                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="nav-link" onclick="closeNav()">Home</a></li>
+                <li><a href="products.html" class="nav-link" onclick="closeNav()">Products</a></li>
+                <li><a href="track-order.html" class="nav-link" onclick="closeNav()">Track Order</a></li>
+                <li><a href="about.html" class="nav-link active" onclick="closeNav()">Our Story</a></li>
+                <li><a href="contact.html" class="nav-link" onclick="closeNav()">Contact</a></li>
             </ul>
-
-            <div class="hamburger">
+            <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" type="button" onclick="toggleNav()">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
-            </div>
+            </button>
         </div>
     </nav>
 
@@ -204,29 +203,16 @@
     <!-- Scripts -->
     <script src="js/main.js"></script>
     <script>
-        // Fallback mobile menu initialization
-        document.addEventListener('DOMContentLoaded', function() {
-            const hamburger = document.querySelector('.hamburger');
-            const navLinks = document.querySelector('.nav-links');
-
-            if (hamburger && navLinks) {
-                hamburger.addEventListener('click', function() {
-                    navLinks.classList.toggle('active');
-
-                    // Animate hamburger bars
-                    const bars = document.querySelectorAll('.bar');
-                    if (navLinks.classList.contains('active')) {
-                        bars[0].style.transform = "rotate(-45deg) translate(-5px, 6px)";
-                        bars[1].style.opacity = "0";
-                        bars[2].style.transform = "rotate(45deg) translate(-5px, -6px)";
-                    } else {
-                        bars[0].style.transform = "none";
-                        bars[1].style.opacity = "1";
-                        bars[2].style.transform = "none";
-                    }
-                });
-            }
-        });
+        function toggleNav() {
+            var nav = document.getElementById('navLinks');
+            var btn = document.getElementById('hamburgerBtn');
+            nav.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+        function closeNav() {
+            document.getElementById('navLinks').classList.remove('active');
+            document.getElementById('hamburgerBtn').classList.remove('active');
+        }
     </script>
 </body>
 
