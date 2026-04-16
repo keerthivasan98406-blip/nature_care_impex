@@ -42,18 +42,17 @@
                 <span class="logo-text">Nature Care Impex</span>
             </a>
 
-            <ul class="nav-links">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="products.html" class="nav-link active">Products</a></li>
-                <li><a href="about.html" class="nav-link">About Us</a></li>
-                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="nav-link" onclick="closeNav()">Home</a></li>
+                <li><a href="products.html" class="nav-link active" onclick="closeNav()">Products</a></li>
+                <li><a href="about.html" class="nav-link" onclick="closeNav()">About Us</a></li>
+                <li><a href="contact.html" class="nav-link" onclick="closeNav()">Contact</a></li>
             </ul>
-
-            <div class="hamburger">
+            <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" type="button" onclick="toggleNav()">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
-            </div>
+            </button>
         </div>
     </nav>
 
@@ -112,6 +111,18 @@
     <!-- Scripts -->
     <script src="js/api-service.js"></script>
     <script src="js/main.js"></script>
+    <script>
+        function toggleNav() {
+            var nav = document.getElementById('navLinks');
+            var btn = document.getElementById('hamburgerBtn');
+            nav.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+        function closeNav() {
+            document.getElementById('navLinks').classList.remove('active');
+            document.getElementById('hamburgerBtn').classList.remove('active');
+        }
+    </script>
 </body>
 
 </html>
