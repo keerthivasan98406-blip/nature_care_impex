@@ -73,7 +73,6 @@
                         <option value="cancelled">Cancelled</option>
                     </select>
                     <button class="btn-secondary" onclick="refreshOrders()">🔄 Refresh Orders</button>
-                    <button class="btn-warning" onclick="createTestOrder()" style="background-color: #28a745; color: white;">🧪 Create Test Order</button>
                 </div>
 
                 <div class="orders-summary">
@@ -121,7 +120,7 @@
                 <div class="section-actions">
                     <button class="btn-primary" onclick="showAddProductModal()">Add New Product</button>
                     <button class="btn-secondary" onclick="checkDatabaseConnection()">Check Database Status</button>
-                    <button class="btn-warning" onclick="removeDuplicateProducts()">Remove Duplicates</button>
+
                 </div>
 
                 <div class="products-grid" id="products-grid">
@@ -134,9 +133,14 @@
                 <h2>Monthly Sales & Profit Analysis</h2>
                 
                 <div class="sales-controls">
-                    <select id="sales-year" class="filter-select">
+                    <select id="sales-year" class="filter-select" onchange="handleYearChange(this.value)">
+                        <option value="2030">2030</option>
+                        <option value="2029">2029</option>
+                        <option value="2028">2028</option>
+                        <option value="2027">2027</option>
+                        <option value="2026" selected>2026</option>
+                        <option value="2025">2025</option>
                         <option value="2024">2024</option>
-                        <option value="2023">2023</option>
                     </select>
                 </div>
 
@@ -163,12 +167,7 @@
                     </div>
                 </div>
 
-                <div class="monthly-chart">
-                    <h3>Monthly Performance (2024)</h3>
-                    <div class="chart-container">
-                        <canvas id="salesChart" width="800" height="400"></canvas>
-                    </div>
-                </div>
+
 
                 <div class="monthly-breakdown">
                     <h3>Monthly Breakdown</h3>
@@ -306,37 +305,61 @@
                     </div>
                 </div>
                 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="initial-stock">Initial Stock</label>
-                        <input type="number" id="initial-stock" min="0" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="min-stock">Minimum Stock Alert</label>
-                        <input type="number" id="min-stock" min="0" required>
-                    </div>
-                </div>
+
                 
                 <div class="form-group">
-                    <label for="product-image">Product Image</label>
+                    <label>Product Images (Please provide up to three images)</label>
                     <div class="image-help-text" style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">
-                        💡 <strong>Image Options:</strong><br>
-                        • <strong>URL:</strong> Enter a direct link to an image (recommended)<br>
-                        • <strong>File Upload:</strong> Select an image file from your computer (max 5MB)<br>
-                        • <strong>No Image:</strong> Leave both empty to use a default category image
+                        💡 <strong>Primary Image:</strong>
                     </div>
-                    <div class="image-input-options">
+                    <div class="image-input-options" style="margin-bottom: 15px;">
                         <div class="input-option">
-                            <label for="product-image-url">Image URL:</label>
-                            <input type="url" id="product-image-url" placeholder="https://example.com/image.jpg">
+                            <label for="product-image-url">Image URL 1:</label>
+                            <input type="url" id="product-image-url" placeholder="https://example.com/image1.jpg">
                         </div>
                         <div class="input-option-divider">OR</div>
                         <div class="input-option">
-                            <label for="product-image-file">Upload Image File:</label>
+                            <label for="product-image-file">Upload Image 1:</label>
                             <input type="file" id="product-image-file" accept="image/*">
                         </div>
                         <div class="image-preview" id="product-image-preview" style="display: none;">
-                            <img id="preview-img" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; margin-top: 10px;">
+                            <img id="preview-img" src="" alt="Preview 1" style="max-width: 100px; max-height: 100px; border-radius: 8px; margin-top: 10px;">
+                        </div>
+                    </div>
+                    
+                    <div class="image-help-text" style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">
+                        💡 <strong>Secondary Image:</strong>
+                    </div>
+                    <div class="image-input-options" style="margin-bottom: 15px;">
+                        <div class="input-option">
+                            <label for="product-image-url-2">Image URL 2:</label>
+                            <input type="url" id="product-image-url-2" placeholder="https://example.com/image2.jpg">
+                        </div>
+                        <div class="input-option-divider">OR</div>
+                        <div class="input-option">
+                            <label for="product-image-file-2">Upload Image 2:</label>
+                            <input type="file" id="product-image-file-2" accept="image/*">
+                        </div>
+                        <div class="image-preview" id="product-image-preview-2" style="display: none;">
+                            <img id="preview-img-2" src="" alt="Preview 2" style="max-width: 100px; max-height: 100px; border-radius: 8px; margin-top: 10px;">
+                        </div>
+                    </div>
+
+                    <div class="image-help-text" style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">
+                        💡 <strong>Third Image:</strong>
+                    </div>
+                    <div class="image-input-options">
+                        <div class="input-option">
+                            <label for="product-image-url-3">Image URL 3:</label>
+                            <input type="url" id="product-image-url-3" placeholder="https://example.com/image3.jpg">
+                        </div>
+                        <div class="input-option-divider">OR</div>
+                        <div class="input-option">
+                            <label for="product-image-file-3">Upload Image 3:</label>
+                            <input type="file" id="product-image-file-3" accept="image/*">
+                        </div>
+                        <div class="image-preview" id="product-image-preview-3" style="display: none;">
+                            <img id="preview-img-3" src="" alt="Preview 3" style="max-width: 100px; max-height: 100px; border-radius: 8px; margin-top: 10px;">
                         </div>
                     </div>
                 </div>

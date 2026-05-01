@@ -30,16 +30,8 @@
         rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/main.css?v=3">
-    <style>
-    @media (max-width: 768px) {
-        #navLinks { display: none !important; position: fixed !important; top: 64px !important; left: 0 !important; width: 100% !important; background: #fff !important; flex-direction: column !important; z-index: 99999 !important; border-top: 2px solid #C9A84C !important; box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important; margin: 0 !important; padding: 0 !important; }
-        #navLinks.active { display: flex !important; }
-        #navLinks li { width: 100% !important; border-bottom: 1px solid #eee !important; }
-        #navLinks a { display: block !important; padding: 16px 24px !important; color: #1A4A30 !important; font-weight: 600 !important; font-size: 0.95rem !important; text-transform: uppercase !important; letter-spacing: 0.08em !important; }
-        #hamburgerBtn { display: flex !important; }
-    }
-    </style>
+    <link rel="stylesheet" href="css/main.css?v=4">
+
 
     <style>
         .about-split {
@@ -59,10 +51,10 @@
 
         .about-image {
             flex: 1;
-            height: 400px;
-            border-radius: var(--radius-sharp);
+            aspect-ratio: 16 / 10;
+            border-radius: var(--r-md);
             overflow: hidden;
-            box-shadow: var(--shadow-soft);
+            box-shadow: var(--shadow-md);
         }
 
         .about-image img {
@@ -325,16 +317,7 @@
                         <h3>Verified Certificate of Trust</h3>
                         <p>Ethical Business Practices & Reliability</p>
                     </div>
-                    <div class="certificate-card">
-                        <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777617708/Nature_care_impex_C-TPAT_SECURITY_POLICY_page-0001_mn3jzk.jpg" alt="C-TPAT Security Policy" onerror="this.src='https://placehold.co/400x565/e2e8f0/1e293b?text=C-TPAT+Policy'">
-                        <h3>C-TPAT Security Policy</h3>
-                        <p>Supply Chain Security Standards</p>
-                    </div>
-                    <div class="certificate-card">
-                        <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777617741/Nature_care_impex_C-TPAT_SECURITY_SELF-DECLARATION_page-0001_cm3hxc.jpg" alt="C-TPAT Self Declaration" onerror="this.src='https://placehold.co/400x565/e2e8f0/1e293b?text=C-TPAT+Declaration'">
-                        <h3>C-TPAT Self-Declaration</h3>
-                        <p>Compliance with International Supply Chain Security</p>
-                    </div>
+                  
                 </div>
             </div>
 
@@ -356,13 +339,9 @@
                         <li><a href="index.html">Home</a></li>
                         <li><a href="products.html">Products</a></li>
                         <li><a href="gallery.html">Gallery</a></li>
-                <li><a href="gallery.html" class="nav-link" onclick="closeNav()">Gallery</a></li>
                         <li><a href="about.html">About Us</a></li>
                         <li><a href="contact.html">Contact</a></li>
                         <li><a href="track-order.html">Track Order</a></li>
-                        <li><a href="product-detail.html">Product Details</a></li>
-                        <li><a href="order-details.html">Place Order</a></li>
-                        <li><a href="payment.html">Payment Options</a></li>
                     </ul>
                 </div>
 
@@ -394,6 +373,7 @@
 
     <!-- Scripts -->
     <script src="js/main.js"></script>
+    <script src="js/ux-common.js"></script>
     <script>
         function toggleNav() {
             var nav = document.getElementById('navLinks');

@@ -87,6 +87,8 @@ router.post('/', async (req, res) => {
         const lastProduct = await Product.findOne().sort({ id: -1 });
         const nextId = lastProduct ? lastProduct.id + 1 : 1;
 
+        console.log('📦 Incoming product data:', JSON.stringify(req.body, null, 2));
+
         const productData = {
             ...req.body,
             id: nextId

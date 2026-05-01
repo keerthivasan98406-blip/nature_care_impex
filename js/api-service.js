@@ -262,6 +262,19 @@ class APIService {
         }
     }
 
+    async deleteOrder(orderId) {
+        try {
+            console.log(`🗑️ API Request: Deleting order ${orderId}`);
+            const result = await this.apiCall(`/orders/${orderId}`, {
+                method: 'DELETE'
+            });
+            return result;
+        } catch (error) {
+            console.error('Delete order error:', error);
+            throw error;
+        }
+    }
+
     // Orders API
     async getOrders(filters = {}) {
         let endpoint = '/orders';
@@ -483,16 +496,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('✅ Server is online - MongoDB integration active');
         console.log('🔗 Server URL confirmed:', window.apiService.baseURL);
         
-        // Initialize database if needed
-        try {
-            const initResponse = await fetch(`${window.apiService.baseURL}/products/initialize`, {
-                method: 'POST'
-            });
-            const initResult = await initResponse.json();
-            console.log('📊 Database initialization result:', initResult);
-        } catch (error) {
-            console.log('⚠️ Database initialization error:', error.message);
-        }
+        // Initialization removed to prevent default products from reappearing
+
     } else {
         console.log('⚠️ Server offline - Using localStorage fallback');
         console.log('🔗 Attempted server URL:', window.apiService.baseURL);

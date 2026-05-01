@@ -25,16 +25,8 @@
         rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/main.css?v=3">
-    <style>
-    @media (max-width: 768px) {
-        #navLinks { display: none !important; position: fixed !important; top: 64px !important; left: 0 !important; width: 100% !important; background: #fff !important; flex-direction: column !important; z-index: 99999 !important; border-top: 2px solid #C9A84C !important; box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important; margin: 0 !important; padding: 0 !important; }
-        #navLinks.active { display: flex !important; }
-        #navLinks li { width: 100% !important; border-bottom: 1px solid #eee !important; }
-        #navLinks a { display: block !important; padding: 16px 24px !important; color: #1A4A30 !important; font-weight: 600 !important; font-size: 0.95rem !important; text-transform: uppercase !important; letter-spacing: 0.08em !important; }
-        #hamburgerBtn { display: flex !important; }
-    }
-    </style>
+    <link rel="stylesheet" href="css/main.css?v=4">
+
 
     <style>
         .contact-container {
@@ -135,6 +127,7 @@
                 <li><a href="index.html" class="nav-link" onclick="closeNav()">Home</a></li>
                 <li><a href="products.html" class="nav-link" onclick="closeNav()">Products</a></li>
                 <li><a href="gallery.html" class="nav-link" onclick="closeNav()">Gallery</a></li>
+                <li><a href="track-order.html" class="nav-link" onclick="closeNav()">Track Order</a></li>
                 <li><a href="about.html" class="nav-link" onclick="closeNav()">About Us</a></li>
                 <li><a href="contact.html" class="nav-link active" onclick="closeNav()">Contact</a></li>
             </ul>
@@ -222,7 +215,7 @@
                     <div class="info-icon">📞</div>
                     <div>
                         <h3>Call Us</h3>
-                        <p><a href="tel:9345540373">9345540373</a></p>
+                        <p><a href="tel:9345540373">91-9345540373</a></p>
                         <p>Mon - Sat, 9am - 6pm</p>
                     </div>
                 </div>
@@ -253,7 +246,6 @@
                         <li><a href="index.html">Home</a></li>
                         <li><a href="products.html">Products</a></li>
                         <li><a href="gallery.html">Gallery</a></li>
-                <li><a href="gallery.html" class="nav-link" onclick="closeNav()">Gallery</a></li>
                         <li><a href="about.html">About Us</a></li>
                         <li><a href="contact.html">Contact</a></li>
                         <li><a href="track-order.html">Track Order</a></li>
@@ -267,7 +259,7 @@
                     <h3>Contact Info</h3>
                     <ul class="footer-links">
                         <li>📧 naturecareimpex@gmail.com</li>
-                        <li>📞 9345540373</li>
+                        <li>📞+91-9345540373</li>
                         <li>📍 Shop 11A bajar street, kottakuppam, vanur taluk, villupuram district, tamilnadu, 605104</li>
                         <li>GSTIN: 33AAYFN7568G</li>
                     </ul>
@@ -285,6 +277,7 @@
 
     <!-- Scripts -->
     <script src="js/main.js"></script>
+    <script src="js/ux-common.js"></script>
     <script>
         // Fallback mobile menu initialization - replaced by toggleNav()
         function toggleNav() {

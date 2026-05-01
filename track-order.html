@@ -25,68 +25,8 @@
         rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/main.css?v=3">
-    <style>
-    @media (max-width: 768px) {
-        #navLinks { display: none !important; position: fixed !important; top: 64px !important; left: 0 !important; width: 100% !important; background: #fff !important; flex-direction: column !important; z-index: 99999 !important; border-top: 2px solid #C9A84C !important; box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important; margin: 0 !important; padding: 0 !important; }
-        #navLinks.active { display: flex !important; }
-        #navLinks li { width: 100% !important; border-bottom: 1px solid #eee !important; }
-        #navLinks a { display: block !important; padding: 16px 24px !important; color: #1A4A30 !important; font-weight: 600 !important; font-size: 0.95rem !important; text-transform: uppercase !important; letter-spacing: 0.08em !important; }
-        #hamburgerBtn { display: flex !important; }
-    }
-    </style>
-    <style>
-        .track-container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #f9f9f9;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .track-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 40px;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .form-group label {
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
-        .form-group input,
-        .form-group select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        .track-btn {
-            padding: 12px;
-            background: #2ecc71;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .track-btn:hover {
-            background: #27ae60;
-        }
-        .demo-notice {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+    <link rel="stylesheet" href="css/main.css?v=4">
+
     </style>
 </head>
 
@@ -106,6 +46,7 @@
                 <li><a href="index.html" class="nav-link" onclick="closeNav()">Home</a></li>
                 <li><a href="products.html" class="nav-link" onclick="closeNav()">Products</a></li>
                 <li><a href="gallery.html" class="nav-link" onclick="closeNav()">Gallery</a></li>
+                <li><a href="track-order.html" class="nav-link active" onclick="closeNav()">Track Order</a></li>
                 <li><a href="about.html" class="nav-link" onclick="closeNav()">About Us</a></li>
                 <li><a href="contact.html" class="nav-link" onclick="closeNav()">Contact</a></li>
             </ul>
@@ -116,7 +57,8 @@
             </button>
         </div>
     </nav>
-    <section class="track-container">
+    <section style="padding: 0 20px 60px;">
+    <div class="track-container">
         <h1>📦 Track Your Order</h1>
         <p>Enter your Order ID or Email to track your order status</p>
         
@@ -164,6 +106,7 @@
                 </div>
             </div>
         </div>
+    </div><!-- /.track-container -->
     </section>
 
     <!-- Footer -->
@@ -181,13 +124,9 @@
                         <li><a href="index.html">Home</a></li>
                         <li><a href="products.html">Products</a></li>
                         <li><a href="gallery.html">Gallery</a></li>
-                <li><a href="gallery.html" class="nav-link" onclick="closeNav()">Gallery</a></li>
                         <li><a href="about.html">About Us</a></li>
                         <li><a href="contact.html">Contact</a></li>
                         <li><a href="track-order.html">Track Order</a></li>
-                        <li><a href="product-detail.html">Product Details</a></li>
-                        <li><a href="order-details.html">Place Order</a></li>
-                        <li><a href="payment.html">Payment Options</a></li>
                     </ul>
                 </div>
 
@@ -212,6 +151,7 @@
     </footer>
 
     <script src="js/api-service.js"></script>
+    <script src="js/ux-common.js"></script>
     <script>
         // Real-time update listener for cross-tab communication
         let currentOrderId = null;

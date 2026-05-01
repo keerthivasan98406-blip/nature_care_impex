@@ -1721,15 +1721,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('✅ Server is online - MongoDB integration active');
         console.log('🔗 Server URL:', window.apiService.baseURL);
         
-        try {
-            const initResponse = await fetch(`${window.apiService.baseURL}/products/initialize`, {
-                method: 'POST'
-            });
-            const initResult = await initResponse.json();
-            console.log('📊 Database initialization result:', initResult);
-        } catch (error) {
-            console.log('⚠️ Database initialization error:', error.message);
-        }
+        // Initialization removed to prevent default products from reappearing
+
     } else {
         console.log('⚠️ Server offline - Using localStorage fallback');
         console.log('🔗 Attempted server URL:', window.apiService.baseURL);

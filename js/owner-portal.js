@@ -11,41 +11,7 @@ let orders = [
     // Default orders removed - only real orders from database will be shown
 ];
 
-let products = [
-    {
-        id: 'cocopeat-5kg',
-        name: 'Cocopeat 5kg Block',
-        category: 'cocopeat',
-        description: 'Premium washed cocopeat blocks ideal for potting mixes',
-        price: 250,
-        cost: 150,
-        stock: 450,
-        minStock: 100,
-        image: 'https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190898/photo_2025-12-31_22-18-07_c2hs4m.jpg'
-    },
-    {
-        id: 'grow-bags',
-        name: 'Coco Grow Bags',
-        category: 'eco-care',
-        description: 'Ready-to-use grow bags for greenhouse cultivation',
-        price: 90,
-        cost: 55,
-        stock: 800,
-        minStock: 200,
-        image: 'https://cdn.moglix.com/p/B5wXshH1wq7TS-xxlarge.jpg'
-    },
-    {
-        id: 'bamboo-pads',
-        name: 'Bamboo Period Pads',
-        category: 'bamboo',
-        description: 'Eco-friendly bamboo period pads',
-        price: 120,
-        cost: 70,
-        stock: 200,
-        minStock: 50,
-        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbYHHF-lKgdGS9ftR4AwALD27xwGSO9hsldw&s'
-    }
-];
+let products = [];
 
 let monthlyData = [
     { month: 'Jan', sales: 245000, costs: 147000, profit: 98000, orders: 42 },
@@ -160,34 +126,53 @@ function setupFormHandlers() {
         addProductForm.addEventListener('submit', handleAddProduct);
         
         // Image preview handlers
-        const imageUrlInput = document.getElementById('product-image-url');
-        const imageFileInput = document.getElementById('product-image-file');
+        const imageUrlInput1 = document.getElementById('product-image-url');
+        const imageFileInput1 = document.getElementById('product-image-file');
+        const imageUrlInput2 = document.getElementById('product-image-url-2');
+        const imageFileInput2 = document.getElementById('product-image-file-2');
         
-        if (imageUrlInput) {
-            imageUrlInput.addEventListener('input', function() {
-                if (this.value) {
-                    showImagePreview(this.value);
-                    // Clear file input when URL is entered
-                    if (imageFileInput) imageFileInput.value = '';
-                }
-            });
-        }
-        
-        if (imageFileInput) {
-            imageFileInput.addEventListener('change', async function() {
-                if (this.files[0]) {
-                    try {
-                        const base64 = await convertFileToBase64(this.files[0]);
-                        showImagePreview(base64);
-                        // Clear URL input when file is selected
-                        if (imageUrlInput) imageUrlInput.value = '';
-                    } catch (error) {
-                        console.error('Error converting file:', error);
-                        showNotification('Error processing image file', 'error');
+        function setupImagePreview(urlInput, fileInput, previewContainerId, previewImgId) {
+            if (urlInput) {
+                urlInput.addEventListener('input', function() {
+                    if (this.value) {
+                        const container = document.getElementById(previewContainerId);
+                        const img = document.getElementById(previewImgId);
+                        if (container && img) {
+                            img.src = this.value;
+                            container.style.display = 'block';
+                        }
+                        if (fileInput) fileInput.value = '';
                     }
-                }
-            });
+                });
+            }
+            
+            if (fileInput) {
+                fileInput.addEventListener('change', async function() {
+                    if (this.files[0]) {
+                        try {
+                            const base64 = await convertFileToBase64(this.files[0]);
+                            const container = document.getElementById(previewContainerId);
+                            const img = document.getElementById(previewImgId);
+                            if (container && img) {
+                                img.src = base64;
+                                container.style.display = 'block';
+                            }
+                            if (urlInput) urlInput.value = '';
+                        } catch (error) {
+                            console.error('Error converting file:', error);
+                            showNotification('Error processing image file', 'error');
+                        }
+                    }
+                });
+            }
         }
+
+        const imageUrlInput3 = document.getElementById('product-image-url-3');
+        const imageFileInput3 = document.getElementById('product-image-file-3');
+
+        setupImagePreview(imageUrlInput1, imageFileInput1, 'product-image-preview', 'preview-img');
+        setupImagePreview(imageUrlInput2, imageFileInput2, 'product-image-preview-2', 'preview-img-2');
+        setupImagePreview(imageUrlInput3, imageFileInput3, 'product-image-preview-3', 'preview-img-3');
     }
 
     // Order Filter
@@ -659,72 +644,7 @@ async function refreshOrders() {
 // Make refresh function globally available
 window.refreshOrders = refreshOrders;
 
-// Test function to create a sample order for debugging
-async function createTestOrder() {
-    console.log('🧪 Creating test order...');
-    showNotification('Creating test order...', 'info');
-    
-    const testOrder = {
-        orderId: 'TEST-' + Date.now(),
-        product: {
-            id: 1, // Must be a number according to schema
-            name: 'Cocopeat 5kg Block',
-            category: 'cocopeat',
-            image: 'https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190898/photo_2025-12-31_22-18-07_c2hs4m.jpg',
-            description: 'Premium washed cocopeat blocks ideal for potting mixes'
-        },
-        customerDetails: {
-            customerName: 'Test Customer',
-            customerEmail: 'test@example.com',
-            customerPhone: '9876543210',
-            deliveryAddress: 'Test Address, Test City, Test State - 123456',
-            quantity: 2,
-            orderNotes: 'Test order for debugging database connection'
-        },
-        unitPrice: 250,
-        totalAmount: 500,
-        status: 'screenshot', // Valid enum value
-        productSize: 'Standard',
-        paymentScreenshot: {
-            filename: 'test-screenshot.png',
-            originalName: 'test-screenshot.png',
-            mimetype: 'image/png',
-            size: 1024,
-            dataUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
-            uploadedAt: new Date()
-        },
-        orderDate: new Date().toISOString().split('T')[0],
-        orderMonth: new Date().toISOString().slice(0, 7),
-        submittedAt: new Date(),
-        createdAt: new Date().toISOString()
-    };
-    
-    try {
-        if (window.apiService) {
-            console.log('📤 Sending test order:', testOrder);
-            const result = await window.apiService.createOrder(testOrder);
-            console.log('📡 Test order result:', result);
-            
-            if (result.success) {
-                showNotification('✅ Test order created successfully in database!', 'success');
-                console.log('✅ Test order saved to database:', result.data);
-                await loadOrders(); // Refresh orders
-            } else {
-                showNotification('❌ Failed to create test order: ' + result.message, 'error');
-                console.error('❌ Test order failed:', result);
-            }
-        } else {
-            showNotification('❌ API Service not available', 'error');
-            console.error('❌ API Service not available');
-        }
-    } catch (error) {
-        console.error('❌ Test order error:', error);
-        showNotification('❌ Test order error: ' + error.message, 'error');
-    }
-}
 
-// Make test function globally available
-window.createTestOrder = createTestOrder;
 
 function updateOrderSummary(allOrders = null) {
     if (!allOrders) {
@@ -1348,45 +1268,7 @@ async function checkDatabaseConnection() {
 }
 
 // Function to remove duplicate products
-async function removeDuplicateProducts() {
-    try {
-        showNotification('Checking for duplicate products...', 'info');
-        
-        if (!window.apiService) {
-            showNotification('❌ API Service not available', 'error');
-            return;
-        }
-        
-        const result = await window.apiService.getProducts();
-        if (result.success && result.data) {
-            const allProducts = result.data;
-            const uniqueProducts = [];
-            const seenNames = new Set();
-            
-            // Remove duplicates based on product name
-            for (const product of allProducts) {
-                if (!seenNames.has(product.name)) {
-                    seenNames.add(product.name);
-                    uniqueProducts.push(product);
-                } else {
-                    console.log('Found duplicate product:', product.name);
-                }
-            }
-            
-            if (allProducts.length > uniqueProducts.length) {
-                const duplicatesCount = allProducts.length - uniqueProducts.length;
-                showNotification(`Found ${duplicatesCount} duplicate products. Refreshing display...`, 'warning');
-                
-                // Refresh the products display
-                await loadProducts();
-            } else {
-                showNotification('✅ No duplicate products found!', 'success');
-            }
-        }
-    } catch (error) {
-        showNotification('Error checking duplicates: ' + error.message, 'error');
-    }
-}
+
 
 // Make all functions globally available at the end of the file
 window.editProduct = editProduct;
@@ -1404,7 +1286,7 @@ window.loadProducts = loadProducts;
 window.handleAddProduct = handleAddProduct;
 window.syncProductsToMainSite = syncProductsToMainSite;
 window.checkDatabaseConnection = checkDatabaseConnection;
-window.removeDuplicateProducts = removeDuplicateProducts;
+
 
 // Initialize portal when DOM is ready
 if (document.readyState === 'loading') {
@@ -1522,10 +1404,7 @@ async function loadProducts() {
                             <div class="product-stat-label">Price</div>
                             <div class="product-stat-value">₹${product.price || 0}</div>
                         </div>
-                        <div class="product-stat">
-                            <div class="product-stat-label">Stock</div>
-                            <div class="product-stat-value ${(product.stock || 0) <= (product.minStock || 0) ? 'text-danger' : ''}">${product.stock || 0}</div>
-                        </div>
+
                         <div class="product-stat">
                             <div class="product-stat-label">Profit</div>
                             <div class="product-stat-value">₹${(product.price || 0) - (product.cost || 0)}</div>
@@ -1537,7 +1416,6 @@ async function loadProducts() {
                     </div>
                     <div class="product-actions">
                         <button class="btn-small" onclick="editProduct('${product.id}')">Edit</button>
-                        <button class="btn-small" onclick="updateStock('${product.id}')">Stock</button>
                         <button class="btn-small btn-danger" onclick="deleteProduct('${product.id}')">Delete</button>
                     </div>
                 </div>
@@ -1567,60 +1445,83 @@ async function handleAddProduct(e) {
         submitBtn.textContent = 'Adding Product...';
         submitBtn.disabled = true;
         
-        // Get image source (URL or file) with better validation and category-based defaults
-        const imageUrl = document.getElementById('product-image-url').value.trim();
-        const imageFile = document.getElementById('product-image-file').files[0];
-        const category = document.getElementById('product-category').value;
+        // Get primary image source (URL or file)
+        const imageUrl1 = document.getElementById('product-image-url').value.trim();
+        const imageFile1 = document.getElementById('product-image-file').files[0];
         
-        // Category-based default images
-        const defaultImages = {
-            'cocopeat': 'https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190898/photo_2025-12-31_22-18-07_c2hs4m.jpg',
-            'bamboo': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbYHHF-lKgdGS9ftR4AwALD27xwGSO9hsldw&s',
-            'eco-care': 'https://cdn.moglix.com/p/B5wXshH1wq7TS-xxlarge.jpg'
-        };
+        // Get secondary image source (URL or file)
+        const imageUrl2 = document.getElementById('product-image-url-2').value.trim();
+        const imageFile2 = document.getElementById('product-image-file-2').files[0];
         
-        let productImage = defaultImages[category] || 'https://via.placeholder.com/300x200?text=No+Image';
+        // Get third image source (URL or file)
+        const imageUrl3 = document.getElementById('product-image-url-3').value.trim();
+        const imageFile3 = document.getElementById('product-image-file-3').files[0];
         
-        if (imageUrl) {
-            // Validate URL format
-            try {
-                new URL(imageUrl);
-                productImage = imageUrl;
-            } catch (e) {
-                showNotification('Invalid image URL format, using default image', 'warning');
-                productImage = defaultImages[category] || 'https://via.placeholder.com/300x200?text=Invalid+URL';
+        async function processImage(url, file) {
+            if (url) {
+                try {
+                    new URL(url);
+                    return url;
+                } catch (e) {
+                    throw new Error('Invalid image URL format');
+                }
+            } else if (file) {
+                if (!file.type.startsWith('image/')) {
+                    throw new Error('Invalid file type');
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    throw new Error('File too large. Max 5MB allowed');
+                }
+                return await convertFileToBase64(file);
             }
-        } else if (imageFile) {
-            // Validate file type
-            if (!imageFile.type.startsWith('image/')) {
-                showNotification('Please select a valid image file', 'error');
-                throw new Error('Invalid file type');
-            }
-            
-            // Validate file size (max 5MB)
-            if (imageFile.size > 5 * 1024 * 1024) {
-                showNotification('Image file too large. Please select a file under 5MB', 'error');
-                throw new Error('File too large');
-            }
-            
-            // Convert file to base64 for storage
-            productImage = await convertFileToBase64(imageFile);
+            return null;
         }
-        
+
+        let productImage1 = null;
+        let productImage2 = null;
+        let productImage3 = null;
+
+        try {
+            productImage1 = await processImage(imageUrl1, imageFile1);
+            productImage2 = await processImage(imageUrl2, imageFile2);
+            productImage3 = await processImage(imageUrl3, imageFile3);
+        } catch (e) {
+            showNotification(e.message, 'error');
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+            return;
+        }
+
+        if (!productImage1 && !productImage2 && !productImage3) {
+            showNotification('Please provide at least one product image', 'error');
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+            return;
+        }
+
         const newProduct = {
             name: document.getElementById('product-name').value,
             category: document.getElementById('product-category').value,
             description: document.getElementById('product-description').value,
             price: parseFloat(document.getElementById('product-price').value),
             cost: parseFloat(document.getElementById('product-cost').value),
-            stock: parseInt(document.getElementById('initial-stock').value),
-            minStock: parseInt(document.getElementById('min-stock').value),
-            image: productImage,
-            sizes: ["Standard"], // Default size, can be enhanced later
+            stock: 999, // Default value as input was removed
+            minStock: 0, // Default value as input was removed
+            image: (productImage1 || productImage2 || productImage3 || "").trim(),
+            image2: (productImage2 || "").trim() || null,
+            image3: (productImage3 || "").trim() || null,
+            sizes: ["Standard"],
             isActive: true
         };
         
-        console.log('Creating new product:', newProduct);
+        console.log('Final product object to be sent:', newProduct);
+        
+        if (!newProduct.image) {
+            showNotification('At least one product image is required!', 'error');
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+            return;
+        }
         
         // Try MongoDB first, fall back to localStorage if unavailable
         let savedToDatabase = false;
@@ -1768,6 +1669,8 @@ async function syncProductsToMainSite() {
             name: product.name,
             category: product.category,
             image: product.image,
+            image2: product.image2,
+            image3: product.image3,
             description: product.description,
             sizes: product.sizes || ["Standard"],
             price: product.price || 100,
@@ -1777,6 +1680,10 @@ async function syncProductsToMainSite() {
         
         // Save to localStorage for main site to pick up
         localStorage.setItem('allProducts', JSON.stringify(mainSiteProducts));
+        
+        // Trigger event for main site to refresh if it's open in another tab
+        localStorage.setItem('productUpdateEvent', Date.now().toString());
+        
         console.log('✅ Products synced to main site:', mainSiteProducts.length, 'unique products');
         
         return mainSiteProducts;
@@ -1929,7 +1836,8 @@ window.deleteOrder = deleteOrder;
 
 // Enhanced editProduct function with full modal implementation
 function editProduct(productId) {
-    const product = products.find(p => p.id === productId);
+    // Robust find using loose equality for string/number comparison
+    const product = products.find(p => p.id == productId);
     if (!product) {
         showNotification('Product not found', 'error');
         return;
@@ -1977,22 +1885,29 @@ function editProduct(productId) {
                         </div>
                     </div>
                     
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="edit-product-stock">Current Stock</label>
-                            <input type="number" id="edit-product-stock" min="0" value="${product.stock}" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-min-stock">Minimum Stock Alert</label>
-                            <input type="number" id="edit-min-stock" min="0" value="${product.minStock}" required>
-                        </div>
-                    </div>
+
                     
                     <div class="form-group">
-                        <label for="edit-product-image">Product Image URL</label>
-                        <input type="url" id="edit-product-image" value="${product.image}" placeholder="https://example.com/image.jpg">
+                        <label for="edit-product-image">Primary Image URL</label>
+                        <input type="url" id="edit-product-image" value="${product.image}" placeholder="https://example.com/image1.jpg">
                         <div class="image-preview" id="edit-image-preview" style="display: ${product.image ? 'block' : 'none'};">
-                            <img id="edit-preview-img" src="${product.image}" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; margin-top: 10px;">
+                            <img id="edit-preview-img" src="${product.image}" alt="Preview" style="max-width: 100px; max-height: 100px; border-radius: 8px; margin-top: 10px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-product-image-2">Secondary Image URL</label>
+                        <input type="url" id="edit-product-image-2" value="${product.image2 || ''}" placeholder="https://example.com/image2.jpg">
+                        <div class="image-preview" id="edit-image-preview-2" style="display: ${product.image2 ? 'block' : 'none'};">
+                            <img id="edit-preview-img-2" src="${product.image2 || ''}" alt="Preview 2" style="max-width: 100px; max-height: 100px; border-radius: 8px; margin-top: 10px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-product-image-3">Third Image URL</label>
+                        <input type="url" id="edit-product-image-3" value="${product.image3 || ''}" placeholder="https://example.com/image3.jpg">
+                        <div class="image-preview" id="edit-image-preview-3" style="display: ${product.image3 ? 'block' : 'none'};">
+                            <img id="edit-preview-img-3" src="${product.image3 || ''}" alt="Preview 3" style="max-width: 100px; max-height: 100px; border-radius: 8px; margin-top: 10px;">
                         </div>
                     </div>
                     
@@ -2015,15 +1930,24 @@ function editProduct(productId) {
     // Add form handler
     document.getElementById('edit-product-form').addEventListener('submit', handleEditProduct);
     
-    // Add image preview handler
-    document.getElementById('edit-product-image').addEventListener('input', function() {
-        if (this.value) {
-            const preview = document.getElementById('edit-image-preview');
-            const previewImg = document.getElementById('edit-preview-img');
-            previewImg.src = this.value;
-            preview.style.display = 'block';
+    // Add image preview handlers
+    const setupEditPreview = (inputId, previewId, imgId) => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener('input', function() {
+                if (this.value) {
+                    const preview = document.getElementById(previewId);
+                    const previewImg = document.getElementById(imgId);
+                    previewImg.src = this.value;
+                    preview.style.display = 'block';
+                }
+            });
         }
-    });
+    };
+    
+    setupEditPreview('edit-product-image', 'edit-image-preview', 'edit-preview-img');
+    setupEditPreview('edit-product-image-2', 'edit-image-preview-2', 'edit-preview-img-2');
+    setupEditPreview('edit-product-image-3', 'edit-image-preview-3', 'edit-preview-img-3');
 }
 
 // Handle edit product form submission
@@ -2044,9 +1968,12 @@ async function handleEditProduct(e) {
             description: document.getElementById('edit-product-description').value,
             price: parseFloat(document.getElementById('edit-product-price').value),
             cost: parseFloat(document.getElementById('edit-product-cost').value),
-            stock: parseInt(document.getElementById('edit-product-stock').value),
-            minStock: parseInt(document.getElementById('edit-min-stock').value),
-            image: document.getElementById('edit-product-image').value || 'https://via.placeholder.com/300x200'
+            // Preserve existing values as inputs were removed
+            stock: products.find(p => p.id == productId)?.stock || 999,
+            minStock: products.find(p => p.id == productId)?.minStock || 0,
+            image: document.getElementById('edit-product-image').value || document.getElementById('edit-product-image-2').value || document.getElementById('edit-product-image-3').value || 'https://via.placeholder.com/300x200',
+            image2: document.getElementById('edit-product-image-2').value || null,
+            image3: document.getElementById('edit-product-image-3').value || null
         };
         
         // Try to update in MongoDB first
@@ -2068,10 +1995,11 @@ async function handleEditProduct(e) {
             }
         }
         
-        // Update local products array ONLY if database update failed
-        const productIndex = products.findIndex(p => p.id === productId);
-        if (productIndex !== -1 && !updateSuccess) {
+        // Update local products array with new data
+        const productIndex = products.findIndex(p => p.id == productId);
+        if (productIndex !== -1) {
             products[productIndex] = { ...products[productIndex], ...updatedProduct };
+            console.log('✅ Local products array updated');
         }
         
         // Sync with main site
@@ -2251,7 +2179,8 @@ async function confirmDeleteProduct(productId) {
 
 // Enhanced updateStock function with quick stock adjustment modal
 function updateStock(productId) {
-    const product = products.find(p => p.id === productId);
+    // Robust find using loose equality for string/number comparison
+    const product = products.find(p => p.id == productId);
     if (!product) {
         showNotification('Product not found', 'error');
         return;
@@ -2407,7 +2336,8 @@ async function handleStockUpdate(e) {
         const amount = parseInt(document.getElementById('stock-amount').value);
         const reason = document.getElementById('stock-reason').value;
         
-        const product = products.find(p => p.id === productId);
+        // Robust find using loose equality
+        const product = products.find(p => p.id == productId);
         if (!product) {
             throw new Error('Product not found');
         }
@@ -2446,7 +2376,7 @@ async function handleStockUpdate(e) {
         }
         
         // Update local products array
-        const productIndex = products.findIndex(p => p.id === productId);
+        const productIndex = products.findIndex(p => p.id == productId);
         if (productIndex !== -1) {
             products[productIndex].stock = newStock;
         }
@@ -2593,7 +2523,8 @@ function updateRealTimeStats(allOrders) {
     });
     
     // Update Monthly Sales data
-    updateMonthlySalesData(allOrders, currentYear);
+    const selectedYear = document.getElementById('sales-year')?.value || currentYear;
+    updateMonthlySalesData(allOrders, selectedYear);
     
     console.log('Statistics updated:', {
         totalOrders,
@@ -2645,8 +2576,22 @@ function updateMonthlySalesData(allOrders, year) {
         const orderMonth = order.orderMonth || order.date?.slice(0, 7);
         if (orderMonth && monthlyStats[orderMonth]) {
             const orderAmount = order.amount || 0;
-            const orderCost = orderAmount * 0.6; // Assuming 60% cost, 40% profit
-            const orderProfit = orderAmount * 0.4;
+            
+            // Try to find the actual cost from products array
+            let orderCost = orderAmount * 0.6; // Fallback to 60%
+            
+            // Find product by name or ID if possible
+            const product = products.find(p => 
+                p.name === order.product || 
+                p.id == order.productId || 
+                (order.product && order.product.name === p.name)
+            );
+            
+            if (product && product.cost) {
+                orderCost = product.cost * (order.quantity || 1);
+            }
+            
+            const orderProfit = orderAmount - orderCost;
             
             monthlyStats[orderMonth].sales += orderAmount;
             monthlyStats[orderMonth].orders += 1;
@@ -2678,7 +2623,33 @@ function updateMonthlySalesData(allOrders, year) {
         profit: Math.round(month.profit),
         orders: month.orders
     }));
+
+    // Update label in the UI
+    const yearTitle = document.querySelector('#sales-section h2');
+    if (yearTitle) {
+        yearTitle.textContent = `Monthly Sales & Profit Analysis (${year})`;
+    }
 }
+
+async function handleYearChange(year) {
+    console.log('📅 Year changed to:', year);
+    showNotification(`Loading sales data for ${year}...`, 'info');
+    
+    // Get fresh data from localStorage
+    const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+    const allOrders = [...orders, ...customerOrders.map(order => ({
+        amount: order.totalAmount || order.customerDetails?.total || 0,
+        status: order.status || 'pending',
+        date: order.createdAt || order.timestamp || new Date().toISOString(),
+        orderMonth: order.orderMonth || order.createdAt?.slice(0, 7),
+        product: order.product?.name || order.product,
+        quantity: order.customerDetails?.quantity || 1
+    }))];
+    
+    updateMonthlySalesData(allOrders, year);
+}
+
+window.handleYearChange = handleYearChange;
 
 // Update the order details modal to show size/variant
 function showOrderDetailsModal(order) {

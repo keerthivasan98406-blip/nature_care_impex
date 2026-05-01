@@ -79,7 +79,11 @@
 
 /* ── Reset & Base ─────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { max-width: 100%; overflow-x: hidden; }
+html, body { 
+    max-width: 100%; 
+    overflow-x: hidden; 
+    scroll-behavior: smooth; 
+}
 
 body {
     font-family: 'Lato', 'Jost', sans-serif;
@@ -99,6 +103,10 @@ h1, h2, h3, h4, h5, h6 {
     letter-spacing: -0.01em;
     margin-bottom: 1rem;
 }
+
+h1 { font-size: clamp(2rem, 8vw, 4.2rem); }
+h2 { font-size: clamp(1.6rem, 5vw, 2.8rem); }
+h3 { font-size: clamp(1.3rem, 4vw, 1.8rem); }
 
 p { color: var(--text-muted); margin-bottom: 1.2rem; }
 a { text-decoration: none; color: inherit; transition: var(--ease-fast); }
@@ -316,7 +324,7 @@ img { max-width: 100%; display: block; height: auto; }
     padding: 0 40px;
 }
 .hero-content h1 {
-    font-size: 4.2rem;
+    font-size: clamp(2.4rem, 8vw, 4.2rem);
     color: var(--ivory);
     font-weight: 400;
     line-height: 1.1;
@@ -325,7 +333,7 @@ img { max-width: 100%; display: block; height: auto; }
     transform: translateY(50px);
     transition: opacity 1s cubic-bezier(0.22,1,0.36,1) 0.3s,
                 transform 1s cubic-bezier(0.22,1,0.36,1) 0.3s;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    text-shadow: 0 4px 30px rgba(0,0,0,0.6);
 }
 .carousel-slide.active .hero-content h1 { opacity: 1; transform: translateY(0); }
 
@@ -1293,26 +1301,23 @@ canvas { margin: 0 auto !important; display: block !important; }
         height: 64px;
         padding: 0 16px;
     }
-    .navbar .logo { flex-direction: row; align-items: center; margin-top: 0; gap: 8px; }
-    .navbar .logo img { width: 38px; height: 38px; margin-bottom: 0; }
+    .navbar .logo { flex-direction: row; align-items: center; margin-top: 0; gap: 12px; }
+    .navbar .logo img { width: 44px; height: 44px; margin-bottom: 0; border-width: 1px; box-shadow: none; }
     .navbar .logo-text { display: none; }
     .mobile-brand-name {
         display: block;
         position: absolute;
         left: 50%; top: 50%;
         transform: translate(-50%, -50%);
-        font-size: 13px;
+        font-family: 'Playfair Display', serif;
+        font-size: 15px;
         font-weight: 700;
         color: var(--green-mid);
         text-align: center;
         z-index: 10;
         pointer-events: none;
         white-space: nowrap;
-        max-width: 180px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
+        letter-spacing: 0.04em;
     }
     .hamburger {
         display: flex !important;
@@ -1461,8 +1466,8 @@ canvas { margin: 0 auto !important; display: block !important; }
     /* Back button */
     .back-button { top: 14px; left: 14px; padding: 8px 12px; font-size: 0.78rem; }
 
-    /* Buttons */
-    .btn { width: 100%; padding: 14px; font-size: 15px; margin: 8px 0; }
+    /* Buttons — only section-level CTAs expand full-width */
+    .cta-group .btn, .cta-group-banner .btn { padding: 13px 18px; font-size: 0.82rem; }
     .form-row { grid-template-columns: 1fr; }
 }
 
@@ -1505,3 +1510,332 @@ canvas { margin: 0 auto !important; display: block !important; }
     .product-grid { padding: 0 4px; gap: 12px; }
     .btn { padding: 12px; font-size: 14px; }
 }
+
+/* Premium Swiper Carousel Styles */
+.product-card .swiper {
+    width: 100%;
+    height: 250px;
+    border-radius: 12px 12px 0 0;
+}
+
+.product-card .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover .swiper-slide img {
+    transform: scale(1.05);
+}
+
+.product-card .swiper-pagination-bullet {
+    background: #D4AF37;
+    opacity: 0.5;
+}
+
+.product-card .swiper-pagination-bullet-active {
+    opacity: 1;
+    width: 15px;
+    border-radius: 5px;
+}
+
+.product-card .swiper-button-next,
+.product-card .swiper-button-prev {
+    color: #fff;
+    background: rgba(0,0,0,0.3);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    after { font-size: 12px; }
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.product-card:hover .swiper-button-next,
+.product-card:hover .swiper-button-prev {
+    opacity: 1;
+}
+
+/* Product Detail Gallery */
+.detail-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.main-swiper {
+    width: 100%;
+    height: 500px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.main-swiper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumb-swiper {
+    height: 100px;
+    padding: 10px 0;
+}
+
+.thumb-swiper .swiper-slide {
+    width: 25%;
+    height: 100%;
+    opacity: 0.4;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: opacity 0.3s;
+}
+
+.thumb-swiper .swiper-slide-thumb-active {
+    opacity: 1;
+    border: 2px solid #D4AF37;
+}
+
+.thumb-swiper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ── WhatsApp Floating Action Button ─────────────────────── */
+.whatsapp-fab {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 9999;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #25D366;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 24px rgba(37,211,102,0.45);
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fabPop 0.6s cubic-bezier(0.34,1.56,0.64,1) 1.5s both;
+}
+.whatsapp-fab:hover {
+    transform: scale(1.12) translateY(-4px);
+    box-shadow: 0 10px 36px rgba(37,211,102,0.55);
+}
+.whatsapp-fab svg {
+    width: 30px;
+    height: 30px;
+    fill: #fff;
+}
+.whatsapp-fab .fab-tooltip {
+    position: absolute;
+    right: 68px;
+    background: #1A4A30;
+    color: #E8D5A3;
+    white-space: nowrap;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(8px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.whatsapp-fab:hover .fab-tooltip {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ── Scroll-to-Top Button ─────────────────────────────────── */
+.scroll-top-btn {
+    position: fixed;
+    bottom: 98px;
+    right: 28px;
+    z-index: 9998;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--green-mid);
+    color: var(--gold-light);
+    border: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    box-shadow: var(--shadow-md);
+    transition: var(--ease);
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+}
+.scroll-top-btn.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}
+.scroll-top-btn:hover {
+    background: var(--gold-bright);
+    color: var(--green-deep);
+    transform: translateY(-4px);
+}
+
+/* ── Skeleton Loader ──────────────────────────────────────── */
+.skeleton {
+    background: linear-gradient(90deg, #e8e1d4 25%, #f5f0e8 50%, #e8e1d4 75%);
+    background-size: 200% 100%;
+    animation: skeletonPulse 1.5s ease-in-out infinite;
+    border-radius: var(--r-md);
+}
+@keyframes skeletonPulse {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+.skeleton-card {
+    background: var(--ivory);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    width: 100%;
+    max-width: 360px;
+    min-height: 380px;
+}
+.skeleton-img  { width: 100%; height: 220px; }
+.skeleton-body { padding: 20px 18px; }
+.skeleton-line {
+    height: 14px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+.skeleton-line.short  { width: 40%; }
+.skeleton-line.medium { width: 70%; }
+.skeleton-line.long   { width: 90%; }
+
+/* ── FAB Pop Keyframe ─────────────────────────────────────── */
+@keyframes fabPop {
+    from { opacity: 0; transform: scale(0.5); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Focus Accessibility ──────────────────────────────────── */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 3px;
+    border-radius: var(--r-sm);
+}
+
+/* ── Track-Order Page Specific ────────────────────────────── */
+.track-container {
+    max-width: 800px;
+    margin: 100px auto 60px;
+    padding: 40px;
+    background: var(--white);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+}
+.track-container h1 {
+    color: var(--green-mid);
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 12px;
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+}
+.track-container p { color: var(--text-muted); }
+.track-container .track-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 36px;
+}
+.track-container .form-group {
+    display: flex;
+    flex-direction: column;
+}
+.track-container .form-group label {
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 0.9rem;
+}
+.track-container .form-group input,
+.track-container .form-group select {
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: var(--ivory);
+    color: var(--text-main);
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+.track-container .form-group input:focus,
+.track-container .form-group select:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+    background: var(--white);
+}
+.track-btn {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--green-mid), var(--green-deep));
+    color: var(--gold-light);
+    border: none;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: 'Lato', sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: var(--ease);
+    box-shadow: 0 4px 16px rgba(13,43,31,0.25);
+}
+.track-btn:hover {
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+    color: var(--green-deep);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-gold);
+}
+
+/* ── Back Button z-index fix ──────────────────────────────── */
+.back-button { z-index: 800; }
+
+/* ── Global btn override — don't force full-width on all breakpoints ── */
+@media (max-width: 768px) {
+    /* Only specific contexts get full-width buttons */
+    .form-actions .btn,
+    .modal-actions .btn,
+    .payment-actions .btn,
+    .action-buttons .btn { width: 100%; }
+
+    /* Track-order inline result grid → single column on mobile */
+    #trackResults [style*="grid-template-columns: 1fr 1fr"] {
+        display: block !important;
+    }
+    #trackResults [style*="display: flex"][style*="justify-content: space-between"] {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+    .track-container {
+        margin: 80px 16px 40px;
+        padding: 24px 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .whatsapp-fab { bottom: 20px; right: 16px; width: 52px; height: 52px; }
+    .scroll-top-btn { bottom: 82px; right: 16px; }
+    .track-container { margin: 72px 10px 32px; padding: 18px 14px; }
+}
+

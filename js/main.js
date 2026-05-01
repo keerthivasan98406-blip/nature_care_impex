@@ -83,7 +83,7 @@ function populateProductInfo(product) {
     document.getElementById('order-product-category').textContent = product.category;
     document.getElementById('order-product-description').textContent = product.description;
     
-    const price = getProductPrice(product.id);
+    const price = product.price || getProductPrice(product.id);
     document.getElementById('order-product-price').textContent = `₹${price.toLocaleString()}`;
     
     // Populate size options
@@ -121,7 +121,7 @@ function setupOrderForm(orderData) {
 function updateOrderSummary() {
     const quantity = parseInt(document.getElementById('order-quantity').value) || 1;
     const orderData = JSON.parse(sessionStorage.getItem('currentOrder'));
-    const price = getProductPrice(orderData.product.id);
+    const price = orderData.product.price || getProductPrice(orderData.product.id);
     const subtotal = quantity * price;
     const charges = 20; // ₹20 for both shipping and COD
     const total = subtotal + charges;
@@ -156,9 +156,11 @@ function handleOrderFormSubmit(orderData) {
         orderNotes: document.getElementById('order-notes').value
     };
     
-    // Calculate total
+    // Calculate total (Subtotal + Delivery Charge)
     const price = getProductPrice(orderData.product.id);
-    const total = formData.quantity * price;
+    const subtotal = formData.quantity * price;
+    const deliveryCharge = 20;
+    const total = subtotal + deliveryCharge;
     
     // Create final order
     const finalOrder = {
@@ -238,26 +240,28 @@ function populatePaymentInfo(orderData) {
     document.getElementById('payment-quantity').textContent = orderData.customerDetails.quantity;
     document.getElementById('payment-unit-price').textContent = `₹${orderData.unitPrice.toLocaleString()}`;
     
-    // Always show delivery charges for all payment methods
-    const deliveryCharge = 20;
-    const baseAmount = orderData.totalAmount;
-    const finalAmount = baseAmount + deliveryCharge;
-    
-    // Show delivery charges row (always visible now)
+    // Total amount already includes delivery charge from submission
+    const finalAmount = orderData.totalAmount;
+    const amount = orderData.totalAmount;
+    const upiId = 'naveethulhussain700-4@okaxis';
     const deliveryChargesRow = document.getElementById('cod-charges-row');
     const deliveryChargesElement = document.getElementById('payment-cod-charges');
     const totalAmountElement = document.getElementById('payment-total-amount');
     
-    if (deliveryChargesRow && deliveryChargesElement && totalAmountElement) {
+    if (deliveryChargesRow && deliveryChargesElement) {
         deliveryChargesRow.style.display = 'flex';
-        deliveryChargesElement.textContent = `₹${deliveryCharge}`;
-        totalAmountElement.textContent = `₹${finalAmount.toLocaleString()}`;
+        deliveryChargesElement.textContent = `₹20`;
         
         // Update the label to show "Delivery Charges" instead of "COD Charges"
         const deliveryLabel = deliveryChargesRow.querySelector('span:first-child');
         if (deliveryLabel) {
             deliveryLabel.textContent = 'Delivery Charges:';
         }
+    }
+    
+    // Always update total amount if the element exists
+    if (totalAmountElement) {
+        totalAmountElement.textContent = `₹${finalAmount.toLocaleString()}`;
     }
     
     // Customer details
@@ -317,10 +321,9 @@ function generatePaymentQR(orderData) {
         'naveethulhussain700-4@upi'      // Generic fallback
     ];
     const merchantName = 'Nature Care Impex';
-    const deliveryCharge = 20; // Fixed delivery charge for all orders
-    const amount = orderData.totalAmount + deliveryCharge; // Include delivery charge in QR payment
-    const currency = 'INR';
-    const transactionNote = `Order-${orderData.orderId}`;
+    const deliveryCharge = 20;    // The amount in orderData already includes delivery charges
+    const amount = orderData.totalAmount; 
+    const upiId = 'naveethulhussain700-4@okaxis'; // Using primary UPI IDconst transactionNote = `Order-${orderData.orderId}`;
     
     // SIMPLE UPI FORMAT - GUARANTEED TO WORK
     const simpleUpiData = `upi://pay?pa=${primaryUpiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
@@ -761,7 +764,7 @@ async function loadProductsData() {
         // Try to load from MongoDB API first
         if (window.apiService) {
             const result = await window.apiService.getProducts();
-            if (result.success && result.data && result.data.length > 0) {
+            if (result.success && result.data) {
                 console.log('✅ Products loaded from MongoDB:', result.data.length);
                 
                 // Convert database products to website format
@@ -770,6 +773,8 @@ async function loadProductsData() {
                     name: product.name,
                     category: product.category,
                     image: product.image,
+                    image2: product.image2,
+                    image3: product.image3,
                     description: product.description,
                     sizes: product.sizes || ["Standard"],
                     price: product.price,
@@ -782,7 +787,7 @@ async function loadProductsData() {
                 console.log('✅ Products synced to localStorage for website:', websiteProducts.length);
                 return websiteProducts;
             } else {
-                console.log('⚠️ No products found in database, using fallback');
+                console.log('⚠️ Failed to load from database, using fallback');
             }
         } else {
             console.log('⚠️ API Service not available');
@@ -805,70 +810,8 @@ async function loadProductsData() {
         }
     }
     
-    console.log('⚠️ No products found, using default products');
-    
-    // Default products if none saved (should match database defaults)
-    const defaultProducts = [
-        {
-            id: 1,
-            name: "Cocopeat 5kg Block",
-            category: "cocopeat",
-            image: "https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190898/photo_2025-12-31_22-18-07_c2hs4m.jpg",
-            description: "Premium washed cocopeat blocks ideal for potting mixes and hydroponics. High water retention and porosity.",
-            sizes: ["S", "M", "L", "XL", "XXL"],
-            price: 250,
-            cost: 150,
-            stock: 100
-        },
-        {
-            id: 2,
-            name: "Coco Grow Bags",
-            category: "eco-care",
-            image: "https://cdn.moglix.com/p/B5wXshH1wq7TS-xxlarge.jpg",
-            description: "Ready-to-use grow bags for greenhouse cultivation. UV treated for durability and optimal root growth.",
-            sizes: ["S", "M", "L", "XL", "XXL"],
-            price: 90,
-            cost: 60,
-            stock: 200
-        },
-        {
-            id: 3,
-            name: "Coco Bricks (650g)",
-            category: "cocopeat",
-            image: "https://images.unsplash.com/photo-1591857177580-dc82b9e4e119?auto=format&fit=crop&w=800&q=80",
-            description: "Compact 650g briquettes, perfect for home gardening and smaller applications. Expands to 9 liters.",
-            sizes: ["S", "M", "L", "XL", "XXL"],
-            price: 180,
-            cost: 120,
-            stock: 150
-        },
-        {
-            id: 5,
-            name: "Bamboo Period Pads",
-            category: "bamboo",
-            image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbYHHF-lKgdGS9ftR4AwALD27xwGSO9hsldw&s",
-            description: "Comfortable, absorbent, and eco-friendly bamboo period pads. Washable and reusable for a sustainable cycle.",
-            sizes: ["S", "M", "L", "XL", "XXL"],
-            price: 120,
-            cost: 80,
-            stock: 80
-        },
-        {
-            id: 6,
-            name: "12 Coco Bricks 400g",
-            category: "cocopeat",
-            image: "https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190712/photo_2025-12-31_22-14-34_zu8ayl.jpg",
-            description: "High-quality 400g coco peat bricks, perfect for home gardening and seed starting. Compact and easy to use.",
-            sizes: ["S", "M", "L", "XL", "XXL"],
-            price: 200,
-            cost: 140,
-            stock: 120
-        }
-    ];
-    
-    // Save default products to localStorage
-    localStorage.setItem('allProducts', JSON.stringify(defaultProducts));
-    return defaultProducts;
+    console.log('⚠️ No products found, returning empty array');
+    return [];
 }
 
 // Initialize products variable
@@ -985,6 +928,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Make functions globally available
 window.refreshProducts = refreshProducts;
 window.loadProductsData = loadProductsData;
+window.renderAllProducts = renderAllProducts;
 window.initializeProducts = initializeProducts;
 window.getCurrentFilter = () => currentFilterCategory;
 
@@ -1243,10 +1187,13 @@ async function loadProductDetails() {
     // Generate Size Options
     const sizeOptions = product.sizes.map(size => `<option value="${size}">${size}</option>`).join('');
 
+    const detailImages = [product.image, product.image2, product.image3].filter(img => img);
+    const imagesHtml = detailImages.map(img => `<img src="${img}" alt="${product.name}" style="width: 100%; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">`).join('');
+
     const html = `
         <div class="detail-wrapper">
             <div class="detail-image">
-                <img src="${product.image}" alt="${product.name}">
+                ${imagesHtml}
             </div>
             <div class="detail-content">
                 <span class="product-category">${product.category}</span>
@@ -1454,17 +1401,9 @@ function getProductPrice(productId) {
         console.error('Error reading products from localStorage:', error);
     }
     
-    // Final fallback to hardcoded prices (for backward compatibility)
-    const fallbackPrices = {
-        1: 250,  // Cocopeat 5kg Block
-        2: 90,   // Coco Grow Bags
-        3: 180,  // Coco Bricks 650g
-        5: 120,  // Bamboo Period Pads
-        6: 200   // 12 Coco Bricks 400g
-    };
-    
-    const fallbackPrice = fallbackPrices[productId] || 100;
-    console.log(`Using fallback price for product ${productId}: ₹${fallbackPrice}`);
+    // Final fallback if no price is found anywhere
+    const fallbackPrice = 0;
+    console.warn(`⚠️ No price found for product ${productId}, using fallback: ₹${fallbackPrice}`);
     return fallbackPrice;
 }
 
@@ -1735,10 +1674,41 @@ window.confirmOrder = confirmOrder;
 function createProductCard(product) {
     console.log('Creating product card for:', product.name, 'ID:', product.id);
     const productPrice = product.price || getProductPrice(product.id);
+    
+    // Check for multiple images (up to 3)
+    const images = [product.image, product.image2, product.image3].filter(img => img);
+    
+    // Create the image layout with a carousel if there are multiple images
+    const imageContent = images.length > 1 
+        ? `<div id="carouselExampleControls-${product.id}" class="carousel slide" style="position: relative; overflow: hidden; width: 100%; height: 100%;">
+                <div class="carousel-inner" id="carousel-inner-${product.id}" style="display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; width: 100%; height: 100%; scroll-behavior: smooth;">
+                    ${images.map((img, index) => `
+                        <div class="carousel-item ${index === 0 ? 'active' : ''}" style="flex: 0 0 100%; scroll-snap-align: start; width: 100%; height: 100%;">
+                            <img class="d-block w-100" src="${img}" alt="Slide ${index + 1}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                        </div>
+                    `).join('')}
+                </div>
+                <a class="carousel-control-prev" href="javascript:void(0)" role="button" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById('carousel-inner-${product.id}').scrollBy({left: -document.getElementById('carousel-inner-${product.id}').offsetWidth, behavior: 'smooth'});" style="position: absolute; left: 0; top: 0; bottom: 0; width: 15%; display: flex; align-items: center; justify-content: center; color: #fff; text-align: center; opacity: 0.5; transition: opacity .15s ease; background: none; border: none; cursor: pointer; text-decoration: none;">
+                    <span class="carousel-control-prev-icon" aria-hidden="true" style="display: inline-block; width: 20px; height: 20px; background: transparent no-repeat center center; background-size: 100% 100%; background-image: url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27%23fff%27 viewBox=%270 0 8 8%27%3e%3cpath d=%27M5.25 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z%27/%3e%3c/svg%3e');"></span>
+                </a>
+                <a class="carousel-control-next" href="javascript:void(0)" role="button" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById('carousel-inner-${product.id}').scrollBy({left: document.getElementById('carousel-inner-${product.id}').offsetWidth, behavior: 'smooth'});" style="position: absolute; right: 0; top: 0; bottom: 0; width: 15%; display: flex; align-items: center; justify-content: center; color: #fff; text-align: center; opacity: 0.5; transition: opacity .15s ease; background: none; border: none; cursor: pointer; text-decoration: none;">
+                    <span class="carousel-control-next-icon" aria-hidden="true" style="display: inline-block; width: 20px; height: 20px; background: transparent no-repeat center center; background-size: 100% 100%; background-image: url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27%23fff%27 viewBox=%270 0 8 8%27%3e%3cpath d=%27M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z%27/%3e%3c/svg%3e');"></span>
+                </a>
+            </div>
+            <style>
+                #carousel-inner-${product.id}::-webkit-scrollbar { display: none; }
+                #carouselExampleControls-${product.id} .carousel-control-prev:hover, 
+                #carouselExampleControls-${product.id} .carousel-control-next:hover { 
+                    opacity: 0.9 !important; 
+                    background: rgba(0,0,0,0.1);
+                }
+            </style>`
+        : `<img src="${product.image}" alt="${product.name}" class="product-image" style="display: block; width: 100%; height: 100%; object-fit: cover;">`;
+
     return `
         <div class="product-card">
-            <div class="card-image-wrapper">
-                <img src="${product.image}" alt="${product.name}" class="product-image">
+            <div class="card-image-wrapper" style="cursor: pointer; padding: 0;">
+                ${imageContent}
             </div>
             <div class="product-info">
                 <div class="product-category">${product.category}</div>
