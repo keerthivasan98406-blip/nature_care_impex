@@ -84,6 +84,148 @@
                 height: 300px;
             }
         }
+
+        .certificates-section {
+            padding: 60px 0;
+            border-top: 1px solid #eee;
+            margin-top: 40px;
+        }
+        
+        .certificates-section h2 {
+            color: #1A4A30;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            position: relative;
+            padding-bottom: 15px;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .certificates-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: #C9A84C;
+        }
+
+        .certificates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+
+        .certificate-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .certificate-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(26, 74, 48, 0.1);
+            border-color: #C9A84C;
+        }
+
+        .certificate-card img {
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+            transition: transform 0.3s ease;
+            object-fit: contain;
+            background: #fdfdfd;
+        }
+
+        .certificate-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .certificate-card h3 {
+            font-size: 1.1rem;
+            color: #1A4A30;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .certificate-card p {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100000;
+            padding-top: 50px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 900px;
+            animation-name: zoom;
+            animation-duration: 0.3s;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        @keyframes zoom {
+            from {transform:scale(0)} 
+            to {transform:scale(1)}
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+            z-index: 100001;
+        }
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: #C9A84C;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .certificate-card img {
+            cursor: pointer;
+        }
+        
+        @media only screen and (max-width: 700px){
+            .modal-content {
+                width: 95%;
+            }
+        }
     </style>
 </head>
 
@@ -103,6 +245,7 @@
             <ul class="nav-links" id="navLinks">
                 <li><a href="index.html" class="nav-link" onclick="closeNav()">Home</a></li>
                 <li><a href="products.html" class="nav-link" onclick="closeNav()">Products</a></li>
+                <li><a href="gallery.html" class="nav-link" onclick="closeNav()">Gallery</a></li>
                 <li><a href="track-order.html" class="nav-link" onclick="closeNav()">Track Order</a></li>
                 <li><a href="about.html" class="nav-link active" onclick="closeNav()">Our Story</a></li>
                 <li><a href="contact.html" class="nav-link" onclick="closeNav()">Contact</a></li>
@@ -163,6 +306,38 @@
                 </div>
             </div>
 
+            <!-- Certificates Section -->
+            <div class="certificates-section">
+                <h2>Our Certifications & Compliance</h2>
+                <div class="certificates-grid">
+                    <div class="certificate-card">
+                        <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777617657/IN62746A_NATURE_CARE_IMPEX_9.._page-0001_blhw4w.jpg" alt="ISO 9001:2015" onerror="this.src='https://placehold.co/400x565/e2e8f0/1e293b?text=ISO+9001'">
+                        <h3>ISO 9001:2015</h3>
+                        <p>Quality Management System Standard</p>
+                    </div>
+                    <div class="certificate-card">
+                        <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777617667/IN62747D_NATURE_CARE_IMPEX_2.._page-0001_t3wnwv.jpg" alt="ISO 22000:2018" onerror="this.src='https://placehold.co/400x565/e2e8f0/1e293b?text=ISO+22000'">
+                        <h3>ISO 22000:2018</h3>
+                        <p>Food Safety Management System</p>
+                    </div>
+                    <div class="certificate-card">
+                        <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777617992/NATURE-CARE-IMPEX_page-0001_qwzuo3.jpg" alt="VCT Certificate of Trust" onerror="this.src='https://placehold.co/400x565/e2e8f0/1e293b?text=VCT+Trust'">
+                        <h3>Verified Certificate of Trust</h3>
+                        <p>Ethical Business Practices & Reliability</p>
+                    </div>
+                    <div class="certificate-card">
+                        <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777617708/Nature_care_impex_C-TPAT_SECURITY_POLICY_page-0001_mn3jzk.jpg" alt="C-TPAT Security Policy" onerror="this.src='https://placehold.co/400x565/e2e8f0/1e293b?text=C-TPAT+Policy'">
+                        <h3>C-TPAT Security Policy</h3>
+                        <p>Supply Chain Security Standards</p>
+                    </div>
+                    <div class="certificate-card">
+                        <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777617741/Nature_care_impex_C-TPAT_SECURITY_SELF-DECLARATION_page-0001_cm3hxc.jpg" alt="C-TPAT Self Declaration" onerror="this.src='https://placehold.co/400x565/e2e8f0/1e293b?text=C-TPAT+Declaration'">
+                        <h3>C-TPAT Self-Declaration</h3>
+                        <p>Compliance with International Supply Chain Security</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -180,6 +355,8 @@
                     <ul class="footer-links">
                         <li><a href="index.html">Home</a></li>
                         <li><a href="products.html">Products</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                <li><a href="gallery.html" class="nav-link" onclick="closeNav()">Gallery</a></li>
                         <li><a href="about.html">About Us</a></li>
                         <li><a href="contact.html">Contact</a></li>
                         <li><a href="track-order.html">Track Order</a></li>
@@ -209,6 +386,12 @@
         </div>
     </footer>
 
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="fullImage">
+    </div>
+
     <!-- Scripts -->
     <script src="js/main.js"></script>
     <script>
@@ -221,6 +404,30 @@
         function closeNav() {
             document.getElementById('navLinks').classList.remove('active');
             document.getElementById('hamburgerBtn').classList.remove('active');
+        }
+
+        // Image Modal Logic
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('fullImage');
+        
+        // Add click event to all certificate images
+        document.querySelectorAll('.certificate-card img').forEach(img => {
+            img.addEventListener('click', function() {
+                modal.style.display = "block";
+                modalImg.src = this.src;
+            });
+        });
+
+        // Close modal function
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        // Close modal when clicking outside the image
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
         }
     </script>
 </body>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="🌿 Gallery of Nature Care Impex - View our cocopeat, grow bags, and bamboo products in action.">
+    <link rel="canonical" href="https://nature-care-impex-1.onrender.com/gallery.html">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/logo.jpg">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/logo.jpg">
+    <link rel="apple-touch-icon" href="assets/logo.jpg">
+    
+    <title>🌿 Gallery - Nature Care Impex</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css?v=3">
+    
+    <style>
+        @media (max-width: 768px) {
+            #navLinks { display: none !important; position: fixed !important; top: 64px !important; left: 0 !important; width: 100% !important; background: #fff !important; flex-direction: column !important; z-index: 99999 !important; border-top: 2px solid #C9A84C !important; box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important; margin: 0 !important; padding: 0 !important; }
+            #navLinks.active { display: flex !important; }
+            #navLinks li { width: 100% !important; border-bottom: 1px solid #eee !important; }
+            #navLinks a { display: block !important; padding: 16px 24px !important; color: #1A4A30 !important; font-weight: 600 !important; font-size: 0.95rem !important; text-transform: uppercase !important; letter-spacing: 0.08em !important; }
+            #hamburgerBtn { display: flex !important; }
+        }
+
+        /* Gallery Styles */
+        .gallery-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .gallery-header h1 {
+            color: #1A4A30;
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            position: relative;
+            padding-bottom: 15px;
+            display: inline-block;
+        }
+
+        .gallery-header h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: #C9A84C;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 2px solid #1A4A30;
+            color: #1A4A30;
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-family: 'Lato', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: #1A4A30;
+            color: #fff;
+        }
+
+        /* Grid Layout */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 250px;
+            background: #f5f5f5;
+        }
+
+        .gallery-item.hide {
+            display: none;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(26, 74, 48, 0.2);
+        }
+
+        .gallery-item img, .gallery-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        /* Video Play Icon Overlay */
+        .video-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1A4A30;
+            font-size: 24px;
+            pointer-events: none;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100000;
+            padding-top: 50px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 900px;
+            max-height: 80vh;
+            animation-name: zoom;
+            animation-duration: 0.3s;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            object-fit: contain;
+        }
+
+        @keyframes zoom {
+            from {transform:scale(0)} 
+            to {transform:scale(1)}
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+            z-index: 100001;
+        }
+
+        .close-modal:hover {
+            color: #C9A84C;
+        }
+        
+        @media only screen and (max-width: 700px){
+            .modal-content {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <img src="assets/logo.jpg" alt="Nature Care Impex">
+                <span class="logo-text">Nature Care Impex</span>
+            </a>
+            
+            <div class="mobile-brand-name">Nature Care Impex</div>
+
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="nav-link" onclick="closeNav()">Home</a></li>
+                <li><a href="products.html" class="nav-link" onclick="closeNav()">Products</a></li>
+                <li><a href="gallery.html" class="nav-link active" onclick="closeNav()">Gallery</a></li>
+                <li><a href="track-order.html" class="nav-link" onclick="closeNav()">Track Order</a></li>
+                <li><a href="about.html" class="nav-link" onclick="closeNav()">Our Story</a></li>
+                <li><a href="contact.html" class="nav-link" onclick="closeNav()">Contact</a></li>
+            </ul>
+            <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" type="button" onclick="toggleNav()">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="container" style="padding: 10px 0; margin-top: 80px;">
+        <nav style="font-size: 14px; color: #666;">
+            <a href="index.html" style="color: #666; text-decoration: none;">Home</a> 
+            <span style="margin: 0 8px;">›</span> 
+            <span style="color: #333; font-weight: 600;">Gallery</span>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <section class="section-padding" style="min-height: 60vh;">
+        <div class="container">
+            
+            <div class="gallery-header">
+                <h1>Our Gallery</h1>
+                <p style="color: #666; margin-top: 15px; font-size: 1.1rem;">Explore our manufacturing processes and final products.</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-tabs">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="photo">Photos</button>
+                <button class="filter-btn" data-filter="video">Videos</button>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div class="gallery-grid" id="galleryGrid">
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622690/IMG-20260501-WA0037_oq2hmf.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622695/IMG-20260501-WA0068_yifre5.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622695/IMG-20260501-WA0069_leqvxm.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622695/IMG-20260501-WA0051_vnhtzk.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622694/IMG-20260501-WA0052_xj0fnv.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622693/IMG-20260501-WA0062_jwordn.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622693/IMG-20260501-WA0061_waz0ao.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622693/IMG-20260501-WA0060_vlz2sv.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622692/IMG-20260501-WA0058_aejmkt.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622692/IMG-20260501-WA0059_st76df.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622692/IMG-20260501-WA0057_p7fpbw.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622692/IMG-20260501-WA0054_acge5f.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622692/IMG-20260501-WA0053_ga8sdv.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622691/IMG-20260501-WA0050_kmo1px.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622691/IMG-20260501-WA0048_hlqewt.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622691/IMG-20260501-WA0043_c6f1bp.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622691/IMG-20260501-WA0046_xkwqrl.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622691/IMG-20260501-WA0045_sygj3h.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622691/IMG-20260501-WA0044_jrsamj.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622690/IMG-20260501-WA0042_xls5c4.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622690/IMG-20260501-WA0040_chi5so.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622690/IMG-20260501-WA0039_uwos8d.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622690/IMG-20260501-WA0038_tj3ivc.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item photo">
+                    <img loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777622690/IMG-20260501-WA0041_debtyp.jpg" alt="Gallery Photo">
+                </div>
+                <div class="gallery-item video" data-video-src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622718/VID-20260501-WA0078_mcczpt.mp4">
+                    <video loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622718/VID-20260501-WA0078_mcczpt.mp4" muted loop></video>
+                    <div class="video-overlay">▶</div>
+                </div>
+                <div class="gallery-item video" data-video-src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622710/VID-20260501-WA0064_tyseqx.mp4">
+                    <video loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622710/VID-20260501-WA0064_tyseqx.mp4" muted loop></video>
+                    <div class="video-overlay">▶</div>
+                </div>
+                <div class="gallery-item video" data-video-src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622709/VID-20260501-WA0072_au9qan.mp4">
+                    <video loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622709/VID-20260501-WA0072_au9qan.mp4" muted loop></video>
+                    <div class="video-overlay">▶</div>
+                </div>
+                <div class="gallery-item video" data-video-src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622707/VID-20260501-WA0079_xmxzn6.mp4">
+                    <video loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622707/VID-20260501-WA0079_xmxzn6.mp4" muted loop></video>
+                    <div class="video-overlay">▶</div>
+                </div>
+                <div class="gallery-item video" data-video-src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622701/VID-20260501-WA0075_ylllv0.mp4">
+                    <video loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622701/VID-20260501-WA0075_ylllv0.mp4" muted loop></video>
+                    <div class="video-overlay">▶</div>
+                </div>
+                <div class="gallery-item video" data-video-src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622701/VID-20260501-WA0077_bwmipn.mp4">
+                    <video loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622701/VID-20260501-WA0077_bwmipn.mp4" muted loop></video>
+                    <div class="video-overlay">▶</div>
+                </div>
+                <div class="gallery-item video" data-video-src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622701/VID-20260501-WA0076_j8poq1.mp4">
+                    <video loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622701/VID-20260501-WA0076_j8poq1.mp4" muted loop></video>
+                    <div class="video-overlay">▶</div>
+                </div>
+                <div class="gallery-item video" data-video-src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622701/VID-20260501-WA0065_ej1jyv.mp4">
+                    <video loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622701/VID-20260501-WA0065_ej1jyv.mp4" muted loop></video>
+                    <div class="video-overlay">▶</div>
+                </div>
+                <div class="gallery-item video" data-video-src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622699/VID-20260501-WA0074_qnrthn.mp4">
+                    <video loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622699/VID-20260501-WA0074_qnrthn.mp4" muted loop></video>
+                    <div class="video-overlay">▶</div>
+                </div>
+                <div class="gallery-item video" data-video-src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622698/VID-20260501-WA0067_sa4mlz.mp4">
+                    <video loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622698/VID-20260501-WA0067_sa4mlz.mp4" muted loop></video>
+                    <div class="video-overlay">▶</div>
+                </div>
+                <div class="gallery-item video" data-video-src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622696/VID-20260501-WA0066_ztgbv3.mp4">
+                    <video loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622696/VID-20260501-WA0066_ztgbv3.mp4" muted loop></video>
+                    <div class="video-overlay">▶</div>
+                </div>
+                <div class="gallery-item video" data-video-src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622695/VID-20260501-WA0063_sbvfwp.mp4">
+                    <video loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622695/VID-20260501-WA0063_sbvfwp.mp4" muted loop></video>
+                    <div class="video-overlay">▶</div>
+                </div>
+                <div class="gallery-item video" data-video-src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622694/VID-20260501-WA0056_udd0q4.mp4">
+                    <video loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622694/VID-20260501-WA0056_udd0q4.mp4" muted loop></video>
+                    <div class="video-overlay">▶</div>
+                </div>
+                <div class="gallery-item video" data-video-src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622722/VID-20260501-WA0080_fxmdvr.mp4">
+                    <video loading="lazy" src="https://res.cloudinary.com/dy5kyfcw4/video/upload/v1777622722/VID-20260501-WA0080_fxmdvr.mp4" muted loop></video>
+                    <div class="video-overlay">▶</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Nature Care Impex</h3>
+                    <p>Leading exporter of coir and natural products.</p>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="track-order.html">Track Order</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li>📧 naturecareimpex@gmail.com</li>
+                        <li>📞 9345540373</li>
+                        <li>📍 Shop 11A bajar street, kottakuppam, vanur taluk, villupuram district, tamilnadu, 605104</li>
+                        <li>GSTIN: 33AAYFN7568G</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 Nature Care Impex. All rights reserved.</p>
+                <p style="margin-top: 10px; font-size: 0.85rem; opacity: 0.7;">
+                    <a href="owner.html" style="color: inherit; text-decoration: none; transition: opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">Admin Portal</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Image/Video Modal -->
+    <div id="mediaModal" class="modal">
+        <span class="close-modal" onclick="closeMediaModal()">&times;</span>
+        <div id="modalContentContainer" style="display: flex; justify-content: center; align-items: center; height: 100%;">
+            <!-- Content will be injected here via JS -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+    <script>
+        // Navigation toggle
+        function toggleNav() {
+            var nav = document.getElementById('navLinks');
+            var btn = document.getElementById('hamburgerBtn');
+            nav.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+        function closeNav() {
+            document.getElementById('navLinks').classList.remove('active');
+            document.getElementById('hamburgerBtn').classList.remove('active');
+        }
+
+        // Filtering Logic
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const galleryItems = document.querySelectorAll('.gallery-item');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const filterValue = btn.getAttribute('data-filter');
+
+                galleryItems.forEach(item => {
+                    if (filterValue === 'all' || item.classList.contains(filterValue)) {
+                        item.classList.remove('hide');
+                    } else {
+                        item.classList.add('hide');
+                    }
+                });
+            });
+        });
+
+        // Modal Logic
+        const modal = document.getElementById('mediaModal');
+        const modalContainer = document.getElementById('modalContentContainer');
+
+        galleryItems.forEach(item => {
+            item.addEventListener('click', function() {
+                modal.style.display = "block";
+                modalContainer.innerHTML = ''; // Clear previous content
+
+                if (this.classList.contains('video')) {
+                    // It's a video
+                    const videoSrc = this.getAttribute('data-video-src');
+                    const videoElem = document.createElement('video');
+                    videoElem.src = videoSrc;
+                    videoElem.controls = true;
+                    videoElem.autoplay = true;
+                    videoElem.className = 'modal-content';
+                    modalContainer.appendChild(videoElem);
+                } else {
+                    // It's a photo
+                    const imgSrc = this.querySelector('img').src;
+                    const imgElem = document.createElement('img');
+                    imgElem.src = imgSrc;
+                    imgElem.className = 'modal-content';
+                    modalContainer.appendChild(imgElem);
+                }
+            });
+        });
+
+        function closeMediaModal() {
+            modal.style.display = "none";
+            // Stop video playing if any
+            modalContainer.innerHTML = '';
+        }
+
+        // Close on outside click
+        window.onclick = function(event) {
+            if (event.target == modal || event.target == modalContainer) {
+                closeMediaModal();
+            }
+        }
+    </script>
+</body>
+</html>
