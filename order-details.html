@@ -66,7 +66,7 @@
         <div class="container">
             <div class="order-details-wrapper">
                 <h1 class="page-title">Order Details</h1>
-                
+
                 <!-- Product Summary -->
                 <div class="product-summary-card">
                     <div class="product-image-container">
@@ -79,6 +79,48 @@
                         <div id="order-product-price" class="product-price">₹0</div>
                     </div>
                 </div>
+
+                <!-- ★★★ QUANTITY — TOP PRIORITY FIELD ★★★ -->
+                <div style="
+                    background: linear-gradient(135deg, #f0f7f2 0%, #e6f4eb 100%);
+                    border: 3px solid #1A4A30;
+                    border-radius: 16px;
+                    padding: 24px 28px;
+                    margin: 24px 0;
+                    box-shadow: 0 6px 24px rgba(26,74,48,0.13);
+                ">
+                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+                        <div>
+                            <div style="font-size:0.75rem; font-weight:800; color:#C9A84C; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:5px;">
+                                ★ Required Field
+                            </div>
+                            <div style="font-size:1.4rem; font-weight:900; color:#1A4A30;">
+                                Quantity *
+                            </div>
+                            <div style="font-size:0.85rem; color:#555; margin-top:3px;">
+                                How many units do you want to order?
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center; border:2px solid #1A4A30; border-radius:12px; overflow:hidden; background:#fff; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                            <button type="button" id="qty-minus"
+                                style="width:52px;height:52px;background:#1A4A30;color:#fff;border:none;font-size:1.6rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;transition:background 0.2s;"
+                                onmouseover="this.style.background='#C9A84C'" onmouseout="this.style.background='#1A4A30'"
+                                onclick="changeOrderQty(-1)">−</button>
+                            <input type="number" id="order-quantity" name="quantity" min="1" value="1" required
+                                style="width:80px;height:52px;text-align:center;border:none;outline:none;font-size:1.4rem;font-weight:900;color:#1A4A30;background:#fff;"
+                                oninput="updateOrderSummary()" onchange="updateOrderSummary()">
+                            <button type="button" id="qty-plus"
+                                style="width:52px;height:52px;background:#1A4A30;color:#fff;border:none;font-size:1.6rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;transition:background 0.2s;"
+                                onmouseover="this.style.background='#C9A84C'" onmouseout="this.style.background='#1A4A30'"
+                                onclick="changeOrderQty(1)">+</button>
+                        </div>
+                    </div>
+                    <div id="qty-total-bar" style="margin-top:16px;padding:12px 18px;background:#1A4A30;color:#fff;border-radius:10px;text-align:center;font-size:1.1rem;font-weight:700;letter-spacing:0.3px;">
+                        Total: <span id="qty-total-price">calculating...</span>
+                        <span id="qty-breakdown" style="font-size:0.82rem;opacity:0.8;margin-left:8px;"></span>
+                    </div>
+                </div>
+                <!-- ★★★ END QUANTITY FIELD ★★★ -->
 
                 <!-- Order Form -->
                 <div class="order-form-container">
@@ -116,10 +158,6 @@
                                     <select id="product-size" name="productSize">
                                         <!-- Options will be populated by JavaScript -->
                                     </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="order-quantity">Quantity *</label>
-                                    <input type="number" id="order-quantity" name="quantity" min="1" value="1" required>
                                 </div>
                             </div>
                             
@@ -240,7 +278,47 @@
         // Load order details when page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadOrderDetailsPage();
+
+            // Populate live total bar once product data is loaded
+            setTimeout(function() {
+                const orderData = JSON.parse(sessionStorage.getItem('currentOrder') || 'null');
+                if (orderData && orderData.product) {
+                    const price = orderData.product.price || 0;
+                    updateQtyTotalBar(price);
+
+                    // Re-hook quantity input to also update the bar
+                    const qtyInput = document.getElementById('order-quantity');
+                    if (qtyInput) {
+                        qtyInput.addEventListener('input', function() { updateQtyTotalBar(price); });
+                        qtyInput.addEventListener('change', function() { updateQtyTotalBar(price); });
+                    }
+                }
+            }, 600);
         });
+
+        // +/- stepper
+        function changeOrderQty(delta) {
+            const input = document.getElementById('order-quantity');
+            const newVal = Math.max(1, (parseInt(input.value) || 1) + delta);
+            input.value = newVal;
+            if (typeof updateOrderSummary === 'function') updateOrderSummary();
+            // update live bar
+            const orderData = JSON.parse(sessionStorage.getItem('currentOrder') || 'null');
+            if (orderData && orderData.product) {
+                updateQtyTotalBar(orderData.product.price || 0);
+            }
+        }
+
+        // Live total bar updater
+        function updateQtyTotalBar(unitPrice) {
+            const qty = parseInt(document.getElementById('order-quantity')?.value) || 1;
+            const subtotal = qty * unitPrice;
+            const totalWithCharges = subtotal + 20; // +₹20 shipping/COD
+            const priceEl = document.getElementById('qty-total-price');
+            const breakdownEl = document.getElementById('qty-breakdown');
+            if (priceEl) priceEl.textContent = '₹' + totalWithCharges.toLocaleString();
+            if (breakdownEl) breakdownEl.textContent = '(' + qty + ' × ₹' + unitPrice.toLocaleString() + ' + ₹20 charges)';
+        }
     </script>
     <script>
         function toggleNav() {

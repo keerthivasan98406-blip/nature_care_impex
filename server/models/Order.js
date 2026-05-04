@@ -9,16 +9,16 @@ const OrderSchema = new mongoose.Schema({
     product: {
         id: { type: Number, required: true },
         name: { type: String, required: true },
-        category: { type: String, required: true },
-        image: { type: String, required: true },
-        description: { type: String, required: true }
+        category: { type: String, default: 'General' },
+        image: { type: String, default: '' },
+        description: { type: String, default: '' }
     },
     customerDetails: {
-        customerName: { type: String, required: true },
-        customerEmail: { type: String, required: true },
-        customerPhone: { type: String, required: true },
-        deliveryAddress: { type: String, required: true },
-        quantity: { type: Number, required: true, min: 1 },
+        customerName: { type: String, default: 'Guest' },
+        customerEmail: { type: String, default: '' },
+        customerPhone: { type: String, default: '' },
+        deliveryAddress: { type: String, default: '' },
+        quantity: { type: Number, default: 1 },
         orderNotes: { type: String, default: '' }
     },
     unitPrice: {
@@ -33,12 +33,11 @@ const OrderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'payment_submitted', 'screenshot', 'processing', 'shipped', 'completed', 'cancelled'],
         default: 'pending'
     },
     productSize: {
         type: String,
-        required: true
+        default: 'Standard'
     },
     paymentScreenshot: {
         filename: String,
@@ -65,10 +64,9 @@ const OrderSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Indexes for faster queries
-OrderSchema.index({ orderId: 1 });
+// Mongoose automatically creates indexes for unique: true and index: true
+// These manual definitions are redundant and causing warnings
 OrderSchema.index({ 'customerDetails.customerEmail': 1 });
-OrderSchema.index({ status: 1 });
 OrderSchema.index({ orderMonth: 1 });
 OrderSchema.index({ createdAt: -1 });
 

@@ -42,7 +42,10 @@ class APIService {
             const data = await response.json();
             
             if (!response.ok) {
-                throw new Error(data.message || 'API call failed');
+                let errorMsg = data.message || 'API call failed';
+                if (data.errors) errorMsg += `: ${data.errors.join(', ')}`;
+                if (data.error) errorMsg += ` (${data.error})`;
+                throw new Error(errorMsg);
             }
 
             return data;

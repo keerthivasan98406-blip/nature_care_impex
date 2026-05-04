@@ -109,6 +109,12 @@ function setupOrderForm(orderData) {
     // Add quantity change handler
     quantityInput.addEventListener('input', updateOrderSummary);
     
+    // Add payment method change handlers
+    const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
+    paymentRadios.forEach(radio => {
+        radio.addEventListener('change', updateOrderSummary);
+    });
+    
     // Add form submit handler
     form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -162,13 +168,17 @@ function handleOrderFormSubmit(orderData) {
     const deliveryCharge = 20;
     const total = subtotal + deliveryCharge;
     
+    // Get selected payment method
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'online';
+    
     // Create final order
     const finalOrder = {
         ...orderData,
         customerDetails: formData,
         unitPrice: price,
         totalAmount: total,
-        status: 'pending',
+        status: paymentMethod === 'cod' ? 'cod' : 'pending',
+        paymentMethod: paymentMethod,
         productSize: formData.productSize, // Add size/variant to main order object
         orderDate: new Date().toISOString().split('T')[0], // Add order date for monthly calculations
         orderMonth: new Date().toISOString().slice(0, 7) // YYYY-MM format for monthly grouping
@@ -198,7 +208,9 @@ function loadPaymentPage() {
             product: {
                 id: 1,
                 name: 'Cocopeat 5kg Block',
-                category: 'Cocopeat'
+                category: 'Cocopeat',
+                image: 'assets/products/cocopeat-block.jpg',
+                description: 'Premium quality cocopeat block for gardening.'
             },
             customerDetails: {
                 customerName: 'Demo Customer',
@@ -209,6 +221,7 @@ function loadPaymentPage() {
             },
             unitPrice: 250,
             totalAmount: 250,
+            productSize: '5kg',
             status: 'pending'
         };
         
@@ -255,7 +268,7 @@ function populatePaymentInfo(orderData) {
         // Update the label to show "Delivery Charges" instead of "COD Charges"
         const deliveryLabel = deliveryChargesRow.querySelector('span:first-child');
         if (deliveryLabel) {
-            deliveryLabel.textContent = 'Delivery Charges:';
+            deliveryLabel.textContent = orderData.paymentMethod === 'cod' ? 'COD Charges:' : 'Delivery Charges:';
         }
     }
     
@@ -269,6 +282,47 @@ function populatePaymentInfo(orderData) {
     document.getElementById('customer-phone-display').textContent = orderData.customerDetails.customerPhone;
     document.getElementById('customer-email-display').textContent = orderData.customerDetails.customerEmail;
     document.getElementById('customer-address-display').textContent = orderData.customerDetails.deliveryAddress;
+
+    // Handle COD specific UI changes
+    const isCOD = orderData.paymentMethod === 'cod' || orderData.status === 'cod';
+    if (isCOD) {
+        console.log('📦 COD detected - Hiding UPI and Screenshot sections');
+        const upiSection = document.querySelector('.payment-methods-section');
+        const screenshotSection = document.getElementById('screenshot-section');
+        
+        if (upiSection) {
+            const h3 = upiSection.querySelector('h3');
+            if (h3) h3.textContent = 'Payment Method: Cash on Delivery';
+        }
+
+        // KEEP UPI specific parts visible (as per user request)
+        const qrContainer = document.querySelector('.qr-payment-section');
+        if (qrContainer) qrContainer.style.display = 'block';
+        
+        // ONLY Hide the screenshot section
+        if (screenshotSection) {
+            screenshotSection.style.display = 'none';
+            screenshotSection.setAttribute('hidden', 'true');
+        }
+        
+        // KEEP UPI ID section visible
+        const upiIdSection = document.querySelector('.upi-id-section');
+        if (upiIdSection) upiIdSection.style.display = 'block';
+        
+        // Update confirmation text to mention optional online payment
+        const confirmBtn = document.getElementById('confirm-payment-btn');
+        if (confirmBtn) {
+            confirmBtn.textContent = '✅ Confirm COD Order';
+            confirmBtn.style.background = 'linear-gradient(135deg, #1A4A30 0%, #2e7d32 100%)';
+        }
+        
+        const confirmInstruction = document.querySelector('.confirmation-instruction');
+        if (confirmInstruction) {
+            confirmInstruction.textContent = 'You can pay via UPI now or pay cash on delivery. No payment screenshot is required for COD.';
+        }
+    } else {
+        console.log('💳 Online Payment detected');
+    }
 }
 
 // Function to update total with COD charges
@@ -312,65 +366,64 @@ function updateTotalWithoutCOD() {
 function generatePaymentQR(orderData) {
     console.log('🔄 Generating UPI QR code for amount:', orderData.totalAmount);
     
-    // SIMPLE UPI CONFIGURATION - WORKING UPI ID
-    const primaryUpiId = 'naveethulhussain700-4@okaxis';
-    const fallbackUpiIds = [
-        'naveethulhussain700-4@okaxis',  // Primary working UPI
-        'naveethulhussain700-4@paytm',   // Paytm fallback
-        'naveethulhussain700-4@ybl',     // PhonePe fallback
-        'naveethulhussain700-4@upi'      // Generic fallback
-    ];
-    const merchantName = 'Nature Care Impex';
-    const deliveryCharge = 20;    // The amount in orderData already includes delivery charges
-    const amount = orderData.totalAmount; 
-    const upiId = 'naveethulhussain700-4@okaxis'; // Using primary UPI IDconst transactionNote = `Order-${orderData.orderId}`;
-    
-    // SIMPLE UPI FORMAT - GUARANTEED TO WORK
-    const simpleUpiData = `upi://pay?pa=${primaryUpiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
-    
-    console.log('📱 Simple UPI Data:', simpleUpiData);
-    console.log('💰 Product Amount:', orderData.totalAmount);
-    console.log('🚚 Delivery Charge:', deliveryCharge);
-    console.log('💰 Total Amount (including delivery):', amount);
+    const primaryUpiId  = 'naveethulhussain700-4@okaxis';
+    const merchantName  = 'Nature Care Impex';
+    const amount        = orderData.totalAmount;
+    const transactionNote = `Order-${orderData.orderId}`; // ← was broken before (appended on wrong line)
+
+    // Standard UPI deep-link string
+    const upiData = `upi://pay?pa=${primaryUpiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+
+    console.log('📱 UPI Data:', upiData);
+    console.log('💰 Total Amount:', amount);
     console.log('🆔 UPI ID:', primaryUpiId);
-    
+
     const qrCodeElement = document.getElementById('payment-qr-code');
     if (!qrCodeElement) {
         console.error('❌ QR code element not found');
         return;
     }
-    
-    // DIRECT QR GENERATION - GOOGLE CHARTS (MOST RELIABLE)
-    const qrUrl = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(simpleUpiData)}&choe=UTF-8`;
-    
-    console.log('🔗 QR URL:', qrUrl);
-    
+
+    // Primary: api.qrserver.com  (reliable, no CORS issues)
+    const primaryQrUrl  = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiData)}&format=png&margin=10`;
+    // Backup: Google Charts
+    const backupQrUrl   = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(upiData)}&choe=UTF-8`;
+
+    console.log('🔗 Primary QR URL:', primaryQrUrl);
+
     qrCodeElement.onload = function() {
         console.log('✅ UPI QR code loaded successfully');
-        this.style.border = '3px solid #28a745';
+        this.style.border  = '3px solid #28a745';
         this.style.display = 'block';
-        
-        // Add success message
+
         const container = this.parentElement;
         let validationMsg = container.querySelector('.qr-validation');
         if (!validationMsg) {
             validationMsg = document.createElement('p');
             validationMsg.className = 'qr-validation';
-            validationMsg.style.cssText = 'color: #28a745; font-weight: 600; margin-top: 10px; font-size: 14px;';
+            validationMsg.style.cssText = 'color:#28a745;font-weight:600;margin-top:10px;font-size:14px;';
             container.appendChild(validationMsg);
         }
-        validationMsg.innerHTML = `✅ QR Code Ready - Amount: ₹${amount}`;
+        validationMsg.innerHTML = `✅ QR Code Ready — Amount: ₹${amount}`;
     };
-    
+
     qrCodeElement.onerror = function() {
-        console.error('❌ QR generation failed, trying backup...');
-        // Backup QR service
-        this.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(simpleUpiData)}&format=png`;
+        console.error('❌ Primary QR service failed, trying backup...');
+        this.onerror = function() {
+            console.error('❌ Both QR services failed');
+            this.style.display = 'none';
+            const container = this.parentElement;
+            container.innerHTML += `<div style="padding:20px;text-align:center;color:#dc3545;border:2px dashed #dc3545;border-radius:8px;margin-top:10px;">
+                <p>⚠️ QR code could not load.</p>
+                <p>Please use the <strong>UPI ID</strong> below to pay manually.</p>
+            </div>`;
+        };
+        this.src = backupQrUrl;
     };
-    
-    qrCodeElement.src = qrUrl;
+
+    qrCodeElement.src = primaryQrUrl;
     qrCodeElement.style.maxWidth = '250px';
-    qrCodeElement.style.height = 'auto';
+    qrCodeElement.style.height  = 'auto';
 }
 
 // SIMPLE AND DIRECT PAYMENT APP OPENER - NO POPUPS
@@ -577,94 +630,85 @@ function removeScreenshot() {
 // Enhanced confirmPayment function with MongoDB integration
 async function confirmPayment() {
     console.log('Confirming payment...');
-    
+
     const orderData = JSON.parse(sessionStorage.getItem('orderForPayment'));
     if (!orderData) {
-        alert('Order data not found. Please try again.');
+        alert('Order data not found. Please restart the order process.');
+        window.location.href = 'products.html';
         return;
     }
-    
-    // Show confirmation dialog
-    const confirmMessage = `Please confirm your order:
 
-Order ID: ${orderData.orderId}
-Product: ${orderData.product.name}
-Quantity: ${orderData.customerDetails.quantity}
-Total Amount: ₹${orderData.totalAmount.toLocaleString()}
+    // ── Confirmation dialog ──────────────────────────────────────────────────
+    const qty    = orderData.customerDetails?.quantity || 1;
+    const name   = orderData.customerDetails?.customerName || 'Customer';
+    const phone  = orderData.customerDetails?.customerPhone || '';
+    const confirmMessage =
+        `Confirm your order:\n\n` +
+        `Order ID : ${orderData.orderId}\n` +
+        `Product  : ${orderData.product?.name}\n` +
+        `Quantity : ${qty}\n` +
+        `Total    : ₹${(orderData.totalAmount || 0).toLocaleString()}\n\n` +
+        `Customer : ${name}\n` +
+        `Phone    : ${phone}\n\n` +
+        `Click OK to confirm.`;
 
-Customer: ${orderData.customerDetails.customerName}
-Phone: ${orderData.customerDetails.customerPhone}
+    if (!confirm(confirmMessage)) return;
 
-Are you sure you want to place this order?`;
-    
-    if (!confirm(confirmMessage)) {
-        return;
-    }
-    
-    // Update order status and add timestamps
-    orderData.status = 'screenshot'; // Changed from 'confirmed' to 'screenshot'
-    orderData.submittedAt = new Date().toISOString();
-    orderData.createdAt = orderData.timestamp || new Date().toISOString();
-    
-    // Ensure all required fields for owner portal
+    // Disable button to prevent double submit
+    const btn = document.getElementById('confirm-payment-btn');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Processing...'; }
+
+    // ── Build final order object ─────────────────────────────────────────────
     const finalOrder = {
         ...orderData,
-        // Add any missing fields that owner portal expects
+        status: orderData.paymentMethod === 'cod' ? 'cod' : 'pending',
+        submittedAt: new Date().toISOString(),
+        createdAt: orderData.timestamp || new Date().toISOString(),
+        orderDate:  orderData.orderDate  || new Date().toISOString().split('T')[0],
+        orderMonth: orderData.orderMonth || new Date().toISOString().slice(0, 7),
         customerDetails: {
             ...orderData.customerDetails,
-            name: orderData.customerDetails.customerName,
-            email: orderData.customerDetails.customerEmail,
-            phone: orderData.customerDetails.customerPhone,
-            address: orderData.customerDetails.deliveryAddress,
-            quantity: orderData.customerDetails.quantity,
-            notes: orderData.customerDetails.orderNotes || '',
-            total: orderData.totalAmount
+            name:    orderData.customerDetails?.customerName    || '',
+            email:   orderData.customerDetails?.customerEmail   || '',
+            phone:   orderData.customerDetails?.customerPhone   || '',
+            address: orderData.customerDetails?.deliveryAddress || '',
+            quantity: qty,
+            notes:   orderData.customerDetails?.orderNotes || '',
+            total:   orderData.totalAmount
         }
     };
-    
+
+    // ── Step 1: Save to localStorage FIRST (guaranteed) ──────────────────────
     try {
-        console.log('💾 Attempting to save order to database...');
-        console.log('Order data being sent:', finalOrder);
-        
-        // Try to save to MongoDB first
-        if (window.apiService) {
-            console.log('🔄 API Service available, calling createOrder...');
-            const result = await window.apiService.createOrder(finalOrder);
-            console.log('📡 API Response:', result);
-            
-            if (result.success && !result.fallback) {
-                console.log('✅ Order saved to MongoDB successfully!');
-                showOrderSuccessMessage(finalOrder, 'database');
-            } else if (result.success && result.fallback) {
-                console.log('⚠️ Order saved to localStorage only (database unavailable)');
-                showOrderSuccessMessage(finalOrder, 'localStorage');
-            } else {
-                console.log('❌ MongoDB save failed:', result.message);
-                console.log('📱 Falling back to localStorage only');
-                showOrderSuccessMessage(finalOrder, 'localStorage');
-            }
-        } else {
-            console.log('❌ API Service not available');
-            console.log('📱 Saving to localStorage only');
-            showOrderSuccessMessage(finalOrder, 'localStorage');
+        let customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+        // Avoid duplicates
+        if (!customerOrders.find(o => o.orderId === finalOrder.orderId)) {
+            customerOrders.push(finalOrder);
+            localStorage.setItem('customerOrders', JSON.stringify(customerOrders));
         }
-    } catch (error) {
-        console.error('❌ Error saving order to database:', error);
-        console.log('📱 Falling back to localStorage only');
-        showOrderSuccessMessage(finalOrder, 'localStorage');
+        console.log('✅ Order saved to localStorage:', finalOrder.orderId);
+    } catch (lsErr) {
+        console.warn('⚠️ localStorage save failed:', lsErr);
     }
-    
-    // Always store in localStorage as backup
-    let customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
-    customerOrders.push(finalOrder);
-    localStorage.setItem('customerOrders', JSON.stringify(customerOrders));
-    
-    console.log('📱 Order stored in localStorage:', finalOrder.orderId);
-    console.log('📊 Total customer orders now:', customerOrders.length);
-    
-    // Clear session storage
+
+    // ── Step 2: Clear session storage ───────────────────────────────────────
     sessionStorage.removeItem('orderForPayment');
     sessionStorage.removeItem('currentOrder');
+
+    // ── Step 3: Try MongoDB (non-blocking — don't wait for redirect) ─────────
+    let savedToDb = false;
+    try {
+        if (window.apiService) {
+            const result = await window.apiService.createOrder(finalOrder);
+            savedToDb = !!(result && result.success);
+            console.log(savedToDb ? '✅ Order saved to MongoDB' : '⚠️ MongoDB save returned failure');
+        }
+    } catch (dbErr) {
+        console.warn('⚠️ MongoDB save failed (order already in localStorage):', dbErr.message);
+    }
+
+    // ── Step 4: Show success and redirect ───────────────────────────────────
+    showOrderSuccessMessage(finalOrder, savedToDb ? 'database' : 'localStorage');
 }
 
 function showOrderSuccessMessage(order, saveLocation) {
@@ -1190,6 +1234,8 @@ async function loadProductDetails() {
     const detailImages = [product.image, product.image2, product.image3].filter(img => img);
     const imagesHtml = detailImages.map(img => `<img src="${img}" alt="${product.name}" style="width: 100%; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">`).join('');
 
+    const productPrice = product.price || 0;
+
     const html = `
         <div class="detail-wrapper">
             <div class="detail-image">
@@ -1199,20 +1245,111 @@ async function loadProductDetails() {
                 <span class="product-category">${product.category}</span>
                 <h1>${product.name}</h1>
                 <p class="description">${product.description}</p>
-                
+
                 <div class="spec-group">
                     <label for="size-select">Select Size / Variant:</label>
                     <select id="size-select" class="size-select">
                         ${sizeOptions}
                     </select>
                 </div>
-                
+
+                <!-- ★ QUANTITY SELECTOR ★ -->
+                <div class="quantity-section" style="
+                    background: linear-gradient(135deg, #f0f7f2 0%, #e8f5ec 100%);
+                    border: 2px solid #1A4A30;
+                    border-radius: 14px;
+                    padding: 20px 22px;
+                    margin: 22px 0;
+                    box-shadow: 0 4px 16px rgba(26,74,48,0.10);
+                ">
+                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;">
+                        <div>
+                            <div style="font-size:0.78rem; font-weight:700; color:#C9A84C; text-transform:uppercase; letter-spacing:1.2px; margin-bottom:4px;">
+                                ★ Required
+                            </div>
+                            <label for="detail-quantity" style="font-size:1.15rem; font-weight:800; color:#1A4A30; display:block; margin-bottom:0;">
+                                Quantity *
+                            </label>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0; border:2px solid #1A4A30; border-radius:10px; overflow:hidden; background:#fff;">
+                            <button type="button" onclick="changeDetailQty(-1)" style="
+                                width:44px; height:44px; background:#1A4A30; color:#fff;
+                                border:none; font-size:1.4rem; cursor:pointer;
+                                display:flex; align-items:center; justify-content:center;
+                                transition:background 0.2s; font-weight:700;
+                            " onmouseover="this.style.background='#C9A84C'" onmouseout="this.style.background='#1A4A30'">−</button>
+                            <input type="number" id="detail-quantity" value="1" min="1" max="9999"
+                                style="
+                                    width:70px; height:44px; text-align:center;
+                                    border:none; outline:none; font-size:1.2rem;
+                                    font-weight:800; color:#1A4A30;
+                                "
+                                oninput="updateDetailTotal(${productPrice})"
+                                onchange="updateDetailTotal(${productPrice})"
+                            >
+                            <button type="button" onclick="changeDetailQty(1)" style="
+                                width:44px; height:44px; background:#1A4A30; color:#fff;
+                                border:none; font-size:1.4rem; cursor:pointer;
+                                display:flex; align-items:center; justify-content:center;
+                                transition:background 0.2s; font-weight:700;
+                            " onmouseover="this.style.background='#C9A84C'" onmouseout="this.style.background='#1A4A30'">+</button>
+                        </div>
+                    </div>
+                    ${productPrice > 0 ? `
+                    <div id="detail-total-display" style="
+                        margin-top:14px; padding:10px 14px;
+                        background:#1A4A30; color:#fff; border-radius:8px;
+                        font-size:1.05rem; font-weight:700; text-align:center;
+                        letter-spacing:0.3px;
+                    ">
+                        Total: ₹<span id="detail-total-amount">${productPrice.toLocaleString()}</span>
+                        <span style="font-size:0.8rem; opacity:0.8; margin-left:6px;">(1 × ₹${productPrice.toLocaleString()})</span>
+                    </div>` : ''}
+                </div>
+                <!-- ★ END QUANTITY SELECTOR ★ -->
+
                 <div class="action-buttons">
                     <button class="btn btn-primary" onclick="startOrderProcess('${product.id}')">Buy Now</button>
                     <a href="contact.html?subject=${encodeURIComponent(product.name)}" class="btn btn-secondary">Contact Sales</a>
                 </div>
             </div>
         </div>
+
+        <script>
+            // ── Quantity stepper helpers ───────────────────────────────────
+            function changeDetailQty(delta) {
+                const input = document.getElementById('detail-quantity');
+                const newVal = Math.max(1, (parseInt(input.value) || 1) + delta);
+                input.value = newVal;
+                updateDetailTotal(${productPrice});
+            }
+            function updateDetailTotal(unitPrice) {
+                const qty = parseInt(document.getElementById('detail-quantity').value) || 1;
+                const total = qty * unitPrice;
+                const amountEl = document.getElementById('detail-total-amount');
+                if (amountEl) amountEl.textContent = total.toLocaleString();
+                const display = document.getElementById('detail-total-display');
+                if (display) {
+                    // Update the breakdown hint
+                    const hint = display.querySelector('span:last-child');
+                    if (hint) hint.textContent = '(' + qty + ' × ₹' + unitPrice.toLocaleString() + ')';
+                }
+            }
+            // ── Override startOrderProcess to pre-fill quantity ────────────
+            const _origStartOrder = window.startOrderProcess;
+            window.startOrderProcess = function(productId) {
+                _origStartOrder(productId);
+                // After a brief moment (modal creation), inject the quantity
+                setTimeout(() => {
+                    const qtyEl = document.getElementById('order-quantity');
+                    const detailQty = document.getElementById('detail-quantity');
+                    if (qtyEl && detailQty) {
+                        qtyEl.value = detailQty.value;
+                        if (typeof updateOrderTotal === 'function') updateOrderTotal();
+                    }
+                }, 300);
+            };
+        <\/script>
     `;
 
     container.innerHTML = html;

@@ -310,17 +310,38 @@ async function loadDashboardData() {
         // Sync products to main site
         await syncProductsToMainSite();
         
-        // Load orders and calculate statistics
-        const adminOrders = orders;
-        const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
-        const allOrders = [...adminOrders, ...customerOrders.map(order => ({
-            amount: order.totalAmount || order.customerDetails?.total || 0,
-            status: order.status || 'pending',
-            date: order.createdAt || order.timestamp || new Date().toISOString()
-        }))];
+        // Load orders from DB and calculate statistics
+        let allOrdersData = [];
+        if (window.apiService) {
+            try {
+                const result = await window.apiService.getOrders();
+                if (result.success && result.data) {
+                    allOrdersData = result.data.map(order => ({
+                        amount: order.totalAmount || 0,
+                        status: order.status || 'pending',
+                        date: order.createdAt || new Date().toISOString(),
+                        orderMonth: order.orderMonth || (order.createdAt ? order.createdAt.slice(0, 7) : new Date().toISOString().slice(0, 7))
+                    }));
+                    console.log('✅ Dashboard stats loaded from MongoDB:', allOrdersData.length);
+                }
+            } catch (err) {
+                console.log('⚠️ MongoDB stats load failed, using local');
+            }
+        }
+        
+        // Fallback to local if DB empty or failed
+        if (allOrdersData.length === 0) {
+            const customerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
+            allOrdersData = customerOrders.map(order => ({
+                amount: order.totalAmount || order.customerDetails?.total || 0,
+                status: order.status || 'pending',
+                date: order.createdAt || order.timestamp || new Date().toISOString(),
+                orderMonth: order.orderMonth || (order.createdAt ? order.createdAt.slice(0, 7) : new Date().toISOString().slice(0, 7))
+            }));
+        }
         
         // Update real-time statistics
-        updateRealTimeStats(allOrders);
+        updateRealTimeStats(allOrdersData);
         
         console.log('✅ Dashboard data loaded successfully');
         
@@ -333,18 +354,17 @@ async function loadDashboardData() {
 // Update real-time statistics
 function updateRealTimeStats(allOrders) {
     try {
-        // Set up periodic updates (every 30 seconds)
-        setInterval(() => {
-            const refreshedCustomerOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
-            const refreshedAllOrders = [...adminOrders, ...refreshedCustomerOrders.map(order => ({
-                amount: order.totalAmount || order.customerDetails?.total || 0,
-                status: order.paymentScreenshot ? 'screenshot' : (order.status || 'pending'),
-                date: order.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],
-                orderMonth: order.orderMonth || order.createdAt?.slice(0, 7) || new Date().toISOString().slice(0, 7)
-            }))];
-            updateRealTimeStats(refreshedAllOrders);
+        // Set up periodic updates (every 60 seconds)
+        if (window._statsInterval) clearInterval(window._statsInterval);
+        window._statsInterval = setInterval(async () => {
+            console.log('🔄 Periodic background refresh...');
+            // Simply call loadOrders which updates everything
+            await loadOrders();
             updateRecentActivity();
-        }, 30000);
+        }, 60000);
+        
+        // Update summary elements immediately
+        updateOrderSummary(allOrders);
     } catch (error) {
         console.error('Error in updateRealTimeStats:', error);
     }
@@ -2600,26 +2620,63 @@ function updateMonthlySalesData(allOrders, year) {
         }
     });
     
+    // ── Date awareness ─────────────────────────────────────────────────────
+    const today           = new Date();
+    const currentYear     = today.getFullYear();
+    const currentMonthNum = today.getMonth() + 1; // 1 = Jan … 12 = Dec
+    const currentDay      = today.getDate();
+    const selectedYear    = parseInt(year);
+    // ───────────────────────────────────────────────────────────────────────
+
     // Update the monthly breakdown table
     const tbody = document.getElementById('monthly-breakdown-tbody');
     if (tbody) {
-        tbody.innerHTML = Object.values(monthlyStats).map(month => `
-            <tr>
-                <td>${month.month}</td>
-                <td>₹${Math.round(month.sales).toLocaleString()}</td>
-                <td>₹${Math.round(month.costs).toLocaleString()}</td>
-                <td>₹${Math.round(month.profit).toLocaleString()}</td>
-                <td>${month.sales > 0 ? Math.round((month.profit / month.sales) * 100) : 0}%</td>
-                <td>${month.orders}</td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = Object.entries(monthlyStats).map(([monthKey, month], index) => {
+            const monthNumber    = index + 1;
+            const isCurrentYear  = selectedYear === currentYear;
+            const isFutureMonth  = isCurrentYear && monthNumber > currentMonthNum;
+            const isCurrentMonth = isCurrentYear && monthNumber === currentMonthNum;
+
+            if (isFutureMonth) {
+                return `
+                    <tr style="opacity:0.35; background:#f8f8f8; font-style:italic;">
+                        <td style="color:#bbb;">${month.month}</td>
+                        <td colspan="4" style="text-align:center; color:#ccc; font-size:0.82rem; letter-spacing:0.4px;">
+                            — Not yet reached —
+                        </td>
+                        <td style="color:#ccc;">—</td>
+                    </tr>`;
+            }
+
+            const rowStyle = isCurrentMonth
+                ? 'background:#fffbea; border-left:4px solid #C9A84C; font-weight:700;'
+                : '';
+
+            const badge = isCurrentMonth
+                ? ` <span style="font-size:0.68rem;background:#C9A84C;color:#fff;
+                        padding:1px 8px;border-radius:10px;font-weight:700;
+                        vertical-align:middle;margin-left:5px;">
+                        Today: ${currentDay} ${month.month}
+                   </span>`
+                : '';
+
+            return `
+                <tr style="${rowStyle}">
+                    <td>${month.month}${badge}</td>
+                    <td>₹${Math.round(month.sales).toLocaleString()}</td>
+                    <td>₹${Math.round(month.costs).toLocaleString()}</td>
+                    <td>₹${Math.round(month.profit).toLocaleString()}</td>
+                    <td>${month.sales > 0 ? Math.round((month.profit / month.sales) * 100) : 0}%</td>
+                    <td>${month.orders}</td>
+                </tr>`;
+        }).join('');
     }
     
     // Update global monthlyData for chart
     monthlyData = Object.values(monthlyStats).map(month => ({
-        month: month.month,
-        sales: Math.round(month.sales),
-        costs: Math.round(month.costs),
+        month:  month.month,
+        sales:  Math.round(month.sales),
+        costs:  Math.round(month.costs),
         profit: Math.round(month.profit),
         orders: month.orders
     }));

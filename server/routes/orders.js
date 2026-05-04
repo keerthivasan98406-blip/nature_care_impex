@@ -161,6 +161,9 @@ router.post('/track', async (req, res) => {
 // Create new order
 router.post('/', async (req, res) => {
     try {
+        console.log('--- NEW ORDER ATTEMPT ---');
+        console.log('Status received:', req.body.status);
+        console.log('Time:', new Date().toLocaleTimeString());
         // Check if database is connected
         if (mongoose.connection.readyState !== 1) {
             return res.status(503).json({
@@ -190,10 +193,13 @@ router.post('/', async (req, res) => {
         });
     } catch (error) {
         console.error('❌ Error creating order in database:', error);
+        
         res.status(400).json({
             success: false,
             message: 'Error creating order in database',
-            error: error.message
+            error: error.message,
+            stack: error.stack,
+            details: error.errors || null
         });
     }
 });
@@ -203,7 +209,7 @@ router.put('/:orderId/status', async (req, res) => {
     try {
         const { status } = req.body;
         
-        const validStatuses = ['pending', 'payment_submitted', 'screenshot', 'processing', 'shipped', 'completed', 'cancelled'];
+        const validStatuses = ['pending', 'payment_submitted', 'screenshot', 'cod', 'processing', 'shipped', 'completed', 'cancelled'];
         
         if (!validStatuses.includes(status)) {
             return res.status(400).json({

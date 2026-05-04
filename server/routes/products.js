@@ -3,15 +3,87 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const Product = require('../models/Product');
 
+// Default products served when database is unavailable
+const DEFAULT_PRODUCTS = [
+    {
+        id: 1,
+        name: "Cocopeat 5kg Block",
+        category: "cocopeat",
+        image: "https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190898/photo_2025-12-31_22-18-07_c2hs4m.jpg",
+        description: "Premium washed cocopeat blocks ideal for potting mixes and hydroponics. High water retention and porosity.",
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        price: 250,
+        cost: 150,
+        stock: 100,
+        isActive: true
+    },
+    {
+        id: 2,
+        name: "Coco Grow Bags",
+        category: "eco-care",
+        image: "https://cdn.moglix.com/p/B5wXshH1wq7TS-xxlarge.jpg",
+        description: "Ready-to-use grow bags for greenhouse cultivation. UV treated for durability and optimal root growth.",
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        price: 90,
+        cost: 60,
+        stock: 200,
+        isActive: true
+    },
+    {
+        id: 3,
+        name: "Coco Bricks (650g)",
+        category: "cocopeat",
+        image: "https://images.unsplash.com/photo-1591857177580-dc82b9e4e119?auto=format&fit=crop&w=800&q=80",
+        description: "Compact 650g briquettes, perfect for home gardening and smaller applications. Expands to 9 liters.",
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        price: 180,
+        cost: 120,
+        stock: 150,
+        isActive: true
+    },
+    {
+        id: 5,
+        name: "Bamboo Period Pads",
+        category: "bamboo",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbYHHF-lKgdGS9ftR4AwALD27xwGSO9hsldw&s",
+        description: "Comfortable, absorbent, and eco-friendly bamboo period pads. Washable and reusable for a sustainable cycle.",
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        price: 120,
+        cost: 80,
+        stock: 80,
+        isActive: true
+    },
+    {
+        id: 6,
+        name: "12 Coco Bricks 400g",
+        category: "cocopeat",
+        image: "https://res.cloudinary.com/dy5kyfcw4/image/upload/v1767190712/photo_2025-12-31_22-14-34_zu8ayl.jpg",
+        description: "High-quality 400g coco peat bricks, perfect for home gardening and seed starting. Compact and easy to use.",
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        price: 200,
+        cost: 140,
+        stock: 120,
+        isActive: true
+    }
+];
+
 // Get all products
 router.get('/', async (req, res) => {
     try {
         // Check if database is connected
         if (mongoose.connection.readyState !== 1) {
-            return res.status(503).json({
-                success: false,
-                message: 'Database not available',
-                fallback: true
+            console.log('⚠️ Database unavailable - serving default products as fallback');
+            const { category } = req.query;
+            let fallbackProducts = DEFAULT_PRODUCTS;
+            if (category && category !== 'all') {
+                fallbackProducts = DEFAULT_PRODUCTS.filter(p => p.category === category);
+            }
+            return res.json({
+                success: true,
+                count: fallbackProducts.length,
+                data: fallbackProducts,
+                fallback: true,
+                message: 'Serving default products (database unavailable)'
             });
         }
 
@@ -29,6 +101,24 @@ router.get('/', async (req, res) => {
         }
 
         const products = await Product.find(filter).sort({ id: 1 });
+        
+        // If DB is connected but empty, serve defaults
+        if (products.length === 0) {
+            console.log('⚠️ No products in database - serving default products');
+            const { category: cat } = req.query;
+            let fallbackProducts = DEFAULT_PRODUCTS;
+            if (cat && cat !== 'all') {
+                fallbackProducts = DEFAULT_PRODUCTS.filter(p => p.category === cat);
+            }
+            return res.json({
+                success: true,
+                count: fallbackProducts.length,
+                data: fallbackProducts,
+                fallback: true,
+                message: 'Serving default products (database empty)'
+            });
+        }
+        
         res.json({
             success: true,
             count: products.length,
@@ -36,11 +126,13 @@ router.get('/', async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching products:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error fetching products',
-            error: error.message,
-            fallback: true
+        // Fallback to default products on error
+        res.json({
+            success: true,
+            count: DEFAULT_PRODUCTS.length,
+            data: DEFAULT_PRODUCTS,
+            fallback: true,
+            message: 'Serving default products (database error)'
         });
     }
 });

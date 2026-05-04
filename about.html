@@ -108,6 +108,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 30px;
+            align-items: stretch;
         }
 
         .certificate-card {
@@ -121,6 +122,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: space-between;
         }
 
         .certificate-card:hover {
@@ -131,8 +133,7 @@
 
         .certificate-card img {
             width: 100%;
-            max-width: 250px;
-            height: auto;
+            height: 260px;
             border-radius: 4px;
             margin-bottom: 20px;
             border: 1px solid #eee;
@@ -157,6 +158,39 @@
             color: #666;
             line-height: 1.4;
             margin: 0;
+        }
+
+        /* Multi-page certificate card styles */
+        .cert-pages-indicator {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .cert-page-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: background 0.3s;
+        }
+        .cert-page-dot.active {
+            background: #C9A84C;
+        }
+        .cert-page-toggle {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #1A4A30;
+            background: #f0f7f2;
+            border: 1px solid #C9A84C;
+            border-radius: 20px;
+            padding: 4px 14px;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .cert-page-toggle:hover {
+            background: #C9A84C;
+            color: #fff;
         }
 
         /* Modal Styles */
@@ -212,10 +246,94 @@
         .certificate-card img {
             cursor: pointer;
         }
+
+        /* Modal nav arrows */
+        .modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(201,168,76,0.85);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 22px;
+            cursor: pointer;
+            z-index: 100002;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .modal-nav:hover { background: #C9A84C; }
+        #modalPrev { left: 20px; }
+        #modalNext { right: 20px; }
+        .modal-page-label {
+            text-align: center;
+            color: #C9A84C;
+            font-size: 0.95rem;
+            margin-top: 12px;
+            letter-spacing: 1px;
+        }
         
         @media only screen and (max-width: 700px){
             .modal-content {
                 width: 95%;
+            }
+            #modalPrev { left: 8px; }
+            #modalNext { right: 8px; }
+        }
+
+        /* Mobile: certificates */
+        @media (max-width: 768px) {
+            .certificates-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .certificate-card {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .certificate-card img {
+                height: 340px;
+                width: 100%;
+                object-fit: contain;
+                background: #f8f8f8;
+                border-radius: 8px;
+            }
+
+            .certificate-card h3 {
+                font-size: 1.2rem;
+                margin-top: 16px;
+            }
+
+            .certificate-card p {
+                font-size: 1rem;
+            }
+
+            /* 4th cert: bigger tap target & dots */
+            .cert-pages-indicator {
+                margin-bottom: 16px;
+                gap: 10px;
+            }
+
+            .cert-page-dot {
+                width: 10px;
+                height: 10px;
+            }
+
+            .cert-page-toggle {
+                font-size: 1rem;
+                padding: 10px 24px;
+                border-radius: 30px;
+                margin-top: 14px;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                width: 100%;
+                max-width: 240px;
             }
         }
     </style>
@@ -267,13 +385,11 @@
             <div class="about-split">
                 <div class="about-text">
                     <h1>Who We Are</h1>
-                    <p>Nature Care Impex is a premier exporter of eco-friendly coir and natural products based in
-                        India. Founded with a vision to promote sustainable living, we specialize in high-quality coco
-                        peat, grow bags, and bamboo products.</p>
+                    <p>We are a forward-thinking company committed to delivering high-quality products and exceptional service to customers worldwide. With a strong foundation built on innovation, reliability, and sustainability, we aim to create solutions that not only meet today’s needs but also shape a better tomorrow.
+
+Our team consists of passionate professionals who bring expertise, creativity, and dedication to every project. We believe in long-term relationships, transparency, and continuous improvement, ensuring that every client experiences trust and value in every interaction.</p>
                     <br>
-                    <p>Our journey began with a simple belief: nature provides everything we need to grow and thrive. By
-                        harnessing the power of renewable resources like coconut husk, we are reducing global plastic
-                        dependency and promoting organic agriculture.</p>
+                    <p> </p>
                 </div>
                 <div class="about-image">
                     <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80"
@@ -293,7 +409,7 @@
                     </p>
                 </div>
                 <div class="about-image">
-                    <img src="https://images.unsplash.com/photo-1545239351-ef35f43d514b?auto=format&fit=crop&w=800&q=80"
+                    <img src="https://st3.depositphotos.com/7417846/15425/i/450/depositphotos_154257788-stock-photo-a-beautiful-girl-in-a.jpg"
                         alt="Sprout in soil">
                 </div>
             </div>
@@ -315,9 +431,27 @@
                     <div class="certificate-card">
                         <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777617992/NATURE-CARE-IMPEX_page-0001_qwzuo3.jpg" alt="VCT Certificate of Trust" onerror="this.src='https://placehold.co/400x565/e2e8f0/1e293b?text=VCT+Trust'">
                         <h3>Verified Certificate of Trust</h3>
-                        <p>Ethical Business Practices & Reliability</p>
+                        <p>Ethical Business Practices &amp; Reliability</p>
                     </div>
-                  
+
+                    <!-- Multi-page Certificate -->
+                    <div class="certificate-card" id="multiPageCert">
+                        <div class="cert-pages-indicator">
+                            <div class="cert-page-dot active" id="dot1"></div>
+                            <div class="cert-page-dot" id="dot2"></div>
+                        </div>
+                        <img
+                            id="multiCertImg"
+                            src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777868901/Untitled_page-0001_sq4ixd.jpg"
+                            alt="Certificate - Page 1"
+                            data-pages='["https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777868901/Untitled_page-0001_sq4ixd.jpg","https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777868901/Untitled_page-0002_juwgbm.jpg"]'
+                            data-current-page="0"
+                            onerror="this.src='https://placehold.co/400x565/e2e8f0/1e293b?text=Certificate'"
+                        >
+                        <h3>Export Certification</h3>
+                        <p>Official Export Compliance Document</p>
+                        <button class="cert-page-toggle" onclick="toggleCertPage(event)">View Page 2 →</button>
+                    </div>
                 </div>
             </div>
 
@@ -367,8 +501,11 @@
 
     <!-- Image Modal -->
     <div id="imageModal" class="modal">
-        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <span class="close-modal" onclick="closeModal()">&#215;</span>
+        <button class="modal-nav" id="modalPrev" onclick="modalNavPage(-1)" style="display:none;">&#8249;</button>
         <img class="modal-content" id="fullImage">
+        <button class="modal-nav" id="modalNext" onclick="modalNavPage(1)" style="display:none;">&#8250;</button>
+        <p class="modal-page-label" id="modalPageLabel"></p>
     </div>
 
     <!-- Scripts -->
@@ -386,28 +523,73 @@
             document.getElementById('hamburgerBtn').classList.remove('active');
         }
 
-        // Image Modal Logic
+        // --- Multi-page cert card toggle ---
+        function toggleCertPage(e) {
+            e.stopPropagation();
+            const img = document.getElementById('multiCertImg');
+            const btn = e.currentTarget;
+            const pages = JSON.parse(img.dataset.pages);
+            let cur = parseInt(img.dataset.currentPage);
+            cur = (cur + 1) % pages.length;
+            img.dataset.currentPage = cur;
+            img.src = pages[cur];
+            img.alt = 'Certificate - Page ' + (cur + 1);
+            btn.textContent = cur === 0 ? 'View Page 2 →' : '← View Page 1';
+            document.getElementById('dot1').classList.toggle('active', cur === 0);
+            document.getElementById('dot2').classList.toggle('active', cur === 1);
+        }
+
+        // --- Modal Logic ---
         const modal = document.getElementById('imageModal');
         const modalImg = document.getElementById('fullImage');
-        
-        // Add click event to all certificate images
+        const modalPrev = document.getElementById('modalPrev');
+        const modalNext = document.getElementById('modalNext');
+        const modalPageLabel = document.getElementById('modalPageLabel');
+        let modalPages = [];
+        let modalCurrentPage = 0;
+
+        function openModal(pages, startIndex) {
+            modalPages = pages;
+            modalCurrentPage = startIndex;
+            modalImg.src = modalPages[modalCurrentPage];
+            modal.style.display = 'block';
+            if (modalPages.length > 1) {
+                modalPrev.style.display = 'flex';
+                modalNext.style.display = 'flex';
+                modalPageLabel.textContent = 'Page ' + (modalCurrentPage + 1) + ' of ' + modalPages.length;
+            } else {
+                modalPrev.style.display = 'none';
+                modalNext.style.display = 'none';
+                modalPageLabel.textContent = '';
+            }
+        }
+
+        function modalNavPage(dir) {
+            modalCurrentPage = (modalCurrentPage + dir + modalPages.length) % modalPages.length;
+            modalImg.src = modalPages[modalCurrentPage];
+            modalPageLabel.textContent = 'Page ' + (modalCurrentPage + 1) + ' of ' + modalPages.length;
+        }
+
+        // Attach click events to all certificate images
         document.querySelectorAll('.certificate-card img').forEach(img => {
             img.addEventListener('click', function() {
-                modal.style.display = "block";
-                modalImg.src = this.src;
+                const pagesAttr = this.dataset.pages;
+                if (pagesAttr) {
+                    const pages = JSON.parse(pagesAttr);
+                    const cur = parseInt(this.dataset.currentPage || 0);
+                    openModal(pages, cur);
+                } else {
+                    openModal([this.src], 0);
+                }
             });
         });
 
-        // Close modal function
         function closeModal() {
-            modal.style.display = "none";
+            modal.style.display = 'none';
         }
 
-        // Close modal when clicking outside the image
         window.onclick = function(event) {
-            if (event.target == modal) {
-                closeModal();
-            }
+            if (event.target == modal) closeModal();
         }
     </script>
 </body>
