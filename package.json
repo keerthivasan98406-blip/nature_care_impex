@@ -1,0 +1,12 @@
+{
+  "name": "nature-care-impex-root",
+  "version": "1.0.0",
+  "description": "Root proxy for Nature Care Impex",
+  "scripts": {
+    "start": "cd server && npm start",
+    "install-all": "cd server && npm install",
+    "dev": "cd server && npm run dev"
+  },
+  "author": "Nature Care Impex",
+  "license": "MIT"
+}

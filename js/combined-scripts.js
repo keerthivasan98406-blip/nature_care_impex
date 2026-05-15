@@ -177,7 +177,16 @@ window.apiService = new APIService();
 
 /* ===== MAIN WEBSITE FUNCTIONALITY ===== */
 
-// Buy Now Ordering System - Define functions first
+// WhatsApp Enquiry Function
+function sendWhatsAppEnquiry(productName, productId) {
+    const phoneNumber = "919345540373";
+    const message = `Hello Nature Care Impex, I'm interested in the product: ${productName} (ID: ${productId}). Could you please provide more details?`;
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+}
+window.sendWhatsAppEnquiry = sendWhatsAppEnquiry;
+
+// Buy Now Ordering System Functionse functions first
 let currentOrder = null;
 let products = [];
 let currentFilterCategory = 'all';
@@ -1293,7 +1302,7 @@ async function loadProductDetails() {
                 </div>
                 
                 <div class="action-buttons">
-                    <button class="btn btn-primary" onclick="startOrderProcess('${product.id}')">Buy Now</button>
+                    <button class="btn btn-primary" onclick="sendWhatsAppEnquiry('${product.name}', '${product.id}')">Enquiry Now</button>
                     <a href="contact.html?subject=${encodeURIComponent(product.name)}" class="btn btn-secondary">Contact Sales</a>
                 </div>
             </div>
@@ -1683,7 +1692,7 @@ function createProductCard(product) {
                 <div class="product-price" style="font-size: 1.2rem; font-weight: bold; color: #D4AF37; margin: 10px 0;">₹${productPrice.toLocaleString()}</div>
                 <div class="product-actions">
                     <a href="product-detail.html?id=${product.id}" class="btn btn-secondary">View Details</a>
-                    <button class="btn btn-primary" onclick="startOrderProcess('${product.id}')">Buy Now</button>
+                    <button class="btn btn-primary" onclick="sendWhatsAppEnquiry('${product.name}', '${product.id}')">Enquiry Now</button>
                 </div>
             </div>
         </div>

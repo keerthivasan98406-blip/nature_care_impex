@@ -1272,7 +1272,7 @@ async function loadProductDetails() {
                             </label>
                         </div>
                         <div style="display:flex; align-items:center; gap:0; border:2px solid #1A4A30; border-radius:10px; overflow:hidden; background:#fff;">
-                            <button type="button" onclick="changeDetailQty(-1)" style="
+                            <button type="button" onclick="changeDetailQty(-1, ${productPrice})" style="
                                 width:44px; height:44px; background:#1A4A30; color:#fff;
                                 border:none; font-size:1.4rem; cursor:pointer;
                                 display:flex; align-items:center; justify-content:center;
@@ -1287,7 +1287,7 @@ async function loadProductDetails() {
                                 oninput="updateDetailTotal(${productPrice})"
                                 onchange="updateDetailTotal(${productPrice})"
                             >
-                            <button type="button" onclick="changeDetailQty(1)" style="
+                            <button type="button" onclick="changeDetailQty(1, ${productPrice})" style="
                                 width:44px; height:44px; background:#1A4A30; color:#fff;
                                 border:none; font-size:1.4rem; cursor:pointer;
                                 display:flex; align-items:center; justify-content:center;
@@ -1309,47 +1309,11 @@ async function loadProductDetails() {
                 <!-- ★ END QUANTITY SELECTOR ★ -->
 
                 <div class="action-buttons">
-                    <button class="btn btn-primary" onclick="startOrderProcess('${product.id}')">Buy Now</button>
+                    <button class="btn btn-primary" onclick="sendWhatsAppEnquiry('${product.name}', '${product.id}')">Enquiry Now</button>
                     <a href="contact.html?subject=${encodeURIComponent(product.name)}" class="btn btn-secondary">Contact Sales</a>
                 </div>
             </div>
         </div>
-
-        <script>
-            // ── Quantity stepper helpers ───────────────────────────────────
-            function changeDetailQty(delta) {
-                const input = document.getElementById('detail-quantity');
-                const newVal = Math.max(1, (parseInt(input.value) || 1) + delta);
-                input.value = newVal;
-                updateDetailTotal(${productPrice});
-            }
-            function updateDetailTotal(unitPrice) {
-                const qty = parseInt(document.getElementById('detail-quantity').value) || 1;
-                const total = qty * unitPrice;
-                const amountEl = document.getElementById('detail-total-amount');
-                if (amountEl) amountEl.textContent = total.toLocaleString();
-                const display = document.getElementById('detail-total-display');
-                if (display) {
-                    // Update the breakdown hint
-                    const hint = display.querySelector('span:last-child');
-                    if (hint) hint.textContent = '(' + qty + ' × ₹' + unitPrice.toLocaleString() + ')';
-                }
-            }
-            // ── Override startOrderProcess to pre-fill quantity ────────────
-            const _origStartOrder = window.startOrderProcess;
-            window.startOrderProcess = function(productId) {
-                _origStartOrder(productId);
-                // After a brief moment (modal creation), inject the quantity
-                setTimeout(() => {
-                    const qtyEl = document.getElementById('order-quantity');
-                    const detailQty = document.getElementById('detail-quantity');
-                    if (qtyEl && detailQty) {
-                        qtyEl.value = detailQty.value;
-                        if (typeof updateOrderTotal === 'function') updateOrderTotal();
-                    }
-                }, 300);
-            };
-        <\/script>
     `;
 
     container.innerHTML = html;
@@ -1362,6 +1326,47 @@ function handleContactForm(e) {
     alert('Thank you! Your message has been sent successfully. We will contact you shortly.');
     e.target.reset();
 }
+
+// Quantity stepper helpers for product detail page
+function changeDetailQty(delta, unitPrice) {
+    const input = document.getElementById('detail-quantity');
+    if (!input) return;
+    const newVal = Math.max(1, (parseInt(input.value) || 1) + delta);
+    input.value = newVal;
+    updateDetailTotal(unitPrice);
+}
+
+function updateDetailTotal(unitPrice) {
+    const input = document.getElementById('detail-quantity');
+    if (!input) return;
+    const qty = parseInt(input.value) || 1;
+    const total = qty * unitPrice;
+    const amountEl = document.getElementById('detail-total-amount');
+    if (amountEl) amountEl.textContent = total.toLocaleString();
+    const display = document.getElementById('detail-total-display');
+    if (display) {
+        const hint = display.querySelector('span:last-child');
+        if (hint) hint.textContent = `(${qty} × ₹${unitPrice.toLocaleString()})`;
+    }
+}
+
+// WhatsApp Enquiry Function
+function sendWhatsAppEnquiry(productName, productId) {
+    const phoneNumber = "919345540373";
+    const qtyInput = document.getElementById('detail-quantity');
+    const quantity = qtyInput ? qtyInput.value : 1;
+    
+    const message = `Hello Nature Care Impex, I'm interested in the product: ${productName} (ID: ${productId}). 
+Quantity: ${quantity}
+Could you please provide more details?`;
+    
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+}
+
+window.changeDetailQty = changeDetailQty;
+window.updateDetailTotal = updateDetailTotal;
+window.sendWhatsAppEnquiry = sendWhatsAppEnquiry;
 
 // Buy Now Ordering System Functions
 
@@ -1854,7 +1859,7 @@ function createProductCard(product) {
                 <div class="product-price" style="font-size: 1.2rem; font-weight: bold; color: #D4AF37; margin: 10px 0;">₹${productPrice.toLocaleString()}</div>
                 <div class="product-actions">
                     <a href="product-detail.html?id=${product.id}" class="btn btn-secondary">View Details</a>
-                    <button class="btn btn-primary" onclick="startOrderProcess('${product.id}')">Buy Now</button>
+                    <button class="btn btn-primary" onclick="sendWhatsAppEnquiry('${product.name}', '${product.id}')">Enquiry Now</button>
                 </div>
             </div>
         </div>
