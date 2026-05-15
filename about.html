@@ -356,7 +356,6 @@
                 <li><a href="index.html" class="nav-link" onclick="closeNav()">Home</a></li>
                 <li><a href="products.html" class="nav-link" onclick="closeNav()">Products</a></li>
                 <li><a href="gallery.html" class="nav-link" onclick="closeNav()">Gallery</a></li>
-                <li><a href="track-order.html" class="nav-link" onclick="closeNav()">Track Order</a></li>
                 <li><a href="about.html" class="nav-link active" onclick="closeNav()">Our Story</a></li>
                 <li><a href="contact.html" class="nav-link" onclick="closeNav()">Contact</a></li>
             </ul>
@@ -434,24 +433,7 @@ Our team consists of passionate professionals who bring expertise, creativity, a
                         <p>Ethical Business Practices &amp; Reliability</p>
                     </div>
 
-                    <!-- Multi-page Certificate -->
-                    <div class="certificate-card" id="multiPageCert">
-                        <div class="cert-pages-indicator">
-                            <div class="cert-page-dot active" id="dot1"></div>
-                            <div class="cert-page-dot" id="dot2"></div>
-                        </div>
-                        <img
-                            id="multiCertImg"
-                            src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777868901/Untitled_page-0001_sq4ixd.jpg"
-                            alt="Certificate - Page 1"
-                            data-pages='["https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777868901/Untitled_page-0001_sq4ixd.jpg","https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777868901/Untitled_page-0002_juwgbm.jpg"]'
-                            data-current-page="0"
-                            onerror="this.src='https://placehold.co/400x565/e2e8f0/1e293b?text=Certificate'"
-                        >
-                        <h3>Export Certification</h3>
-                        <p>Official Export Compliance Document</p>
-                        <button class="cert-page-toggle" onclick="toggleCertPage(event)">View Page 2 →</button>
-                    </div>
+                    <!-- Export Certification removed -->
                 </div>
             </div>
 
@@ -475,7 +457,6 @@ Our team consists of passionate professionals who bring expertise, creativity, a
                         <li><a href="gallery.html">Gallery</a></li>
                         <li><a href="about.html">About Us</a></li>
                         <li><a href="contact.html">Contact</a></li>
-                        <li><a href="track-order.html">Track Order</a></li>
                     </ul>
                 </div>
 
@@ -523,21 +504,7 @@ Our team consists of passionate professionals who bring expertise, creativity, a
             document.getElementById('hamburgerBtn').classList.remove('active');
         }
 
-        // --- Multi-page cert card toggle ---
-        function toggleCertPage(e) {
-            e.stopPropagation();
-            const img = document.getElementById('multiCertImg');
-            const btn = e.currentTarget;
-            const pages = JSON.parse(img.dataset.pages);
-            let cur = parseInt(img.dataset.currentPage);
-            cur = (cur + 1) % pages.length;
-            img.dataset.currentPage = cur;
-            img.src = pages[cur];
-            img.alt = 'Certificate - Page ' + (cur + 1);
-            btn.textContent = cur === 0 ? 'View Page 2 →' : '← View Page 1';
-            document.getElementById('dot1').classList.toggle('active', cur === 0);
-            document.getElementById('dot2').classList.toggle('active', cur === 1);
-        }
+        // --- Cert card toggle removed ---
 
         // --- Modal Logic ---
         const modal = document.getElementById('imageModal');

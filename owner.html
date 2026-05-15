@@ -51,8 +51,8 @@
             <ul class="nav-menu">
                 <li><a href="#" class="nav-item active" data-section="orders">Order Management</a></li>
                 <li><a href="#" class="nav-item" data-section="products">Product Management</a></li>
-                <li><a href="#" class="nav-item" data-section="sales">Monthly Sales</a></li>
-                <li><a href="#" class="nav-item" data-section="reports">Reports</a></li>
+                <li style="display: none;"><a href="#" class="nav-item" data-section="sales">Monthly Sales</a></li>
+                <li style="display: none;"><a href="#" class="nav-item" data-section="reports">Reports</a></li>
             </ul>
         </nav>
 
@@ -88,10 +88,6 @@
                         <h4>This Month</h4>
                         <div class="summary-number" id="monthly-orders">42</div>
                     </div>
-                    <div class="summary-card">
-                        <h4>Revenue</h4>
-                        <div class="summary-number success" id="orders-revenue">₹8,45,000</div>
-                    </div>
                 </div>
 
                 <div class="orders-table">
@@ -101,7 +97,6 @@
                                 <th>Order ID & Date</th>
                                 <th>Customer Details</th>
                                 <th>Product Details</th>
-                                <th>Amount & Notes</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -129,7 +124,7 @@
             </section>
 
             <!-- Monthly Sales Section -->
-            <section id="sales-section" class="dashboard-section">
+            <section id="sales-section" class="dashboard-section" style="display: none;">
                 <h2>Monthly Sales & Profit Analysis</h2>
                 
                 <div class="sales-controls">
@@ -198,7 +193,7 @@
             </section>
 
             <!-- Reports Section -->
-            <section id="reports-section" class="dashboard-section">
+            <section id="reports-section" class="dashboard-section" style="display: none;">
                 <h2>Reports & Analytics</h2>
                 <p>Detailed business reports and analytics coming soon...</p>
             </section>
@@ -241,14 +236,14 @@
                     </div>
                 </div>
                 
-                <div class="form-row">
+                <div class="form-row" style="display: none;">
                     <div class="form-group">
                         <label for="unit-price">Unit Price (₹)</label>
-                        <input type="number" id="unit-price" step="0.01" required>
+                        <input type="number" id="unit-price" step="0.01" value="0">
                     </div>
                     <div class="form-group">
                         <label for="total-amount">Total Amount (₹)</label>
-                        <input type="number" id="total-amount" readonly>
+                        <input type="number" id="total-amount" value="0" readonly>
                     </div>
                 </div>
                 
@@ -294,14 +289,14 @@
                     <textarea id="product-description" rows="3" required></textarea>
                 </div>
                 
-                <div class="form-row">
+                <div class="form-row" style="display: none;">
                     <div class="form-group">
                         <label for="product-price">Price (₹)</label>
-                        <input type="number" id="product-price" step="0.01" required>
+                        <input type="number" id="product-price" step="0.01" value="0">
                     </div>
                     <div class="form-group">
                         <label for="product-cost">Cost (₹)</label>
-                        <input type="number" id="product-cost" step="0.01" required>
+                        <input type="number" id="product-cost" step="0.01" value="0">
                     </div>
                 </div>
                 

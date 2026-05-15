@@ -90,9 +90,7 @@ app.get('/owner', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'owner.html'));
 });
 
-app.get('/track-order', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'track-order.html'));
-});
+
 
 app.get('/payment', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'payment.html'));
@@ -128,7 +126,7 @@ app.listen(PORT, () => {
     console.log('   • http://localhost:' + PORT + '/products (Products)');
     console.log('   • http://localhost:' + PORT + '/contact (Contact)');
     console.log('   • http://localhost:' + PORT + '/owner (Owner Portal)');
-    console.log('   • http://localhost:' + PORT + '/track-order (Track Order)');
+
     console.log('   • http://localhost:' + PORT + '/api/health (API Health)');
     console.log('✨ Ready to serve requests!');
 });

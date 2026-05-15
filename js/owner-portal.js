@@ -581,11 +581,7 @@ async function loadOrders() {
                 <td>
                     <strong>${order.product}</strong>
                     ${order.productSize !== 'Not specified' ? `<br><small style="color: #666;">Size: ${order.productSize}</small>` : ''}
-                    <br><small style="color: #666;">Qty: ${order.quantity} × ₹${Math.round(order.unitPrice || 0).toLocaleString()}</small>
-                </td>
-                <td>
-                    <strong>₹${order.amount.toLocaleString()}</strong>
-                    ${order.notes ? `<br><small style="color: #666;" title="${order.notes}">📝 Notes</small>` : ''}
+                    <br><small style="color: #666;">Qty: ${order.quantity}</small>
                 </td>
                 <td>
                     <div class="status-container">
@@ -610,7 +606,7 @@ async function loadOrders() {
                             productSize: '${order.productSize}',
                             quantity: ${order.quantity},
                             unitPrice: ${order.unitPrice || 0},
-                            amount: ${order.amount},
+                            amount: ${order.amount || 0},
                             status: '${order.status}',
                             date: '${order.date}',
                             notes: '${(order.notes || '').replace(/'/g, "\\'")}',
@@ -691,7 +687,6 @@ function updateOrderSummary(allOrders = null) {
     
     const thisMonth = new Date().toISOString().slice(0, 7);
     document.getElementById('monthly-orders').textContent = allOrders.filter(o => o.date && o.date.startsWith(thisMonth)).length;
-    document.getElementById('orders-revenue').textContent = '₹' + allOrders.reduce((sum, o) => sum + (o.amount || 0), 0).toLocaleString();
 }
 
 function trackOrder(orderId, source) {
@@ -753,7 +748,6 @@ function showOrderTrackingModal(order) {
                             <p><strong>Product:</strong> ${order.product}</p>
                             ${order.productSize !== 'Not specified' ? `<p><strong>Size/Variant:</strong> ${order.productSize}</p>` : ''}
                             <p><strong>Quantity:</strong> ${order.quantity}</p>
-                            <p><strong>Amount:</strong> ₹${order.amount.toLocaleString()}</p>
                             <p><strong>Order Date:</strong> ${order.date}</p>
                         </div>
                         
@@ -919,7 +913,6 @@ function showOrderDetailsModal(order) {
                             <h4>Order Information</h4>
                             <p><strong>Product:</strong> ${order.product}</p>
                             <p><strong>Quantity:</strong> ${order.quantity}</p>
-                            <p><strong>Amount:</strong> ₹${order.amount.toLocaleString()}</p>
                             <p><strong>Status:</strong> <span class="status ${order.status}">${order.status}</span></p>
                             <p><strong>Date:</strong> ${order.date}</p>
                         </div>
@@ -1010,7 +1003,6 @@ function viewScreenshot(orderId) {
                     <div class="screenshot-info">
                         <p><strong>Order ID:</strong> ${orderId}</p>
                         <p><strong>Customer:</strong> ${order.customerDetails?.customerName || order.customerDetails?.name || 'Unknown'}</p>
-                        <p><strong>Amount:</strong> ₹${(order.totalAmount || order.customerDetails?.total || 0).toLocaleString()}</p>
                         <p><strong>Product:</strong> ${order.product?.name || 'Unknown Product'}</p>
                         <p><em>Click image to view full screen</em></p>
                     </div>
@@ -1349,8 +1341,8 @@ function handleAddOrder(e) {
         email: document.getElementById('customer-email').value,
         product: document.getElementById('order-product').options[document.getElementById('order-product').selectedIndex].text,
         quantity: parseInt(document.getElementById('order-quantity').value),
-        unitPrice: parseFloat(document.getElementById('unit-price').value),
-        amount: parseFloat(document.getElementById('total-amount').value),
+        unitPrice: 0,
+        amount: 0,
         status: 'pending',
         notes: document.getElementById('order-notes').value
     };
@@ -1419,21 +1411,6 @@ async function loadProducts() {
                     <div class="product-card-category">${product.category}</div>
                 </div>
                 <div class="product-card-body">
-                    <div class="product-stats">
-                        <div class="product-stat">
-                            <div class="product-stat-label">Price</div>
-                            <div class="product-stat-value">₹${product.price || 0}</div>
-                        </div>
-
-                        <div class="product-stat">
-                            <div class="product-stat-label">Profit</div>
-                            <div class="product-stat-value">₹${(product.price || 0) - (product.cost || 0)}</div>
-                        </div>
-                        <div class="product-stat">
-                            <div class="product-stat-label">Margin</div>
-                            <div class="product-stat-value">${product.price ? Math.round(((product.price - (product.cost || 0)) / product.price) * 100) : 0}%</div>
-                        </div>
-                    </div>
                     <div class="product-actions">
                         <button class="btn-small" onclick="editProduct('${product.id}')">Edit</button>
                         <button class="btn-small btn-danger" onclick="deleteProduct('${product.id}')">Delete</button>
@@ -1523,8 +1500,8 @@ async function handleAddProduct(e) {
             name: document.getElementById('product-name').value,
             category: document.getElementById('product-category').value,
             description: document.getElementById('product-description').value,
-            price: parseFloat(document.getElementById('product-price').value),
-            cost: parseFloat(document.getElementById('product-cost').value),
+            price: 0,
+            cost: 0,
             stock: 999, // Default value as input was removed
             minStock: 0, // Default value as input was removed
             image: (productImage1 || productImage2 || productImage3 || "").trim(),

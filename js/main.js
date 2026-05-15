@@ -1272,7 +1272,7 @@ async function loadProductDetails() {
                             </label>
                         </div>
                         <div style="display:flex; align-items:center; gap:0; border:2px solid #1A4A30; border-radius:10px; overflow:hidden; background:#fff;">
-                            <button type="button" onclick="changeDetailQty(-1, ${productPrice})" style="
+                            <button type="button" onclick="changeDetailQty(-1, 0)" style="
                                 width:44px; height:44px; background:#1A4A30; color:#fff;
                                 border:none; font-size:1.4rem; cursor:pointer;
                                 display:flex; align-items:center; justify-content:center;
@@ -1284,10 +1284,10 @@ async function loadProductDetails() {
                                     border:none; outline:none; font-size:1.2rem;
                                     font-weight:800; color:#1A4A30;
                                 "
-                                oninput="updateDetailTotal(${productPrice})"
-                                onchange="updateDetailTotal(${productPrice})"
+                                oninput="updateDetailTotal(0)"
+                                onchange="updateDetailTotal(0)"
                             >
-                            <button type="button" onclick="changeDetailQty(1, ${productPrice})" style="
+                            <button type="button" onclick="changeDetailQty(1, 0)" style="
                                 width:44px; height:44px; background:#1A4A30; color:#fff;
                                 border:none; font-size:1.4rem; cursor:pointer;
                                 display:flex; align-items:center; justify-content:center;
@@ -1295,16 +1295,6 @@ async function loadProductDetails() {
                             " onmouseover="this.style.background='#C9A84C'" onmouseout="this.style.background='#1A4A30'">+</button>
                         </div>
                     </div>
-                    ${productPrice > 0 ? `
-                    <div id="detail-total-display" style="
-                        margin-top:14px; padding:10px 14px;
-                        background:#1A4A30; color:#fff; border-radius:8px;
-                        font-size:1.05rem; font-weight:700; text-align:center;
-                        letter-spacing:0.3px;
-                    ">
-                        Total: ₹<span id="detail-total-amount">${productPrice.toLocaleString()}</span>
-                        <span style="font-size:0.8rem; opacity:0.8; margin-left:6px;">(1 × ₹${productPrice.toLocaleString()})</span>
-                    </div>` : ''}
                 </div>
                 <!-- ★ END QUANTITY SELECTOR ★ -->
 
@@ -1856,7 +1846,6 @@ function createProductCard(product) {
                 <div class="product-category">${product.category}</div>
                 <h3 class="product-title">${product.name}</h3>
                 <p class="product-desc">${product.description}</p>
-                <div class="product-price" style="font-size: 1.2rem; font-weight: bold; color: #D4AF37; margin: 10px 0;">₹${productPrice.toLocaleString()}</div>
                 <div class="product-actions">
                     <a href="product-detail.html?id=${product.id}" class="btn btn-secondary">View Details</a>
                     <button class="btn btn-primary" onclick="sendWhatsAppEnquiry('${product.name}', '${product.id}')">Enquiry Now</button>
