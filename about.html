@@ -432,8 +432,19 @@ Our team consists of passionate professionals who bring expertise, creativity, a
                         <h3>Verified Certificate of Trust</h3>
                         <p>Ethical Business Practices &amp; Reliability</p>
                     </div>
-
-                    <!-- Export Certification removed -->
+                    <div class="certificate-card">
+                        <img src="https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777868901/Untitled_page-0001_sq4ixd.jpg" 
+                             alt="Official Certification" 
+                             data-pages='["https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777868901/Untitled_page-0001_sq4ixd.jpg", "https://res.cloudinary.com/dy5kyfcw4/image/upload/v1777868901/Untitled_page-0002_juwgbm.jpg"]'
+                             data-current-page="0">
+                        <div class="cert-pages-indicator">
+                            <span class="cert-page-dot active"></span>
+                            <span class="cert-page-dot"></span>
+                        </div>
+                        <h3>Official Certification</h3>
+                        <p>Registration &amp; Compliance Document (2 Pages)</p>
+                        <button class="cert-page-toggle" onclick="toggleCertPage(this, event)">View Page 2</button>
+                    </div>
                 </div>
             </div>
 
@@ -504,7 +515,28 @@ Our team consists of passionate professionals who bring expertise, creativity, a
             document.getElementById('hamburgerBtn').classList.remove('active');
         }
 
-        // --- Cert card toggle removed ---
+        // Toggle for multi-page certificate cards
+        function toggleCertPage(btn, event) {
+            if (event) event.stopPropagation();
+            const card = btn.closest('.certificate-card');
+            const img = card.querySelector('img');
+            const dots = card.querySelectorAll('.cert-page-dot');
+            const pages = JSON.parse(img.dataset.pages);
+            let current = parseInt(img.dataset.currentPage || 0);
+            
+            current = (current + 1) % pages.length;
+            img.src = pages[current];
+            img.dataset.currentPage = current;
+            
+            btn.textContent = 'View Page ' + ((current + 1) % pages.length + 1);
+            
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === current);
+            });
+            
+            // Stop propagation to prevent modal opening immediately
+            event.stopPropagation();
+        }
 
         // --- Modal Logic ---
         const modal = document.getElementById('imageModal');
